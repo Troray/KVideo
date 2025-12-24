@@ -36,7 +36,7 @@ export function Navbar({ onReset, isSecretMode = false }: NavbarProps) {
                                 />
                             </div>
                             <div className="flex flex-col min-w-0">
-                                <h1 className="text-lg sm:text-2xl font-bold text-[var(--text-color)] truncate">KVideo</h1>
+                                <h1 className="text-lg sm:text-2xl font-bold text-[var(--text-color)] truncate">SVideo</h1>
                                 <p className="text-xs text-[var(--text-color-secondary)] hidden sm:block truncate">视频聚合平台</p>
                             </div>
                         </Link>
