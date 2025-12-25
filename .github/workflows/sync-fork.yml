@@ -34,9 +34,9 @@ jobs:
           SYNC_STATUS=$(git log origin/main..upstream/main --oneline)
           
           if [ -z "$SYNC_STATUS" ]; then
-            MESSAGE='✅KVideo仓库提醒<br>GitHub Action 同步操作完成。<br>上游仓库没有新的更新，无需同步。'
+            MESSAGE='✅KVideo仓库提醒\nGitHub Action 同步操作完成。\n上游仓库没有新的更新，无需同步。'
           else
-            MESSAGE='✅KVideo仓库提醒<br>GitHub Action 同步操作完成。<br>上游仓库有新更新，已成功同步到本地仓库。'
+            MESSAGE='✅KVideo仓库提醒\nGitHub Action 同步操作完成。\n上游仓库有新更新，已成功同步到本地仓库。'
           fi
 
           curl -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
