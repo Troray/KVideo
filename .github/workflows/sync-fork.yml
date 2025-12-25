@@ -1,8 +1,8 @@
 name: Sync Fork
 on:
   schedule:
-    - cron: '0 */6 * * *'  # 每6小时，与你原计划一致
-  workflow_dispatch:  # 支持手动触发
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
 jobs:
   sync:
     runs-on: ubuntu-latest
@@ -12,7 +12,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
       
-      - name: 输出中文日志 - 开始同步
+      - name: 开始同步
         run: echo "开始同步本地仓库与上游仓库..."
 
       - name: Sync Upstream
@@ -23,15 +23,23 @@ jobs:
           target_sync_branch: main
           upstream_repo_access_token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 输出中文日志 - 检查更新
+      - name: 检查更新
         run: echo "检查上游仓库是否有更新..."
 
-      - name: 输出中文日志 - 同步完成
+      - name: 同步完成
         run: echo "同步完成。如果有新更新，已同步到本地仓库。"
 
       - name: 推送消息到 Telegram
         run: |
-          MESSAGE="GitHub Action 同步操作完成。\n如果上游仓库有更新，已同步到本地仓库。"
+          SYNC_STATUS=$(git log origin/main..upstream/main --oneline)
+          
+          if [ -z "$SYNC_STATUS" ]; then
+            MESSAGE="✅KVideo仓库提醒<br>GitHub Action 同步操作完成。<br>上游仓库没有新的更新，无需同步。"
+          else
+            MESSAGE="✅KVideo仓库提醒<br>GitHub Action 同步操作完成。<br>上游仓库有新更新，已成功同步到本地仓库。"
+          fi
+
+          # 发送消息到 Telegram
           curl -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
           -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
           -d "text=${MESSAGE}" \
