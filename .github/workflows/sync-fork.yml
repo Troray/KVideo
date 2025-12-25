@@ -14,7 +14,7 @@ jobs:
       - name: Sync with upstream
         uses: tgymnich/fork-sync@v2.0
         with:
-          owner: 原仓库拥有者用户名  # 示例: tgymnich
+          owner: KuekHaoYang  # 示例: tgymnich
           base: main  # 你的分支，通常是 main 或 master
           head: main  # 上游分支，通常相同
           token: ${{ secrets.SYNC_TOKEN }}  # 如果不需要可删掉这行
