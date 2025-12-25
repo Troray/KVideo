@@ -146,6 +146,10 @@ export function useSettingsPage() {
             setSubscriptions(settings.subscriptions || []);
             setPasswordAccess(settings.passwordAccess);
             setAccessPasswords(settings.accessPasswords);
+
+            // Reload to apply changes
+            setTimeout(() => window.location.reload(), 1000);
+
             return true;
         }
 

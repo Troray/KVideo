@@ -25,6 +25,11 @@ export function PasswordGate({ children }: { children: React.ReactNode }) {
             const res = await fetch('/api/config');
             const data = await res.json();
             setHasEnvPassword(data.hasEnvPassword);
+
+            // Sync subscription sources if provided by environment
+            if (data.subscriptionSources) {
+                settingsStore.syncEnvSubscriptions(data.subscriptionSources);
+            }
         } catch {
             // Silently fail - env password not available
         }

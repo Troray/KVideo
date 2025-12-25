@@ -44,22 +44,39 @@ export const getDefaultAdultSources = (): VideoSource[] => ADULT_SOURCES;
 
 
 
-function getEnvSubscriptions(): SourceSubscription[] {
-  if (typeof process === 'undefined' || !process.env.NEXT_PUBLIC_SUBSCRIPTION_SOURCES) {
-    return [];
-  }
+function getEnvSubscriptions(customValue?: string): SourceSubscription[] {
+  const envValue = (customValue || process.env.SUBSCRIPTION_SOURCES || process.env.NEXT_PUBLIC_SUBSCRIPTION_SOURCES || '').trim();
+  if (!envValue) return [];
 
+  // 1. Try JSON
   try {
-    const raw = JSON.parse(process.env.NEXT_PUBLIC_SUBSCRIPTION_SOURCES);
-    if (!Array.isArray(raw)) return [];
-
-    return raw
-      .filter((item: any) => item && typeof item.name === 'string' && typeof item.url === 'string')
-      .map((item: any) => createSubscription(item.name, item.url));
+    const raw = JSON.parse(envValue);
+    if (Array.isArray(raw)) {
+      return raw
+        .filter((item: any) => item && typeof item.name === 'string' && typeof item.url === 'string')
+        .map((item: any) => createSubscription(item.name, item.url));
+    }
   } catch (e) {
-    console.error('Failed to parse NEXT_PUBLIC_SUBSCRIPTION_SOURCES', e);
-    return [];
+    // Ignore JSON parse error, try direct URL
   }
+
+  // 2. Try Simple URL (or comma separated)
+  // Check if it looks like a URL (basic check)
+  if (envValue.includes('http')) {
+    const urls = envValue.split(',').map(u => u.trim()).filter(u => u.length > 0);
+    return urls.map((url, index) => {
+      // Basic URL validation
+      if (!url.startsWith('http')) return null;
+
+      const name = urls.length > 1
+        ? `系统预设源 ${index + 1}`
+        : `系统预设源`;
+
+      return createSubscription(name, url);
+    }).filter((s): s is SourceSubscription => s !== null);
+  }
+
+  return [];
 }
 // Debugging helper
 // console.log("Environment Subscriptions:", getEnvSubscriptions());
@@ -70,7 +87,7 @@ export const settingsStore = {
       return {
         sources: getDefaultSources(),
         adultSources: getDefaultAdultSources(),
-        subscriptions: [],
+        subscriptions: getEnvSubscriptions(),
         sortBy: 'default',
         searchHistory: true,
         watchHistory: true,
@@ -90,7 +107,7 @@ export const settingsStore = {
       return {
         sources: getDefaultSources(),
         adultSources: getDefaultAdultSources(),
-        subscriptions: [],
+        subscriptions: getEnvSubscriptions(),
         sortBy: 'default',
         searchHistory: true,
         watchHistory: true,
@@ -207,7 +224,44 @@ export const settingsStore = {
   },
 
   importSettings(jsonString: string): boolean {
-    return importSettings(jsonString, (s) => this.saveSettings(s));
+    return importSettings(jsonString, (s) => this.saveSettings(s), this.getSettings());
+  },
+
+  syncEnvSubscriptions(rawEnvValue: string): void {
+    if (typeof window === 'undefined') return;
+
+    const currentSettings = this.getSettings();
+    const envSubs = getEnvSubscriptions(rawEnvValue);
+
+    if (envSubs.length === 0) return;
+
+    const mergedSubscriptions = [...currentSettings.subscriptions];
+    let changed = false;
+
+    envSubs.forEach(envSub => {
+      const existingIndex = mergedSubscriptions.findIndex(s => s.url === envSub.url);
+      if (existingIndex > -1) {
+        // Only update if something meaningful changed to avoid unnecessary re-renders
+        if (mergedSubscriptions[existingIndex].name !== envSub.name) {
+          mergedSubscriptions[existingIndex] = {
+            ...mergedSubscriptions[existingIndex],
+            name: envSub.name,
+            autoRefresh: true
+          };
+          changed = true;
+        }
+      } else {
+        mergedSubscriptions.push(envSub);
+        changed = true;
+      }
+    });
+
+    if (changed) {
+      this.saveSettings({
+        ...currentSettings,
+        subscriptions: mergedSubscriptions
+      });
+    }
   },
 
   resetToDefaults(): void {

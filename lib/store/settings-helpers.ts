@@ -30,26 +30,60 @@ export function exportSettings(settings: AppSettings, includeHistory: boolean = 
     return JSON.stringify(exportData, null, 2);
 }
 
+import { parseSourcesFromJson, mergeSources } from '@/lib/utils/source-import-utils';
+
 export function importSettings(
     jsonString: string,
-    saveSettings: (settings: AppSettings) => void
+    saveSettings: (settings: AppSettings) => void,
+    currentSettings?: AppSettings
 ): boolean {
     try {
         const data = JSON.parse(jsonString);
+        let imported = false;
 
-        if (data.settings) {
+        // Case 1: Full Settings Export
+        if (data.settings && typeof data.settings === 'object') {
             saveSettings(data.settings);
+            imported = true;
         }
 
+        // Case 2: History only (can be independent)
         if (data.searchHistory && typeof window !== 'undefined') {
             localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(data.searchHistory));
+            imported = true;
         }
-
         if (data.watchHistory && typeof window !== 'undefined') {
             localStorage.setItem(WATCH_HISTORY_KEY, JSON.stringify(data.watchHistory));
+            imported = true;
         }
 
-        return true;
+        if (imported) return true;
+
+        // Case 3: Source List (Array or Object wrapper)
+        // If we didn't find "settings" key, try to parse the whole thing as sources
+        if (currentSettings) {
+            try {
+                const result = parseSourcesFromJson(jsonString);
+                if (result.totalCount > 0) {
+                    const newSettings = { ...currentSettings };
+
+                    if (result.normalSources.length > 0) {
+                        newSettings.sources = mergeSources(newSettings.sources, result.normalSources);
+                    }
+
+                    if (result.adultSources.length > 0) {
+                        newSettings.adultSources = mergeSources(newSettings.adultSources, result.adultSources);
+                    }
+
+                    saveSettings(newSettings);
+                    return true;
+                }
+            } catch (e) {
+                // Not a valid source format either
+            }
+        }
+
+        return false;
     } catch {
         return false;
     }

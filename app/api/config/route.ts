@@ -8,10 +8,12 @@ import { NextRequest, NextResponse } from 'next/server';
 export const runtime = 'edge';
 
 const ACCESS_PASSWORD = process.env.ACCESS_PASSWORD || '';
+const SUBSCRIPTION_SOURCES = process.env.SUBSCRIPTION_SOURCES || process.env.NEXT_PUBLIC_SUBSCRIPTION_SOURCES || '';
 
 export async function GET() {
     return NextResponse.json({
         hasEnvPassword: ACCESS_PASSWORD.length > 0,
+        subscriptionSources: SUBSCRIPTION_SOURCES,
     });
 }
 
