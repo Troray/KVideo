@@ -9,11 +9,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.SYNC_TOKEN }}
       - name: Sync Upstream
         uses: aormsby/fork-sync-with-upstream-action@v3.4
         with:
           upstream_sync_repo: KuekHaoYang/KVideo
           upstream_sync_branch: main
           target_sync_branch: main
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.SYNC_TOKEN }}
