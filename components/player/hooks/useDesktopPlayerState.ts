@@ -31,6 +31,8 @@ export function useDesktopPlayerState() {
     const [showSpeedMenu, setShowSpeedMenu] = useState(false);
     const [isPiPSupported, setIsPiPSupported] = useState(false);
     const [isAirPlaySupported, setIsAirPlaySupported] = useState(false);
+    const [isCastAvailable, setIsCastAvailable] = useState(false);
+    const [isCasting, setIsCasting] = useState(false);
     const [skipForwardAmount, setSkipForwardAmount] = useState(0);
     const [skipBackwardAmount, setSkipBackwardAmount] = useState(0);
     const [showSkipForwardIndicator, setShowSkipForwardIndicator] = useState(false);
@@ -72,6 +74,8 @@ export function useDesktopPlayerState() {
             showSpeedMenu, setShowSpeedMenu,
             isPiPSupported, setIsPiPSupported,
             isAirPlaySupported, setIsAirPlaySupported,
+            isCastAvailable, setIsCastAvailable,
+            isCasting, setIsCasting,
             skipForwardAmount, setSkipForwardAmount,
             skipBackwardAmount, setSkipBackwardAmount,
             showSkipForwardIndicator, setShowSkipForwardIndicator,

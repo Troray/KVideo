@@ -30,25 +30,73 @@ export function useFullscreenControls({
         }
     }, [setIsPiPSupported, setIsAirPlaySupported]);
 
-    const toggleFullscreen = useCallback(() => {
+    const toggleFullscreen = useCallback(async () => {
         if (!containerRef.current) return;
+
         if (!isFullscreen) {
-            if (containerRef.current.requestFullscreen) {
-                containerRef.current.requestFullscreen();
+            try {
+                if (containerRef.current.requestFullscreen) {
+                    await containerRef.current.requestFullscreen();
+                } else if ((containerRef.current as any).webkitRequestFullscreen) {
+                    await (containerRef.current as any).webkitRequestFullscreen();
+                } else if ((containerRef.current as any).mozRequestFullScreen) {
+                    await (containerRef.current as any).mozRequestFullScreen();
+                } else if ((containerRef.current as any).msRequestFullscreen) {
+                    await (containerRef.current as any).msRequestFullscreen();
+                } else if (videoRef.current && (videoRef.current as any).webkitEnterFullscreen) {
+                    // Fallback for browsers that only support fullscreen on video element (like some car browsers)
+                    (videoRef.current as any).webkitEnterFullscreen();
+                }
+            } catch (error) {
+                console.warn('Fullscreen request failed, trying fallback:', error);
+                // Last ditch effort: try native video fullscreen if container failed
+                if (videoRef.current && (videoRef.current as any).webkitEnterFullscreen) {
+                    try {
+                        (videoRef.current as any).webkitEnterFullscreen();
+                    } catch (e) {
+                        console.error('Final fullscreen fallback failed:', e);
+                    }
+                }
             }
         } else {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
+            try {
+                if (document.exitFullscreen) {
+                    await document.exitFullscreen();
+                } else if ((document as any).webkitExitFullscreen) {
+                    await (document as any).webkitExitFullscreen();
+                } else if ((document as any).mozCancelFullScreen) {
+                    await (document as any).mozCancelFullScreen();
+                } else if ((document as any).msExitFullscreen) {
+                    await (document as any).msExitFullscreen();
+                }
+            } catch (error) {
+                console.error('Failed to exit fullscreen:', error);
             }
         }
-    }, [containerRef, isFullscreen]);
+    }, [containerRef, videoRef, isFullscreen]);
 
     useEffect(() => {
         const handleFullscreenChange = () => {
-            setIsFullscreen(!!document.fullscreenElement);
+            const isInFullscreen = !!(
+                document.fullscreenElement ||
+                (document as any).webkitFullscreenElement ||
+                (document as any).mozFullScreenElement ||
+                (document as any).msFullscreenElement
+            );
+            setIsFullscreen(isInFullscreen);
         };
+
         document.addEventListener('fullscreenchange', handleFullscreenChange);
-        return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+        document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+        document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+        return () => {
+            document.removeEventListener('fullscreenchange', handleFullscreenChange);
+            document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+            document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
+            document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
+        };
     }, [setIsFullscreen]);
 
     const togglePictureInPicture = useCallback(async () => {

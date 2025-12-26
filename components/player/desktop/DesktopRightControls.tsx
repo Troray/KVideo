@@ -10,10 +10,12 @@ interface DesktopRightControlsProps {
     showMoreMenu: boolean;
     isPiPSupported: boolean;
     isAirPlaySupported: boolean;
+    isCastAvailable: boolean;
     isProxied?: boolean;
     onToggleFullscreen: () => void;
     onTogglePictureInPicture: () => void;
     onShowAirPlayMenu: () => void;
+    onShowCastMenu: () => void;
     onToggleSpeedMenu: () => void;
     onToggleMoreMenu: () => void;
     onSpeedChange: (speed: number) => void;
@@ -32,10 +34,12 @@ export function DesktopRightControls({
     showMoreMenu,
     isPiPSupported,
     isAirPlaySupported,
+    isCastAvailable,
     isProxied,
     onToggleFullscreen,
     onTogglePictureInPicture,
     onShowAirPlayMenu,
+    onShowCastMenu,
     onToggleSpeedMenu,
     onToggleMoreMenu,
     onSpeedChange,
@@ -80,6 +84,18 @@ export function DesktopRightControls({
                     title="AirPlay"
                 >
                     <Icons.Airplay size={20} />
+                </button>
+            )}
+
+            {/* Google Cast */}
+            {isCastAvailable && (
+                <button
+                    onClick={onShowCastMenu}
+                    className="btn-icon"
+                    aria-label="Google Cast"
+                    title="Google Cast"
+                >
+                    <Icons.Cast size={20} />
                 </button>
             )}
 

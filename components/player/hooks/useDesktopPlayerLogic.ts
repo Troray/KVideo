@@ -8,6 +8,7 @@ import { useUtilities } from './desktop/useUtilities';
 import { useDesktopShortcuts } from './desktop/useDesktopShortcuts';
 import { useDesktopPlayerState } from './useDesktopPlayerState';
 import { getCopyUrl } from '../utils/urlUtils';
+import { useCastControls } from './desktop/useCastControls';
 
 type DesktopPlayerState = ReturnType<typeof useDesktopPlayerState>;
 
@@ -55,7 +56,9 @@ export function useDesktopPlayerLogic({
         showSkipForwardIndicator, setShowSkipForwardIndicator,
         showSkipBackwardIndicator, setShowSkipBackwardIndicator,
         setIsSkipForwardAnimatingOut, setIsSkipBackwardAnimatingOut,
-        setShowVolumeBar, setToastMessage, setShowToast
+        setShowVolumeBar, setToastMessage, setShowToast,
+        isCastAvailable, setIsCastAvailable,
+        isCasting, setIsCasting
     } = state;
 
     const playbackControls = usePlaybackControls({
@@ -100,6 +103,10 @@ export function useDesktopPlayerLogic({
         src, setToastMessage, setShowToast, toastTimeoutRef
     });
 
+    const castControls = useCastControls({
+        src, videoRef, setIsCastAvailable, setIsCasting
+    });
+
     useDesktopShortcuts({
         videoRef, isPlaying, volume, isPiPSupported,
         togglePlay: playbackControls.togglePlay,
@@ -129,6 +136,7 @@ export function useDesktopPlayerLogic({
         toggleFullscreen: fullscreenControls.toggleFullscreen,
         togglePictureInPicture: fullscreenControls.togglePictureInPicture,
         showAirPlayMenu: fullscreenControls.showAirPlayMenu,
+        showCastMenu: castControls.showCastMenu,
         skipForward: skipControls.skipForward,
         skipBackward: skipControls.skipBackward,
         changePlaybackSpeed: playbackControls.changePlaybackSpeed,

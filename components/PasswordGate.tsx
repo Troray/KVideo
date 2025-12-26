@@ -6,19 +6,29 @@ import { Lock } from 'lucide-react';
 
 const SESSION_UNLOCKED_KEY = 'kvideo-unlocked';
 
-export function PasswordGate({ children }: { children: React.ReactNode }) {
+export function PasswordGate({ children, hasEnvPassword: initialHasEnvPassword }: { children: React.ReactNode, hasEnvPassword: boolean }) {
     const [isLocked, setIsLocked] = useState(true);
     const [password, setPassword] = useState('');
     const [error, setError] = useState(false);
     const [isClient, setIsClient] = useState(false);
-    const [hasEnvPassword, setHasEnvPassword] = useState(false);
+    const [hasEnvPassword, setHasEnvPassword] = useState(initialHasEnvPassword);
     const [isValidating, setIsValidating] = useState(false);
 
     useEffect(() => {
+        const settings = settingsStore.getSettings();
+        const isUnlocked = sessionStorage.getItem(SESSION_UNLOCKED_KEY) === 'true';
+
+        // Determine initial lock state immediately
+        // Lock if (local password enabled OR env password exists) AND not already unlocked in session
+        const shouldBeLocked = (settings.passwordAccess || initialHasEnvPassword) && !isUnlocked;
+
+        setIsLocked(shouldBeLocked);
         setIsClient(true);
+
+        // Still run background checks to keep everything in sync
         checkEnvPasswordStatus();
         checkLockStatus();
-    }, []);
+    }, [initialHasEnvPassword]);
 
     const checkEnvPasswordStatus = async () => {
         try {
@@ -31,39 +41,29 @@ export function PasswordGate({ children }: { children: React.ReactNode }) {
                 settingsStore.syncEnvSubscriptions(data.subscriptionSources);
             }
         } catch {
-            // Silently fail - env password not available
+            // Silently fail
         }
     };
 
     const checkLockStatus = async () => {
         const settings = settingsStore.getSettings();
+        const isUnlocked = sessionStorage.getItem(SESSION_UNLOCKED_KEY) === 'true';
 
-        // Check if env password is set
         try {
             const res = await fetch('/api/config');
             const data = await res.json();
             const envPasswordSet = data.hasEnvPassword;
 
-            // Lock if either local or env password is enabled
-            if (!settings.passwordAccess && !envPasswordSet) {
-                setIsLocked(false);
-                return;
-            }
+            // Updated lock state check
+            const currentlyLocked = (settings.passwordAccess || envPasswordSet) && !isUnlocked;
+            setIsLocked(currentlyLocked);
         } catch {
-            // If API fails, just check local settings
-            if (!settings.passwordAccess) {
-                setIsLocked(false);
-                return;
-            }
-        }
-
-        const isUnlocked = sessionStorage.getItem(SESSION_UNLOCKED_KEY) === 'true';
-        if (isUnlocked) {
-            setIsLocked(false);
-        } else {
-            setIsLocked(true);
+            // Handle error by checking local settings
+            const currentlyLocked = settings.passwordAccess && !isUnlocked;
+            setIsLocked(currentlyLocked);
         }
     };
+
 
     const handleUnlock = async (e: React.FormEvent) => {
         e.preventDefault();

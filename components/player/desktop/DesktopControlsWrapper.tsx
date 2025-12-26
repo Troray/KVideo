@@ -25,6 +25,7 @@ export function DesktopControlsWrapper({ src, state, logic, refs }: DesktopContr
         showVolumeBar,
         isPiPSupported,
         isAirPlaySupported,
+        isCastAvailable,
         setShowSpeedMenu,
         setShowMoreMenu,
     } = state;
@@ -39,6 +40,7 @@ export function DesktopControlsWrapper({ src, state, logic, refs }: DesktopContr
         toggleFullscreen,
         togglePictureInPicture,
         showAirPlayMenu,
+        showCastMenu,
         changePlaybackSpeed,
         handleCopyLink,
         handleProgressClick,
@@ -72,6 +74,7 @@ export function DesktopControlsWrapper({ src, state, logic, refs }: DesktopContr
             showVolumeBar={showVolumeBar}
             isPiPSupported={isPiPSupported}
             isAirPlaySupported={isAirPlaySupported}
+            isCastAvailable={isCastAvailable}
             isProxied={isProxied}
             progressBarRef={progressBarRef}
             volumeBarRef={volumeBarRef}
@@ -84,6 +87,7 @@ export function DesktopControlsWrapper({ src, state, logic, refs }: DesktopContr
             onToggleFullscreen={toggleFullscreen}
             onTogglePictureInPicture={togglePictureInPicture}
             onShowAirPlayMenu={showAirPlayMenu}
+            onShowCastMenu={showCastMenu}
             onToggleSpeedMenu={() => setShowSpeedMenu(!showSpeedMenu)}
             onToggleMoreMenu={() => setShowMoreMenu(!showMoreMenu)}
             onSpeedChange={changePlaybackSpeed}
