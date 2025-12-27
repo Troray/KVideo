@@ -1,77 +1,74 @@
-name: Sync Fork (Smart & Low Cost)
+name: Sync upstream KVideo and notify
 
 on:
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: "0 3 * * *"
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   sync:
     runs-on: ubuntu-latest
 
     steps:
-      # ========= Phase 1：极速判断 upstream 是否变化 =========
-      - name: 检查 upstream 是否有新提交
-        id: upstream_check
-        run: |
-          set -e
-
-          UPSTREAM_REPO="KuekHaoYang/KVideo"
-          BRANCH="main"
-
-          UPSTREAM_SHA=$(curl -s \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github+json" \
-            https://api.github.com/repos/${UPSTREAM_REPO}/commits/${BRANCH} \
-            | jq -r '.sha')
-
-          LOCAL_SHA=$(curl -s \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github+json" \
-            https://api.github.com/repos/${{ github.repository }}/commits/${BRANCH} \
-            | jq -r '.sha')
-
-          if [ "$UPSTREAM_SHA" = "$LOCAL_SHA" ]; then
-            echo "changed=false" >> $GITHUB_OUTPUT
-          else
-            echo "changed=true" >> $GITHUB_OUTPUT
-          fi
-
-      # ========= Phase 2：真正同步 =========
       - name: Checkout repository
-        if: steps.upstream_check.outputs.changed == 'true'
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 配置 Git 提交身份
-        if: steps.upstream_check.outputs.changed == 'true'
+      - name: Configure git identity
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: 添加 upstream 并同步
-        if: steps.upstream_check.outputs.changed == 'true'
+      - name: Add upstream and fetch
         run: |
-          set -e
-
           git remote add upstream https://github.com/KuekHaoYang/KVideo.git || true
           git fetch upstream
 
+      - name: Check upstream changes
+        id: check
+        run: |
+          COUNT=$(git rev-list --count origin/main..upstream/main)
+          echo "count=$COUNT" >> $GITHUB_OUTPUT
+
+      - name: Exit if no changes
+        if: steps.check.outputs.count == '0'
+        run: |
+          echo "✅ 上游无更新，workflow 结束"
+          exit 0
+
+      - name: Collect upstream commit log
+        id: log
+        run: |
+          LOG=$(git log origin/main..upstream/main \
+            --pretty=format:"- %s (%an)" )
+          echo "log<<EOF" >> $GITHUB_OUTPUT
+          echo "$LOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Fast-forward merge
+        run: |
           git merge upstream/main --ff-only
+
+      - name: Push changes
+        run: |
           git push origin main
 
-      # ========= Phase 3：通知 =========
-      - name: 推送 Telegram 通知
-        if: steps.upstream_check.outputs.changed == 'true'
+      - name: Notify Telegram
         run: |
-          MESSAGE='🚀KVideo仓库提醒\n检测到上游仓库有新提交，已成功同步到本仓库。'
+          MESSAGE="🚀 KVideo 同步完成
 
-          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
-            --data-urlencode "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
-            --data-urlencode "text=${MESSAGE}"
+上游检测到 ${{
+            steps.check.outputs.count
+          }} 条新提交：
 
-      - name: 无需同步（日志）
-        if: steps.upstream_check.outputs.changed == 'false'
-        run: echo "✅ 上游无变化，流程结束"
+${{ steps.log.outputs.log }}
+
+📦 已成功同步到本仓库"
+
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
+            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+            -d text="$MESSAGE"
