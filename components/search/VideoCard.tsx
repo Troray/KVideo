@@ -139,15 +139,13 @@ export const VideoCard = memo<VideoCardProps>(({
                     </div>
 
                     {/* Info */}
-                    <div className="p-3 flex-1 flex flex-col">
-                        <h4 className="font-semibold text-sm text-[var(--text-color)] line-clamp-2 min-h-[2.5rem]">
+                    <div className="pt-3">
+                        <h4 className="font-semibold text-sm text-[var(--text-color)] line-clamp-2">
+                            {video.vod_remarks && (
+                                <span className="text-xs text-[var(--accent-color)] mr-1">[{video.vod_remarks}]</span>
+                            )}
                             {video.vod_name}
                         </h4>
-                        {video.vod_remarks && (
-                            <p className="text-xs text-[var(--text-color-secondary)] mt-1 line-clamp-1">
-                                {video.vod_remarks}
-                            </p>
-                        )}
                     </div>
                 </Card>
             </Link>
