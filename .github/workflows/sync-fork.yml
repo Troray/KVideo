@@ -59,7 +59,7 @@ jobs:
           git remote add upstream https://github.com/KuekHaoYang/KVideo.git || true
           git fetch upstream
 
-          git merge upstream/main --no-edit
+          git merge upstream/main --ff-only
           git push origin main
 
       # ========= Phase 3：通知 =========
