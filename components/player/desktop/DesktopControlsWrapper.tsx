@@ -19,21 +19,14 @@ export function DesktopControlsWrapper({ src, state, logic, refs }: DesktopContr
         isMuted,
         isFullscreen,
         showControls,
-        playbackRate,
-        showSpeedMenu,
-        showMoreMenu,
         showVolumeBar,
         isPiPSupported,
         isAirPlaySupported,
         isCastAvailable,
-        setShowSpeedMenu,
-        setShowMoreMenu,
     } = state;
 
     const {
         togglePlay,
-        skipForward,
-        skipBackward,
         toggleMute,
         handleVolumeChange,
         handleVolumeMouseDown,
@@ -41,22 +34,16 @@ export function DesktopControlsWrapper({ src, state, logic, refs }: DesktopContr
         togglePictureInPicture,
         showAirPlayMenu,
         showCastMenu,
-        changePlaybackSpeed,
-        handleCopyLink,
         handleProgressClick,
         handleProgressMouseDown,
-        startSpeedMenuTimeout,
-        clearSpeedMenuTimeout,
         formatTime,
     } = logic;
 
     const {
         progressBarRef,
         volumeBarRef,
-        moreMenuTimeoutRef,
     } = refs;
 
-    const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
     const isProxied = src.includes('/api/proxy');
 
     return (
@@ -68,9 +55,6 @@ export function DesktopControlsWrapper({ src, state, logic, refs }: DesktopContr
             volume={volume}
             isMuted={isMuted}
             isFullscreen={isFullscreen}
-            playbackRate={playbackRate}
-            showSpeedMenu={showSpeedMenu}
-            showMoreMenu={showMoreMenu}
             showVolumeBar={showVolumeBar}
             isPiPSupported={isPiPSupported}
             isAirPlaySupported={isAirPlaySupported}
@@ -79,8 +63,6 @@ export function DesktopControlsWrapper({ src, state, logic, refs }: DesktopContr
             progressBarRef={progressBarRef}
             volumeBarRef={volumeBarRef}
             onTogglePlay={togglePlay}
-            onSkipForward={skipForward}
-            onSkipBackward={skipBackward}
             onToggleMute={toggleMute}
             onVolumeChange={handleVolumeChange}
             onVolumeMouseDown={handleVolumeMouseDown}
@@ -88,26 +70,9 @@ export function DesktopControlsWrapper({ src, state, logic, refs }: DesktopContr
             onTogglePictureInPicture={togglePictureInPicture}
             onShowAirPlayMenu={showAirPlayMenu}
             onShowCastMenu={showCastMenu}
-            onToggleSpeedMenu={() => setShowSpeedMenu(!showSpeedMenu)}
-            onToggleMoreMenu={() => setShowMoreMenu(!showMoreMenu)}
-            onSpeedChange={changePlaybackSpeed}
-            onCopyLink={handleCopyLink}
             onProgressClick={handleProgressClick}
             onProgressMouseDown={handleProgressMouseDown}
-            onSpeedMenuMouseEnter={clearSpeedMenuTimeout}
-            onSpeedMenuMouseLeave={startSpeedMenuTimeout}
-            onMoreMenuMouseEnter={() => {
-                if (moreMenuTimeoutRef.current) {
-                    clearTimeout(moreMenuTimeoutRef.current);
-                }
-            }}
-            onMoreMenuMouseLeave={() => {
-                moreMenuTimeoutRef.current = setTimeout(() => {
-                    setShowMoreMenu(false);
-                }, 300);
-            }}
             formatTime={formatTime}
-            speeds={speeds}
         />
     );
 }

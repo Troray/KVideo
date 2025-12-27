@@ -4,8 +4,10 @@ interface UseControlsVisibilityProps {
     isPlaying: boolean;
     showControls: boolean;
     showSpeedMenu: boolean;
+    showMoreMenu: boolean;
     setShowControls: (show: boolean) => void;
     setShowSpeedMenu: (show: boolean) => void;
+    setShowMoreMenu: (show: boolean) => void;
     controlsTimeoutRef: React.MutableRefObject<NodeJS.Timeout | null>;
     speedMenuTimeoutRef: React.MutableRefObject<NodeJS.Timeout | null>;
     mouseMoveThrottleRef: React.MutableRefObject<NodeJS.Timeout | null>;
@@ -15,25 +17,46 @@ export function useControlsVisibility({
     isPlaying,
     showControls,
     showSpeedMenu,
+    showMoreMenu,
     setShowControls,
     setShowSpeedMenu,
+    setShowMoreMenu,
     controlsTimeoutRef,
     speedMenuTimeoutRef,
     mouseMoveThrottleRef
 }: UseControlsVisibilityProps) {
-    useEffect(() => {
-        if (!isPlaying) return;
+    // Shared hide controls logic
+    const hideControls = useCallback(() => {
+        if (controlsTimeoutRef.current) {
+            clearTimeout(controlsTimeoutRef.current);
+        }
+        controlsTimeoutRef.current = setTimeout(() => {
+            if (isPlaying && !showSpeedMenu && !showMoreMenu) {
+                setShowControls(false);
+            }
+        }, 3000);
+    }, [isPlaying, showSpeedMenu, showMoreMenu, setShowControls, controlsTimeoutRef]);
 
-        const hideControls = () => {
+    // Force controls to show when paused
+    useEffect(() => {
+        if (!isPlaying) {
+            setShowControls(true);
             if (controlsTimeoutRef.current) {
                 clearTimeout(controlsTimeoutRef.current);
             }
-            controlsTimeoutRef.current = setTimeout(() => {
-                if (isPlaying && !showSpeedMenu) {
-                    setShowControls(false);
-                }
-            }, 3000);
-        };
+        } else {
+            // When resuming play, start the timer to hide controls
+            hideControls();
+        }
+    }, [isPlaying, setShowControls, hideControls, controlsTimeoutRef]);
+
+    useEffect(() => {
+        if (!isPlaying || showSpeedMenu || showMoreMenu) {
+            if (controlsTimeoutRef.current) {
+                clearTimeout(controlsTimeoutRef.current);
+            }
+            return;
+        }
 
         hideControls();
 

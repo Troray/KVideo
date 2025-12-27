@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { useDesktopPlayerState } from './hooks/useDesktopPlayerState';
 import { useDesktopPlayerLogic } from './hooks/useDesktopPlayerLogic';
 import { useHlsPlayer } from './hooks/useHlsPlayer';
@@ -52,6 +53,11 @@ export function DesktopVideoPlayer({
     setShowControls,
     setIsLoading,
   } = state;
+
+  // Reset loading state and show spinner when source changes
+  React.useEffect(() => {
+    setIsLoading(true);
+  }, [src, setIsLoading]);
 
   const logic = useDesktopPlayerLogic({
     src,
@@ -109,7 +115,38 @@ export function DesktopVideoPlayer({
 
       <DesktopOverlayWrapper
         state={state}
+        showControls={state.showControls}
         onTogglePlay={togglePlay}
+        onSkipForward={logic.skipForward}
+        onSkipBackward={logic.skipBackward}
+        // More Menu Props
+        showMoreMenu={state.showMoreMenu}
+        isProxied={src.includes('/api/proxy')}
+        onToggleMoreMenu={() => state.setShowMoreMenu(!state.showMoreMenu)}
+        onMoreMenuMouseEnter={() => {
+          if (refs.moreMenuTimeoutRef.current) {
+            clearTimeout(refs.moreMenuTimeoutRef.current);
+            refs.moreMenuTimeoutRef.current = null;
+          }
+        }}
+        onMoreMenuMouseLeave={() => {
+          if (refs.moreMenuTimeoutRef.current) {
+            clearTimeout(refs.moreMenuTimeoutRef.current);
+          }
+          refs.moreMenuTimeoutRef.current = setTimeout(() => {
+            state.setShowMoreMenu(false);
+            refs.moreMenuTimeoutRef.current = null;
+          }, 800); // Increased timeout for better stability
+        }}
+        onCopyLink={logic.handleCopyLink}
+        // Speed Menu Props
+        playbackRate={state.playbackRate}
+        showSpeedMenu={state.showSpeedMenu}
+        speeds={[0.5, 0.75, 1, 1.25, 1.5, 2]}
+        onToggleSpeedMenu={() => state.setShowSpeedMenu(!state.showSpeedMenu)}
+        onSpeedChange={logic.changePlaybackSpeed}
+        onSpeedMenuMouseEnter={logic.clearSpeedMenuTimeout}
+        onSpeedMenuMouseLeave={logic.startSpeedMenuTimeout}
       />
 
       <DesktopControlsWrapper

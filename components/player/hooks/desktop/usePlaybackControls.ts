@@ -40,7 +40,15 @@ export function usePlaybackControls({
         if (isPlaying) {
             videoRef.current.pause();
         } else {
-            videoRef.current.play();
+            const playPromise = videoRef.current.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    // Ignore AbortError: The play() request was interrupted by a call to pause().
+                    if (error.name !== 'AbortError') {
+                        console.error('Playback failed:', error);
+                    }
+                });
+            }
         }
     }, [isPlaying, videoRef]);
 

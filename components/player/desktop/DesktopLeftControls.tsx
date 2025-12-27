@@ -11,8 +11,6 @@ interface DesktopLeftControlsProps {
     showVolumeBar: boolean;
     volumeBarRef: React.RefObject<HTMLDivElement | null>;
     onTogglePlay: () => void;
-    onSkipForward: () => void;
-    onSkipBackward: () => void;
     onToggleMute: () => void;
     onVolumeChange: (e: React.MouseEvent<HTMLDivElement>) => void;
     onVolumeMouseDown: (e: React.MouseEvent<HTMLDivElement>) => void;
@@ -28,8 +26,6 @@ export function DesktopLeftControls({
     showVolumeBar,
     volumeBarRef,
     onTogglePlay,
-    onSkipForward,
-    onSkipBackward,
     onToggleMute,
     onVolumeChange,
     onVolumeMouseDown,
@@ -44,26 +40,6 @@ export function DesktopLeftControls({
                 aria-label={isPlaying ? 'Pause' : 'Play'}
             >
                 {isPlaying ? <Icons.Pause size={20} /> : <Icons.Play size={20} />}
-            </button>
-
-            {/* Skip Backward 10s */}
-            <button
-                onClick={onSkipBackward}
-                className="btn-icon"
-                aria-label="Skip backward 10 seconds"
-                title="后退 10 秒"
-            >
-                <Icons.SkipBack size={20} />
-            </button>
-
-            {/* Skip Forward 10s */}
-            <button
-                onClick={onSkipForward}
-                className="btn-icon"
-                aria-label="Skip forward 10 seconds"
-                title="快进 10 秒"
-            >
-                <Icons.SkipForward size={20} />
             </button>
 
             {/* Volume */}

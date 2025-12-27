@@ -45,15 +45,46 @@ export function useHlsPlayer({
 
             if (!isNativeHlsSupported) {
                 hls = new Hls({
+                    // Worker & Performance
                     enableWorker: true,
                     lowLatencyMode: false, // Disable low latency for more stable playback
-                    startFragPrefetch: false, // Don't prefetch - let browser handle buffering
-                    // Use relaxed buffer settings
-                    maxBufferLength: 30,
-                    maxMaxBufferLength: 60,
-                    fragLoadingMaxRetry: 3,
-                    manifestLoadingMaxRetry: 3,
-                    levelLoadingMaxRetry: 3,
+
+                    // Buffer Settings - More aggressive buffering for smoother playback
+                    maxBufferLength: 60,           // Buffer up to 60 seconds ahead
+                    maxMaxBufferLength: 120,       // Allow up to 2 minutes of buffer
+                    maxBufferSize: 60 * 1000 * 1000, // 60MB buffer size
+                    maxBufferHole: 0.5,            // Allow small gaps in buffer
+
+                    // Start with more buffer before playing
+                    startFragPrefetch: true,       // Enable prefetching next fragment
+
+                    // ABR (Adaptive Bitrate) Settings - Be more conservative
+                    abrEwmaDefaultEstimate: 500000,     // Start with conservative bandwidth estimate (500kbps)
+                    abrEwmaFastLive: 3,                 // Fast adaptation for live
+                    abrEwmaSlowLive: 9,                 // Slow adaptation for live  
+                    abrEwmaFastVoD: 3,                  // Fast adaptation for VoD
+                    abrEwmaSlowVoD: 9,                  // Slow adaptation for VoD
+                    abrBandWidthFactor: 0.8,            // Use 80% of estimated bandwidth (conservative)
+                    abrBandWidthUpFactor: 0.7,          // Even more conservative when switching up
+
+                    // Loading Settings - More retries and longer timeouts
+                    fragLoadingMaxRetry: 6,
+                    fragLoadingRetryDelay: 1000,
+                    fragLoadingMaxRetryTimeout: 64000,
+                    manifestLoadingMaxRetry: 4,
+                    manifestLoadingRetryDelay: 1000,
+                    manifestLoadingMaxRetryTimeout: 64000,
+                    levelLoadingMaxRetry: 4,
+                    levelLoadingRetryDelay: 1000,
+                    levelLoadingMaxRetryTimeout: 64000,
+
+                    // Timeouts
+                    fragLoadingTimeOut: 20000,     // 20 seconds for fragment loading
+                    manifestLoadingTimeOut: 10000, // 10 seconds for manifest
+                    levelLoadingTimeOut: 10000,    // 10 seconds for level
+
+                    // Backbuffer - Keep some played content for seeking back
+                    backBufferLength: 30,          // Keep 30 seconds of played content
                 });
                 hlsRef.current = hls;
 

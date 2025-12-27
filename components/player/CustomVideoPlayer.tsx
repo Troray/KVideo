@@ -1,8 +1,7 @@
 'use client';
 
-import { useIsMobile } from '@/lib/hooks/useMobilePlayer';
 import { DesktopVideoPlayer } from './DesktopVideoPlayer';
-import { MobileVideoPlayer } from './MobileVideoPlayer';
+
 
 interface CustomVideoPlayerProps {
   src: string;
@@ -23,9 +22,5 @@ interface CustomVideoPlayerProps {
  * - Desktop: Full-featured player with hover interactions
  */
 export function CustomVideoPlayer(props: CustomVideoPlayerProps) {
-  const isMobile = useIsMobile();
-
-  return isMobile
-    ? <MobileVideoPlayer {...props} />
-    : <DesktopVideoPlayer {...props} />;
+  return <DesktopVideoPlayer {...props} />;
 }

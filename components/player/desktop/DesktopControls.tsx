@@ -11,9 +11,8 @@ interface DesktopControlsProps {
     volume: number;
     isMuted: boolean;
     isFullscreen: boolean;
-    playbackRate: number;
-    showSpeedMenu: boolean;
-    showMoreMenu: boolean;
+
+
     showVolumeBar: boolean;
     isPiPSupported: boolean;
     isAirPlaySupported: boolean;
@@ -22,8 +21,6 @@ interface DesktopControlsProps {
     progressBarRef: React.RefObject<HTMLDivElement | null>;
     volumeBarRef: React.RefObject<HTMLDivElement | null>;
     onTogglePlay: () => void;
-    onSkipForward: () => void;
-    onSkipBackward: () => void;
     onToggleMute: () => void;
     onVolumeChange: (e: React.MouseEvent<HTMLDivElement>) => void;
     onVolumeMouseDown: (e: React.MouseEvent<HTMLDivElement>) => void;
@@ -31,18 +28,9 @@ interface DesktopControlsProps {
     onTogglePictureInPicture: () => void;
     onShowAirPlayMenu: () => void;
     onShowCastMenu: () => void;
-    onToggleSpeedMenu: () => void;
-    onToggleMoreMenu: () => void;
-    onSpeedChange: (speed: number) => void;
-    onCopyLink: (type?: 'original' | 'proxy') => void;
     onProgressClick: (e: React.MouseEvent<HTMLDivElement>) => void;
     onProgressMouseDown: (e: React.MouseEvent<HTMLDivElement>) => void;
-    onSpeedMenuMouseEnter: () => void;
-    onSpeedMenuMouseLeave: () => void;
-    onMoreMenuMouseEnter: () => void;
-    onMoreMenuMouseLeave: () => void;
     formatTime: (seconds: number) => string;
-    speeds: number[];
 }
 
 export function DesktopControls(props: DesktopControlsProps) {

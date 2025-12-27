@@ -1,6 +1,9 @@
 import React from 'react';
 import { Icons } from '@/components/ui/Icon';
 
+import { DesktopMoreMenu } from './DesktopMoreMenu';
+import { DesktopSpeedMenu } from './DesktopSpeedMenu';
+
 interface DesktopOverlayProps {
     isLoading: boolean;
     isPlaying: boolean;
@@ -12,7 +15,24 @@ interface DesktopOverlayProps {
     isSkipBackwardAnimatingOut: boolean;
     showToast: boolean;
     toastMessage: string | null;
+    showControls: boolean;
     onTogglePlay: () => void;
+    onSkipForward: () => void;
+    onSkipBackward: () => void;
+    showMoreMenu: boolean;
+    isProxied: boolean;
+    onToggleMoreMenu: () => void;
+    onMoreMenuMouseEnter: () => void;
+    onMoreMenuMouseLeave: () => void;
+    onCopyLink: (type?: 'original' | 'proxy') => void;
+    // Speed Menu Props
+    playbackRate: number;
+    showSpeedMenu: boolean;
+    speeds: number[];
+    onToggleSpeedMenu: () => void;
+    onSpeedChange: (speed: number) => void;
+    onSpeedMenuMouseEnter: () => void;
+    onSpeedMenuMouseLeave: () => void;
 }
 
 export function DesktopOverlay({
@@ -26,10 +46,54 @@ export function DesktopOverlay({
     isSkipBackwardAnimatingOut,
     showToast,
     toastMessage,
-    onTogglePlay
+    onTogglePlay,
+    onSkipForward,
+    onSkipBackward,
+    showControls,
+    showMoreMenu,
+    isProxied,
+    onToggleMoreMenu,
+    onMoreMenuMouseEnter,
+    onMoreMenuMouseLeave,
+    onCopyLink,
+    playbackRate,
+    showSpeedMenu,
+    speeds,
+    onToggleSpeedMenu,
+    onSpeedChange,
+    onSpeedMenuMouseEnter,
+    onSpeedMenuMouseLeave
 }: DesktopOverlayProps) {
+    // Show navigation buttons when controls are visible or when paused (controls usually show when paused anyway)
+    const showNavButtons = showControls || !isPlaying;
+
     return (
         <>
+            {/* More Menu (Top Left) */}
+            <div className={`absolute top-6 left-6 z-30 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0'}`} style={{ pointerEvents: showControls ? 'auto' : 'none' }}>
+                <DesktopMoreMenu
+                    showMoreMenu={showMoreMenu}
+                    isProxied={isProxied}
+                    onToggleMoreMenu={onToggleMoreMenu}
+                    onMouseEnter={onMoreMenuMouseEnter}
+                    onMouseLeave={onMoreMenuMouseLeave}
+                    onCopyLink={onCopyLink}
+                />
+            </div>
+
+            {/* Speed Menu (Top Right) */}
+            <div className={`absolute top-6 right-6 z-30 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0'}`} style={{ pointerEvents: showControls ? 'auto' : 'none' }}>
+                <DesktopSpeedMenu
+                    showSpeedMenu={showSpeedMenu}
+                    playbackRate={playbackRate}
+                    speeds={speeds}
+                    onSpeedChange={onSpeedChange}
+                    onToggleSpeedMenu={onToggleSpeedMenu}
+                    onMouseEnter={onSpeedMenuMouseEnter}
+                    onMouseLeave={onSpeedMenuMouseLeave}
+                />
+            </div>
+
             {/* Loading Spinner - Glass Effect */}
             {isLoading && (
                 <div className="loading-overlay-glass">
@@ -37,35 +101,71 @@ export function DesktopOverlay({
                 </div>
             )}
 
-            {/* Skip Forward Indicator */}
-            {showSkipForwardIndicator && (
-                <div className="absolute top-1/2 right-12 -translate-y-1/2 pointer-events-none transition-all duration-300">
-                    <div className={`text-white text-3xl font-bold drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)] ${isSkipForwardAnimatingOut ? 'animate-scale-out' : 'animate-scale-in'
+            {/* Skip Backward Indicator (Animation) */}
+            {showSkipBackwardIndicator && (
+                <div className="absolute top-1/2 left-24 -translate-y-1/2 pointer-events-none transition-all duration-300 z-20">
+                    <div className={`text-white text-3xl font-bold drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)] ${isSkipBackwardAnimatingOut ? 'animate-scale-out' : 'animate-scale-in'
                         }`}>
-                        +{skipForwardAmount}
+                        -{skipBackwardAmount}s
                     </div>
                 </div>
             )}
 
-            {/* Skip Backward Indicator */}
-            {showSkipBackwardIndicator && (
-                <div className="absolute top-1/2 left-12 -translate-y-1/2 pointer-events-none transition-all duration-300">
-                    <div className={`text-white text-3xl font-bold drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)] ${isSkipBackwardAnimatingOut ? 'animate-scale-out' : 'animate-scale-in'
+            {/* Skip Forward Indicator (Animation) */}
+            {showSkipForwardIndicator && (
+                <div className="absolute top-1/2 right-24 -translate-y-1/2 pointer-events-none transition-all duration-300 z-20">
+                    <div className={`text-white text-3xl font-bold drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)] ${isSkipForwardAnimatingOut ? 'animate-scale-out' : 'animate-scale-in'
                         }`}>
-                        -{skipBackwardAmount}
+                        +{skipForwardAmount}s
                     </div>
                 </div>
             )}
+
+            {/* Previous Button (Method: Skip Backward) */}
+            <div
+                className={`absolute left-0 top-0 bottom-0 flex items-center justify-center p-4 md:p-8 transition-opacity duration-300 z-10 ${showNavButtons ? 'opacity-100' : 'opacity-0'
+                    }`}
+                style={{ pointerEvents: showNavButtons ? 'auto' : 'none' }}
+            >
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onSkipBackward();
+                    }}
+                    className="group flex items-center justify-center w-12 h-12 md:w-16 md:h-16 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-sm transition-all duration-300 hover:scale-110 active:scale-95"
+                    aria-label="Skip Backward 10s"
+                >
+                    <Icons.SkipBack className="w-6 h-6 md:w-8 md:h-8 text-white/80 group-hover:text-white" />
+                </button>
+            </div>
+
+            {/* Next Button (Method: Skip Forward) */}
+            <div
+                className={`absolute right-0 top-0 bottom-0 flex items-center justify-center p-4 md:p-8 transition-opacity duration-300 z-10 ${showNavButtons ? 'opacity-100' : 'opacity-0'
+                    }`}
+                style={{ pointerEvents: showNavButtons ? 'auto' : 'none' }}
+            >
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onSkipForward();
+                    }}
+                    className="group flex items-center justify-center w-12 h-12 md:w-16 md:h-16 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-sm transition-all duration-300 hover:scale-110 active:scale-95"
+                    aria-label="Skip Forward 10s"
+                >
+                    <Icons.SkipForward className="w-6 h-6 md:w-8 md:h-8 text-white/80 group-hover:text-white" />
+                </button>
+            </div>
 
             {/* Center Play Button (when paused) */}
             {!isPlaying && !isLoading && (
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
                     <button
                         onClick={onTogglePlay}
-                        className="pointer-events-auto w-20 h-20 rounded-full bg-[var(--glass-bg)] backdrop-blur-[25px] saturate-[180%] border border-[var(--glass-border)] flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-[var(--accent-color)] shadow-[var(--shadow-md)] will-change-transform cursor-pointer"
+                        className="pointer-events-auto w-16 h-16 md:w-20 md:h-20 rounded-full bg-[var(--glass-bg)] backdrop-blur-[25px] saturate-[180%] border border-[var(--glass-border)] flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-[var(--accent-color)] shadow-[var(--shadow-md)] will-change-transform cursor-pointer"
                         aria-label="Play"
                     >
-                        <Icons.Play size={32} className="text-white ml-1" />
+                        <Icons.Play className="w-8 h-8 md:w-10 md:h-10 text-white ml-1" />
                     </button>
                 </div>
             )}

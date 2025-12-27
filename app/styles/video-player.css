@@ -165,8 +165,8 @@
 
 /* Spinner with Glass Background */
 .spinner-glass {
-    width: 56px;
-    height: 56px;
+    width: clamp(40px, 8vw, 56px);
+    height: clamp(40px, 8vw, 56px);
     border: 4px solid rgba(255, 255, 255, 0.15);
     border-top-color: var(--accent-color);
     border-radius: var(--radius-full);

@@ -58,7 +58,8 @@ export function useDesktopPlayerLogic({
         setIsSkipForwardAnimatingOut, setIsSkipBackwardAnimatingOut,
         setShowVolumeBar, setToastMessage, setShowToast,
         isCastAvailable, setIsCastAvailable,
-        isCasting, setIsCasting
+        isCasting, setIsCasting,
+        showMoreMenu, setShowMoreMenu
     } = state;
 
     const playbackControls = usePlaybackControls({
@@ -94,8 +95,8 @@ export function useDesktopPlayerLogic({
     });
 
     const controlsVisibility = useControlsVisibility({
-        isPlaying, showControls, showSpeedMenu,
-        setShowControls, setShowSpeedMenu,
+        isPlaying, showControls, showSpeedMenu, showMoreMenu,
+        setShowControls, setShowSpeedMenu, setShowMoreMenu,
         controlsTimeoutRef, speedMenuTimeoutRef, mouseMoveThrottleRef
     });
 
