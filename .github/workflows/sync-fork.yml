@@ -1,45 +1,79 @@
-name: Sync Fork
+name: Sync Fork (Smart & Low Cost)
+
 on:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '0 */6 * * *'
   workflow_dispatch:
+
 jobs:
   sync:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: 开始同步
-        run: echo "开始同步本地仓库与上游仓库..."
-
-      - name: Sync Upstream
-        uses: aormsby/fork-sync-with-upstream-action@v3.4
-        with:
-          upstream_sync_repo: KuekHaoYang/KVideo
-          upstream_sync_branch: main
-          target_sync_branch: main
-          upstream_repo_access_token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: 检查更新
-        run: echo "检查上游仓库是否有更新..."
-
-      - name: 同步完成
-        run: echo "同步完成。如果有新更新，已同步到本地仓库。"
-
-      - name: 推送消息到 Telegram
+      # ========= Phase 1：极速判断（不 checkout） =========
+      - name: 检查 upstream 是否有新提交
+        id: upstream_check
         run: |
-          SYNC_STATUS=$(git log origin/main..upstream/main --oneline)
-          
-          if [ -z "$SYNC_STATUS" ]; then
-            MESSAGE='✅KVideo仓库提醒\nGitHub Action 同步操作完成。\n上游仓库没有新的更新，无需同步。'
+          set -e
+
+          UPSTREAM_REPO="KuekHaoYang/KVideo"
+          BRANCH="main"
+
+          echo "👉 获取 upstream 最新提交..."
+          UPSTREAM_SHA=$(curl -s \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/${UPSTREAM_REPO}/commits/${BRANCH} \
+            | jq -r '.sha')
+
+          echo "👉 获取本仓库最新提交..."
+          LOCAL_SHA=$(curl -s \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/${{ github.repository }}/commits/${BRANCH} \
+            | jq -r '.sha')
+
+          echo "Upstream SHA: $UPSTREAM_SHA"
+          echo "Local SHA:    $LOCAL_SHA"
+
+          if [ "$UPSTREAM_SHA" = "$LOCAL_SHA" ]; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "ℹ️ 上游无变化，后续步骤将跳过"
           else
-            MESSAGE='✅KVideo仓库提醒\nGitHub Action 同步操作完成。\n上游仓库有新更新，已成功同步到本地仓库。'
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "🚀 检测到上游有新提交"
           fi
 
-          curl -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+      # ========= Phase 2：真正需要同步时才 checkout =========
+      - name: Checkout repository
+        if: steps.upstream_check.outputs.changed == 'true'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 添加 upstream 并同步
+        if: steps.upstream_check.outputs.changed == 'true'
+        run: |
+          set -e
+
+          git remote add upstream https://github.com/KuekHaoYang/KVideo.git || true
+          git fetch upstream
+
+          git merge upstream/main --no-edit
+          git push origin main
+
+      # ========= Phase 3：Telegram 通知 =========
+      - name: 推送 Telegram 通知
+        if: steps.upstream_check.outputs.changed == 'true'
+        run: |
+          MESSAGE='🚀KVideo仓库提醒\n检测到上游仓库有新提交，已成功同步到本仓库。'
+
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
             --data-urlencode "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
-            --data-urlencode "text=${MESSAGE}" \
-            --data-urlencode "parse_mode=HTML"
+            --data-urlencode "text=${MESSAGE}"
+
+      # ========= Phase 4：无变化日志（可选，但利于 debug） =========
+      - name: 无需同步（日志）
+        if: steps.upstream_check.outputs.changed == 'false'
+        run: echo "✅ 本次运行未检测到 upstream 变化，已安全退出。"
