@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # ========= Phase 1：极速判断（不 checkout） =========
+      # ========= Phase 1：极速判断 upstream 是否变化 =========
       - name: 检查 upstream 是否有新提交
         id: upstream_check
         run: |
@@ -19,38 +19,37 @@ jobs:
           UPSTREAM_REPO="KuekHaoYang/KVideo"
           BRANCH="main"
 
-          echo "👉 获取 upstream 最新提交..."
           UPSTREAM_SHA=$(curl -s \
             -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
             -H "Accept: application/vnd.github+json" \
             https://api.github.com/repos/${UPSTREAM_REPO}/commits/${BRANCH} \
             | jq -r '.sha')
 
-          echo "👉 获取本仓库最新提交..."
           LOCAL_SHA=$(curl -s \
             -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
             -H "Accept: application/vnd.github+json" \
             https://api.github.com/repos/${{ github.repository }}/commits/${BRANCH} \
             | jq -r '.sha')
 
-          echo "Upstream SHA: $UPSTREAM_SHA"
-          echo "Local SHA:    $LOCAL_SHA"
-
           if [ "$UPSTREAM_SHA" = "$LOCAL_SHA" ]; then
             echo "changed=false" >> $GITHUB_OUTPUT
-            echo "ℹ️ 上游无变化，后续步骤将跳过"
           else
             echo "changed=true" >> $GITHUB_OUTPUT
-            echo "🚀 检测到上游有新提交"
           fi
 
-      # ========= Phase 2：真正需要同步时才 checkout =========
+      # ========= Phase 2：真正同步 =========
       - name: Checkout repository
         if: steps.upstream_check.outputs.changed == 'true'
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 配置 Git 提交身份
+        if: steps.upstream_check.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: 添加 upstream 并同步
         if: steps.upstream_check.outputs.changed == 'true'
@@ -63,7 +62,7 @@ jobs:
           git merge upstream/main --no-edit
           git push origin main
 
-      # ========= Phase 3：Telegram 通知 =========
+      # ========= Phase 3：通知 =========
       - name: 推送 Telegram 通知
         if: steps.upstream_check.outputs.changed == 'true'
         run: |
@@ -73,7 +72,6 @@ jobs:
             --data-urlencode "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
             --data-urlencode "text=${MESSAGE}"
 
-      # ========= Phase 4：无变化日志（可选，但利于 debug） =========
       - name: 无需同步（日志）
         if: steps.upstream_check.outputs.changed == 'false'
-        run: echo "✅ 本次运行未检测到 upstream 变化，已安全退出。"
+        run: echo "✅ 上游无变化，流程结束"
