@@ -17,7 +17,10 @@ export function useSecretHomePage() {
     // Get adult sources from settings store (supports user customization)
     const enabledAdultSources = useMemo(() => {
         const settings = settingsStore.getSettings();
-        return settings.adultSources.filter(s => s.enabled);
+        return [
+            ...settings.adultSources.filter(s => s.enabled),
+            ...settings.subscriptions.filter(s => (s as any).enabled !== false && (s as any).group === 'adult')
+        ];
     }, []);
 
     // Search stream hook

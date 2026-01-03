@@ -52,7 +52,10 @@ export function useHomePage() {
             // Check if we need to re-trigger search due to new sources being loaded
             // This fixes the issue where initial visit has 0 sources, then sources are loaded async
             // but the search (or lack thereof) is already stuck with empty sources.
-            const enabledSources = settings.sources.filter(s => s.enabled);
+            const enabledSources = [
+                ...settings.sources.filter(s => s.enabled && s.group === 'normal'),
+                ...settings.subscriptions.filter(s => (s as any).enabled !== false && (s as any).group === 'normal')
+            ];
             const hasSources = enabledSources.length > 0;
 
             // If we have a query, and we haven't searched effectively (or result count is 0),
@@ -97,11 +100,14 @@ export function useHomePage() {
         setQuery(searchQuery);
         setHasSearched(true);
         const settings = settingsStore.getSettings();
-        // Filter enabled sources
-        const enabledSources = settings.sources.filter(s => s.enabled);
+        // Filter enabled sources AND only include normal group sources
+        const enabledSources = [
+            ...settings.sources.filter(s => s.enabled && s.group === 'normal'),
+            ...settings.subscriptions.filter(s => (s as any).enabled !== false && (s as any).group === 'normal')
+        ];
 
         if (enabledSources.length === 0) {
-            // If no sources yet, we can't do much, but the subscription above will catch it 
+            // If no sources yet, we can't do much, but the subscription above will catch it
             // once sources are loaded by useSubscriptionSync
             return;
         }
