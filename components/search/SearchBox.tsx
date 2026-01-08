@@ -1,21 +1,46 @@
-import { useState, FormEvent, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { Icons } from '@/components/ui/Icon';
 import { SearchHistoryDropdown } from '@/components/search/SearchHistoryDropdown';
 import { useSearchHistory } from '@/lib/hooks/useSearchHistory';
 import { useSearchBoxHandlers } from './hooks/useSearchBoxHandlers';
+import { useDebouncedSearch } from '@/lib/hooks/useDebouncedSearch';
 
 interface SearchBoxProps {
     onSearch: (query: string) => void;
     onClear?: () => void;
     initialQuery?: string;
     placeholder?: string;
+    enableDebounce?: boolean;
+    debounceDelay?: number;
 }
 
-export function SearchBox({ onSearch, onClear, initialQuery = '', placeholder = '搜索电影、电视剧、综艺...' }: SearchBoxProps) {
+export function SearchBox({
+    onSearch,
+    onClear,
+    initialQuery = '',
+    placeholder = '搜索电影、电视剧、综艺...',
+    enableDebounce = true,
+    debounceDelay = 600
+}: SearchBoxProps) {
     const [query, setQuery] = useState(initialQuery);
     const inputRef = useRef<HTMLInputElement>(null);
+    const isTypingRef = useRef(false);
+
+    // Debounced search hook
+    const { debouncedSearch, immediateSearch, clearTimer } = useDebouncedSearch(
+        (searchQuery) => {
+            if (searchQuery.trim()) {
+                onSearch(searchQuery);
+            }
+        },
+        {
+            delay: debounceDelay,
+            minLength: 1,
+            enabled: enableDebounce
+        }
+    );
 
     // Search history hook
     const {
@@ -32,7 +57,8 @@ export function SearchBox({ onSearch, onClear, initialQuery = '', placeholder = 
         resetHighlight,
     } = useSearchHistory((selectedQuery) => {
         setQuery(selectedQuery);
-        onSearch(selectedQuery);
+        // Use immediate search for history selection
+        immediateSearch(selectedQuery);
         // Blur the input after selecting from history
         inputRef.current?.blur();
     });
@@ -42,28 +68,90 @@ export function SearchBox({ onSearch, onClear, initialQuery = '', placeholder = 
         setQuery(initialQuery);
     }, [initialQuery]);
 
-    const {
-        handleSubmit,
-        handleClear,
-        handleInputFocus,
-        handleInputBlur,
-        handleKeyDown,
-    } = useSearchBoxHandlers({
-        query,
-        setQuery,
-        onSearch,
-        onClear,
-        inputRef,
-        isDropdownOpen,
-        highlightedIndex,
-        searchHistory,
-        addSearch,
-        hideDropdown,
-        showDropdown,
-        resetHighlight,
-        selectHistoryItem,
-        navigateDropdown,
-    });
+    // Handle query changes with debouncing
+    const handleQueryChange = (newQuery: string) => {
+        setQuery(newQuery);
+        isTypingRef.current = true;
+
+        if (enableDebounce) {
+            // Use debounced search for typing
+            debouncedSearch(newQuery);
+        }
+    };
+
+    // Handle input focus - show dropdown
+    const handleInputFocus = () => {
+        showDropdown();
+    };
+
+    // Handle input blur - hide dropdown
+    const handleInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+        const relatedTarget = e.relatedTarget as HTMLElement;
+        if (relatedTarget && relatedTarget.closest('.search-history-dropdown')) {
+            return;
+        }
+        hideDropdown();
+
+        // If user stops typing and there's a pending search, execute it immediately
+        if (isTypingRef.current && query.trim()) {
+            isTypingRef.current = false;
+            if (!enableDebounce) {
+                // If debounce is disabled, search immediately on blur
+                immediateSearch(query);
+            }
+        }
+    };
+
+    // Handle form submission
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (query.trim()) {
+            addSearch(query.trim());
+            // Use immediate search for form submission
+            immediateSearch(query);
+            hideDropdown();
+            inputRef.current?.blur();
+            isTypingRef.current = false;
+        }
+    };
+
+    // Handle clear
+    const handleClear = () => {
+        setQuery('');
+        clearTimer();
+        if (onClear) {
+            onClear();
+        }
+        resetHighlight();
+        isTypingRef.current = false;
+    };
+
+    // Handle keyboard navigation
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (!isDropdownOpen) return;
+
+        switch (e.key) {
+            case 'ArrowDown':
+                e.preventDefault();
+                navigateDropdown('down');
+                break;
+            case 'ArrowUp':
+                e.preventDefault();
+                navigateDropdown('up');
+                break;
+            case 'Enter':
+                if (highlightedIndex >= 0 && searchHistory[highlightedIndex]) {
+                    e.preventDefault();
+                    selectHistoryItem(searchHistory[highlightedIndex].query);
+                    isTypingRef.current = false;
+                }
+                break;
+            case 'Escape':
+                hideDropdown();
+                inputRef.current?.blur();
+                break;
+        }
+    };
 
     return (
         <form onSubmit={handleSubmit} className="relative group" style={{ isolation: 'isolate' }}>
@@ -71,7 +159,7 @@ export function SearchBox({ onSearch, onClear, initialQuery = '', placeholder = 
                 ref={inputRef}
                 type="text"
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={(e) => handleQueryChange(e.target.value)}
                 onFocus={handleInputFocus}
                 onBlur={handleInputBlur}
                 onKeyDown={handleKeyDown}

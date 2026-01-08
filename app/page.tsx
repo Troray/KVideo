@@ -21,6 +21,8 @@ function HomePage() {
     totalSources,
     handleSearch,
     handleReset,
+    handleRetry,
+    getSearchStats,
   } = useHomePage();
 
   return (
@@ -60,7 +62,11 @@ function HomePage() {
 
         {/* No Results */}
         {!loading && hasSearched && results.length === 0 && (
-          <NoResults onReset={handleReset} />
+          <NoResults
+            onReset={handleReset}
+            onRetry={handleRetry}
+            searchStats={getSearchStats()}
+          />
         )}
       </main>
 

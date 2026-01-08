@@ -12,6 +12,9 @@ export function useHomePage() {
     const { loadFromCache, saveToCache } = useSearchCache();
     const hasLoadedCache = useRef(false);
 
+    // 搜索状态引用（去掉重试相关）
+    const isSearchInProgress = useRef(false);
+
     const [query, setQuery] = useState('');
     const [hasSearched, setHasSearched] = useState(false);
     const [currentSortBy, setCurrentSortBy] = useState('default');
@@ -53,17 +56,18 @@ export function useHomePage() {
                 setCurrentSortBy(settings.sortBy);
             }
 
-            // Check if we need to re-trigger search due to new sources being loaded
-            // This fixes the issue where initial visit has 0 sources, then sources are loaded async
-            // but the search (or lack thereof) is already stuck with empty sources.
+            // 检查是否需要重新触发搜索（当源加载完成后）
+            // 但只执行一次，不进行重试
             const enabledSources = settings.sources.filter(s => s.enabled);
             const hasSources = enabledSources.length > 0;
 
-            // If we have a query, and we haven't searched effectively (or result count is 0),
-            // and we suddenly have sources, retry the search.
-            if (query && hasSources && (!hasSearched || results.length === 0) && !loading) {
-                // We simply call handleSearch again which pulls fresh sources from settingsStore
-                performSearch(query, enabledSources, settings.sortBy);
+            // 如果有查询，但还没有搜索过，且现在有可用源，则执行一次搜索
+            if (query && hasSources && !hasSearched && !loading && !isSearchInProgress.current) {
+                isSearchInProgress.current = true;
+                performSearch(query, enabledSources, settings.sortBy)
+                    .finally(() => {
+                        isSearchInProgress.current = false;
+                    });
                 setHasSearched(true);
             }
         };
@@ -74,7 +78,7 @@ export function useHomePage() {
         // Subscribe to changes
         const unsubscribe = settingsStore.subscribe(updateSettings);
         return () => unsubscribe();
-    }, [query, hasSearched, results.length, loading, performSearch, currentSortBy]);
+    }, [query, hasSearched, loading, performSearch, currentSortBy]);
 
     // Load cached results on mount
     useEffect(() => {
@@ -98,6 +102,9 @@ export function useHomePage() {
     const handleSearch = (searchQuery: string) => {
         if (!searchQuery.trim()) return;
 
+        // 重置搜索状态
+        isSearchInProgress.current = false;
+
         setQuery(searchQuery);
         setHasSearched(true);
         const settings = settingsStore.getSettings();
@@ -105,7 +112,7 @@ export function useHomePage() {
         const enabledSources = settings.sources.filter(s => s.enabled);
 
         if (enabledSources.length === 0) {
-            // If no sources yet, we can't do much, but the subscription above will catch it 
+            // If no sources yet, we can't do much, but the subscription above will catch it
             // once sources are loaded by useSubscriptionSync
             return;
         }
@@ -114,11 +121,43 @@ export function useHomePage() {
     };
 
     const handleReset = () => {
+        // 重置搜索状态
+        isSearchInProgress.current = false;
+
         setHasSearched(false);
         setQuery('');
         resetSearch();
         router.replace('/', { scroll: false });
     };
+
+    // 重新搜索逻辑（直接执行，不重试）
+    const handleRetry = useCallback(() => {
+        if (query) {
+            // 重置状态但保留查询
+            isSearchInProgress.current = false;
+            resetSearch();
+
+            // 延迟执行以确保状态重置完成
+            setTimeout(() => {
+                const settings = settingsStore.getSettings();
+                const enabledSources = settings.sources.filter(s => s.enabled);
+                if (enabledSources.length > 0) {
+                    performSearch(query, enabledSources, settings.sortBy);
+                    setHasSearched(true);
+                }
+            }, 100);
+        }
+    }, [query, resetSearch, performSearch]);
+
+    // 获取搜索统计信息
+    const getSearchStats = useCallback(() => {
+        if (!hasSearched) return undefined;
+        return {
+            totalSources: totalSources,
+            completedSources: completedSources,
+            query: query
+        };
+    }, [hasSearched, totalSources, completedSources, query]);
 
     return {
         query,
@@ -130,5 +169,7 @@ export function useHomePage() {
         totalSources,
         handleSearch,
         handleReset,
+        handleRetry,
+        getSearchStats,
     };
 }

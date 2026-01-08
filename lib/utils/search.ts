@@ -13,7 +13,16 @@ export function hasMinimumMatch(title: string, query: string): boolean {
   const normalizedTitle = title.toLowerCase();
   const normalizedQuery = query.toLowerCase().trim();
 
-  // Extract all 2+ character substrings from query
+  // Handle empty query
+  if (!normalizedQuery) return false;
+
+  // 对于短查询（1-2字符），降低要求
+  if (normalizedQuery.length <= 2) {
+    // 对于短中文/字符查询，检查是否包含任意字符
+    return normalizedTitle.split('').some(char => normalizedQuery.includes(char));
+  }
+
+  // 对于正常查询（3+字符），检查连续2字符匹配
   for (let i = 0; i <= normalizedQuery.length - 2; i++) {
     const substring = normalizedQuery.slice(i, i + 2);
     if (normalizedTitle.includes(substring)) {
@@ -21,8 +30,14 @@ export function hasMinimumMatch(title: string, query: string): boolean {
     }
   }
 
+  // 检查单个字符匹配（作为fallback）
+  if (normalizedQuery.split('').some(char => normalizedTitle.includes(char))) {
+    return true;
+  }
+
   return false;
 }
+
 
 /**
  * Calculate search relevance score
@@ -32,6 +47,21 @@ export function calculateRelevanceScore(item: VideoItem, query: string): number 
   let score = 0;
   const normalizedQuery = query.toLowerCase().trim();
   const normalizedTitle = item.vod_name.toLowerCase();
+
+  // Handle short queries specially
+  if (normalizedQuery.length <= 2) {
+    // 对于短查询，优先考虑精确匹配
+    if (normalizedTitle === normalizedQuery) {
+      score += 1000;
+    }
+
+    // 检查是否包含查询字符
+    const queryChars = normalizedQuery.split('');
+    const matchCount = queryChars.filter(char => normalizedTitle.includes(char)).length;
+    score += matchCount * 100;
+
+    return Math.max(0, score);
+  }
 
   // Split query into words for partial matching
   const queryWords = normalizedQuery.split(/\s+/);
@@ -66,7 +96,13 @@ export function calculateRelevanceScore(item: VideoItem, query: string): number 
 
   // 5. Individual word matches
   queryWords.forEach(word => {
-    if (word.length < 2) return; // Skip very short words
+    if (word.length < 2) {
+      // 对于短词（1字符），也给予一定分数
+      if (normalizedTitle.includes(word)) {
+        score += 15;
+      }
+      return;
+    }
 
     if (normalizedTitle.includes(word)) {
       score += 30;
@@ -78,7 +114,8 @@ export function calculateRelevanceScore(item: VideoItem, query: string): number 
     }
   });
 
-  // 6. Actor match
+
+  // 7. Actor match
   if (item.vod_actor) {
     const normalizedActor = item.vod_actor.toLowerCase();
     if (normalizedActor.includes(normalizedQuery)) {
@@ -91,7 +128,7 @@ export function calculateRelevanceScore(item: VideoItem, query: string): number 
     });
   }
 
-  // 7. Director match
+  // 8. Director match
   if (item.vod_director) {
     const normalizedDirector = item.vod_director.toLowerCase();
     if (normalizedDirector.includes(normalizedQuery)) {
@@ -104,7 +141,7 @@ export function calculateRelevanceScore(item: VideoItem, query: string): number 
     });
   }
 
-  // 8. Content/description match (if available)
+  // 9. Content/description match (if available)
   if (item.vod_content) {
     const normalizedContent = item.vod_content.toLowerCase();
     if (normalizedContent.includes(normalizedQuery)) {
@@ -112,7 +149,7 @@ export function calculateRelevanceScore(item: VideoItem, query: string): number 
     }
   }
 
-  // 9. Recent year bonus (favor newer content)
+  // 10. Recent year bonus (favor newer content)
   const currentYear = new Date().getFullYear();
   const itemYear = parseInt(item.vod_year || '0');
   if (itemYear > 0) {
@@ -126,12 +163,12 @@ export function calculateRelevanceScore(item: VideoItem, query: string): number 
     }
   }
 
-  // 10. Penalty for very long titles (might be less relevant)
+  // 11. Penalty for very long titles (might be less relevant)
   if (item.vod_name.length > 50) {
     score -= 5;
   }
 
-  // 11. Bonus for HD/quality indicators in remarks
+  // 12. Bonus for HD/quality indicators in remarks
   if (item.vod_remarks) {
     const remarks = item.vod_remarks.toLowerCase();
     if (remarks.includes('hd') || remarks.includes('1080') || remarks.includes('4k')) {

@@ -20,6 +20,8 @@ function PremiumHomePage() {
         totalSources,
         handleSearch,
         handleReset,
+        handleRetry,
+        getSearchStats,
     } = usePremiumHomePage();
 
     return (
@@ -58,7 +60,11 @@ function PremiumHomePage() {
 
                 {/* No Results */}
                 {!loading && hasSearched && results.length === 0 && (
-                    <NoResults onReset={handleReset} />
+                    <NoResults
+                        onReset={handleReset}
+                        onRetry={handleRetry}
+                        searchStats={getSearchStats()}
+                    />
                 )}
 
                 {/* Premium Content - Trending and Latest */}

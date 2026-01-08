@@ -31,6 +31,8 @@ export function SearchForm({
         onClear={onClear}
         initialQuery={initialQuery}
         placeholder={placeholder}
+        enableDebounce={true}
+        debounceDelay={600}
       />
 
       {/* Loading Animation */}
