@@ -34,21 +34,8 @@ export function NoResults({ onReset, onRetry, searchStats, error }: NoResultsPro
       )}
 
       <p className="text-lg text-[var(--text-color-secondary)] mb-6">
-        {error ? error : "试试其他关键词、检查拼写，或使用更通用的词汇"}
+        {error ? error : "试试其他关键词，或使用更通用的词汇"}
       </p>
-
-      {/* 建议搜索词 */}
-      <div className="mt-4 text-sm">
-        <p className="text-[var(--text-color-secondary)] mb-2">建议尝试：</p>
-        <div className="flex gap-2 justify-center flex-wrap px-8">
-          <Button variant="ghost" className="text-sm px-3 py-1" onClick={() => onReset()}>
-            使用完整名称
-          </Button>
-          <Button variant="ghost" className="text-sm px-3 py-1" onClick={() => onReset()}>
-            简化关键词
-          </Button>
-        </div>
-      </div>
 
       {/* 操作按钮 */}
       <div className="mt-6 flex gap-3 justify-center">
