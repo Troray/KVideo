@@ -37,6 +37,22 @@ export function useHomePage() {
         onUrlUpdate
     );
 
+    // Core search execution function - extracted to eliminate duplication
+    const executeSearch = useCallback((searchQuery: string) => {
+        if (!searchQuery.trim()) return false;
+
+        const settings = settingsStore.getSettings();
+        const enabledSources = settings.sources.filter(s => s.enabled);
+
+        if (enabledSources.length === 0) {
+            return false;
+        }
+
+        performSearch(searchQuery, enabledSources, settings.sortBy);
+        hasSearchedWithSourcesRef.current = true;
+        return true;
+    }, [performSearch]);
+
     // Re-sort results when sort preference changes
     useEffect(() => {
         if (hasSearched && results.length > 0) {
@@ -63,10 +79,9 @@ export function useHomePage() {
             // If we have a query, and we haven't searched with sources yet,
             // and we suddenly have sources, trigger the search.
             if (query && hasSources && !hasSearchedWithSourcesRef.current && !loading) {
-                // We simply call handleSearch again which pulls fresh sources from settingsStore
-                performSearch(query, enabledSources, settings.sortBy);
-                setHasSearched(true);
-                hasSearchedWithSourcesRef.current = true;
+                if (executeSearch(query)) {
+                    setHasSearched(true);
+                }
             }
         };
 
@@ -76,23 +91,14 @@ export function useHomePage() {
         // Subscribe to changes
         const unsubscribe = settingsStore.subscribe(updateSettings);
         return () => unsubscribe();
-    }, [query, loading, performSearch, currentSortBy]);
+    }, [query, loading, executeSearch, currentSortBy]);
 
     const handleSearch = useCallback((searchQuery: string) => {
         if (!searchQuery.trim()) return;
         setQuery(searchQuery);
         setHasSearched(true);
-        const settings = settingsStore.getSettings();
-        // Filter enabled sources
-        const enabledSources = settings.sources.filter(s => s.enabled);
-        if (enabledSources.length === 0) {
-            // If no sources yet, we can't do much, but the subscription above will catch it 
-            // once sources are loaded by useSubscriptionSync
-            return;
-        }
-        performSearch(searchQuery, enabledSources, settings.sortBy);
-        hasSearchedWithSourcesRef.current = true;
-    }, [performSearch]);
+        executeSearch(searchQuery);
+    }, [executeSearch]);
 
     // Load cached results on mount
     useEffect(() => {
