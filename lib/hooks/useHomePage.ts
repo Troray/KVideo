@@ -3,7 +3,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useSearchCache } from '@/lib/hooks/useSearchCache';
 import { useParallelSearch } from '@/lib/hooks/useParallelSearch';
 import { useSubscriptionSync } from '@/lib/hooks/useSubscriptionSync';
-import { settingsStore } from '@/lib/store/settings-store';
+import { settingsStore, type SortOption } from '@/lib/store/settings-store';
 
 export function useHomePage() {
     useSubscriptionSync();
@@ -15,7 +15,7 @@ export function useHomePage() {
 
     const [query, setQuery] = useState('');
     const [hasSearched, setHasSearched] = useState(false);
-    const [currentSortBy, setCurrentSortBy] = useState('default');
+    const [currentSortBy, setCurrentSortBy] = useState<SortOption>('default');
 
     const onUrlUpdate = useCallback((q: string) => {
         router.replace(`/?q=${encodeURIComponent(q)}`, { scroll: false });
@@ -40,7 +40,7 @@ export function useHomePage() {
     // Re-sort results when sort preference changes
     useEffect(() => {
         if (hasSearched && results.length > 0) {
-            applySorting(currentSortBy as any);
+            applySorting(currentSortBy);
         }
     }, [currentSortBy, applySorting, hasSearched, results.length]);
 
@@ -93,7 +93,7 @@ export function useHomePage() {
             return;
         }
 
-        performSearch(searchQuery, enabledSources, currentSortBy as any);
+        performSearch(searchQuery, enabledSources, currentSortBy);
         hasSearchedWithSourcesRef.current = true;
     }, [performSearch, currentSortBy]);
 
