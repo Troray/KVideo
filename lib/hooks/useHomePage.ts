@@ -91,6 +91,7 @@ export function useHomePage() {
             if (cached && cached.query === urlQuery && cached.results.length > 0) {
                 setHasSearched(true);
                 loadCachedResults(cached.results, cached.availableSources);
+                hasSearchedWithSourcesRef.current = true;
             } else {
                 handleSearch(urlQuery);
             }
@@ -113,6 +114,7 @@ export function useHomePage() {
         }
 
         performSearch(searchQuery, enabledSources, currentSortBy as any);
+        hasSearchedWithSourcesRef.current = true;
     };
 
     const handleReset = () => {
