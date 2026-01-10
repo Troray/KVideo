@@ -116,9 +116,6 @@ export function useHomePage() {
     const handleSearch = (searchQuery: string) => {
         if (!searchQuery.trim()) return;
 
-        // 重置搜索状态
-        isSearchInProgress.current = false;
-
         setQuery(searchQuery);
         setHasSearched(true);
         const settings = settingsStore.getSettings();
@@ -131,7 +128,12 @@ export function useHomePage() {
             return;
         }
 
-        performSearch(searchQuery, enabledSources, currentSortBy as any);
+        // Set flag before starting search
+        isSearchInProgress.current = true;
+        performSearch(searchQuery, enabledSources, currentSortBy as any)
+            .finally(() => {
+                isSearchInProgress.current = false;
+            });
     };
 
     const handleReset = () => {

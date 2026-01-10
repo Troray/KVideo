@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/Button';
 import { Icons } from '@/components/ui/Icon';
 import { SearchHistoryDropdown } from '@/components/search/SearchHistoryDropdown';
 import { useSearchHistory } from '@/lib/hooks/useSearchHistory';
-import { useSearchBoxHandlers } from './hooks/useSearchBoxHandlers';
 import { useDebouncedSearch } from '@/lib/hooks/useDebouncedSearch';
 
 interface SearchBoxProps {

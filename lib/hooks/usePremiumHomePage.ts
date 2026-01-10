@@ -3,6 +3,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useSearchCache } from '@/lib/hooks/useSearchCache';
 import { useParallelSearch } from '@/lib/hooks/useParallelSearch';
 import { settingsStore } from '@/lib/store/settings-store';
+import { VideoSource } from '@/lib/types';
 
 export function usePremiumHomePage() {
     const router = useRouter();
@@ -20,7 +21,7 @@ export function usePremiumHomePage() {
 
     // Get premium sources from settings store (supports user customization)
     // 使用状态来响应 settingsStore 的变化
-    const [enabledPremiumSources, setEnabledPremiumSources] = useState<any[]>([]);
+    const [enabledPremiumSources, setEnabledPremiumSources] = useState<VideoSource[]>([]);
 
     // 订阅 settingsStore 变化
     useEffect(() => {
@@ -132,13 +133,16 @@ export function usePremiumHomePage() {
     const handleSearch = (searchQuery: string) => {
         if (!searchQuery.trim()) return;
 
-        // 重置搜索状态
-        isSearchInProgress.current = false;
-
         setQuery(searchQuery);
         setHasSearched(true);
+
+        // Set flag before starting search
+        isSearchInProgress.current = true;
         // Use enabled premium sources from settings
-        performSearch(searchQuery, enabledPremiumSources, currentSortBy as any);
+        performSearch(searchQuery, enabledPremiumSources, currentSortBy as any)
+            .finally(() => {
+                isSearchInProgress.current = false;
+            });
     };
 
     const handleReset = () => {
