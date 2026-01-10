@@ -119,13 +119,13 @@ export function useHomePage() {
 
 
 
-    const handleReset = () => {
+    const handleReset = useCallback(() => {
         setHasSearched(false);
         setQuery('');
         hasSearchedWithSourcesRef.current = false;
         resetSearch();
         router.replace('/', { scroll: false });
-    };
+    }, [resetSearch, router]);
 
     return {
         query,
