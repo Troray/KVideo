@@ -76,7 +76,7 @@ export function useHomePage() {
         // Subscribe to changes
         const unsubscribe = settingsStore.subscribe(updateSettings);
         return () => unsubscribe();
-    }, [query, hasSearched, loading, performSearch, currentSortBy]);
+    }, [query, loading, performSearch, currentSortBy]);
 
     const handleSearch = useCallback((searchQuery: string) => {
         if (!searchQuery.trim()) return;
