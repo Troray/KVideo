@@ -78,6 +78,25 @@ export function useHomePage() {
         return () => unsubscribe();
     }, [query, hasSearched, loading, performSearch, currentSortBy]);
 
+    const handleSearch = useCallback((searchQuery: string) => {
+        if (!searchQuery.trim()) return;
+
+        setQuery(searchQuery);
+        setHasSearched(true);
+        const settings = settingsStore.getSettings();
+        // Filter enabled sources
+        const enabledSources = settings.sources.filter(s => s.enabled);
+
+        if (enabledSources.length === 0) {
+            // If no sources yet, we can't do much, but the subscription above will catch it 
+            // once sources are loaded by useSubscriptionSync
+            return;
+        }
+
+        performSearch(searchQuery, enabledSources, currentSortBy as any);
+        hasSearchedWithSourcesRef.current = true;
+    }, [performSearch, currentSortBy]);
+
     // Load cached results on mount
     useEffect(() => {
         if (hasLoadedCache.current) return;
@@ -96,26 +115,9 @@ export function useHomePage() {
                 handleSearch(urlQuery);
             }
         }
-    }, [searchParams, loadFromCache, loadCachedResults]);
+    }, [searchParams, loadFromCache, loadCachedResults, handleSearch]);
 
-    const handleSearch = (searchQuery: string) => {
-        if (!searchQuery.trim()) return;
 
-        setQuery(searchQuery);
-        setHasSearched(true);
-        const settings = settingsStore.getSettings();
-        // Filter enabled sources
-        const enabledSources = settings.sources.filter(s => s.enabled);
-
-        if (enabledSources.length === 0) {
-            // If no sources yet, we can't do much, but the subscription above will catch it 
-            // once sources are loaded by useSubscriptionSync
-            return;
-        }
-
-        performSearch(searchQuery, enabledSources, currentSortBy as any);
-        hasSearchedWithSourcesRef.current = true;
-    };
 
     const handleReset = () => {
         setHasSearched(false);
