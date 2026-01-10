@@ -11,6 +11,7 @@ export function useHomePage() {
     const searchParams = useSearchParams();
     const { loadFromCache, saveToCache } = useSearchCache();
     const hasLoadedCache = useRef(false);
+    const hasSearchedWithSourcesRef = useRef(false);
 
     const [query, setQuery] = useState('');
     const [hasSearched, setHasSearched] = useState(false);
@@ -59,13 +60,13 @@ export function useHomePage() {
             const enabledSources = settings.sources.filter(s => s.enabled);
             const hasSources = enabledSources.length > 0;
 
-            // If we have a query, and we haven't searched yet (or searched without sources),
+            // If we have a query, and we haven't searched with sources yet,
             // and we suddenly have sources, trigger the search.
-            // Using availableSources.length === 0 instead of results.length === 0 to avoid infinite loop
-            if (query && hasSources && (!hasSearched || availableSources.length === 0) && !loading) {
+            if (query && hasSources && !hasSearchedWithSourcesRef.current && !loading) {
                 // We simply call handleSearch again which pulls fresh sources from settingsStore
                 performSearch(query, enabledSources, settings.sortBy);
                 setHasSearched(true);
+                hasSearchedWithSourcesRef.current = true;
             }
         };
 
@@ -75,7 +76,7 @@ export function useHomePage() {
         // Subscribe to changes
         const unsubscribe = settingsStore.subscribe(updateSettings);
         return () => unsubscribe();
-    }, [query, hasSearched, availableSources.length, loading, performSearch, currentSortBy]);
+    }, [query, hasSearched, loading, performSearch, currentSortBy]);
 
     // Load cached results on mount
     useEffect(() => {
@@ -117,6 +118,7 @@ export function useHomePage() {
     const handleReset = () => {
         setHasSearched(false);
         setQuery('');
+        hasSearchedWithSourcesRef.current = false;
         resetSearch();
         router.replace('/', { scroll: false });
     };
