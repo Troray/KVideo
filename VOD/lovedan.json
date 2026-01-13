@@ -1,0 +1,492 @@
+{
+    "code": 1,
+    "msg": "数据列表",
+    "page": 1,
+    "pagecount": 7461,
+    "limit": "20",
+    "total": 149205,
+    "list": [
+        {
+            "vod_id": 172693,
+            "vod_name": "长剑风云粤语版",
+            "type_id": 26,
+            "type_name": "国产动漫",
+            "vod_en": "changjianfengyunyueyuban",
+            "vod_time": "2026-01-13 17:06:36",
+            "vod_remarks": "全10集",
+            "vod_play_from": "1080zyk"
+        },
+        {
+            "vod_id": 172692,
+            "vod_name": "寻欢作乐的姐姐粤语",
+            "type_id": 24,
+            "type_name": "港台综艺",
+            "vod_en": "xunhuanzuoledejiejieyueyu",
+            "vod_time": "2026-01-13 17:06:36",
+            "vod_remarks": "更新至06集",
+            "vod_play_from": "1080zyk"
+        },
+        {
+            "vod_id": 172679,
+            "vod_name": "我的咖啡男友第二季",
+            "type_id": 15,
+            "type_name": "日韩剧",
+            "vod_en": "wodekafeinanyoudierji",
+            "vod_time": "2026-01-13 17:06:36",
+            "vod_remarks": "更新至06期",
+            "vod_play_from": "wjm3u8,ffm3u8,1080zyk"
+        },
+        {
+            "vod_id": 170363,
+            "vod_name": "黑白厨师：料理阶级战争第二季",
+            "type_id": 23,
+            "type_name": "日韩综艺",
+            "vod_en": "heibaichushiliaolijiejizhanzhengdierji",
+            "vod_time": "2026-01-13 17:06:36",
+            "vod_remarks": "全13期",
+            "vod_play_from": "wjm3u8,ffm3u8,sdm3u8,lzm3u8,1080zyk"
+        },
+        {
+            "vod_id": 9600,
+            "vod_name": "长剑风云",
+            "type_id": 26,
+            "type_name": "国产动漫",
+            "vod_en": "changjianfengyun",
+            "vod_time": "2026-01-13 17:06:36",
+            "vod_remarks": "全10集",
+            "vod_play_from": "sdm3u8,jinyingm3u8,wjm3u8,1080zyk"
+        },
+        {
+            "vod_id": 172691,
+            "vod_name": "驾驶2025",
+            "type_id": 21,
+            "type_name": "剧情片",
+            "vod_en": "jiashi2025",
+            "vod_time": "2026-01-13 17:06:35",
+            "vod_remarks": "HD中字",
+            "vod_play_from": "1080zyk"
+        },
+        {
+            "vod_id": 172690,
+            "vod_name": "玉见梁辰鱼",
+            "type_id": 13,
+            "type_name": "国产剧",
+            "vod_en": "yujianliangchenyu",
+            "vod_time": "2026-01-13 17:06:35",
+            "vod_remarks": "更新至05集",
+            "vod_play_from": "1080zyk"
+        },
+        {
+            "vod_id": 171893,
+            "vod_name": "男生女生向前冲第十八季",
+            "type_id": 31,
+            "type_name": "大陆综艺",
+            "vod_en": "nanshengnvshengxiangqianchongdishibaji",
+            "vod_time": "2026-01-13 17:06:35",
+            "vod_remarks": "更新至20260113期",
+            "vod_play_from": "1080zyk"
+        },
+        {
+            "vod_id": 89267,
+            "vod_name": "风姿物语银河篇",
+            "type_id": 26,
+            "type_name": "国产动漫",
+            "vod_en": "fengziwuyuyinhepian",
+            "vod_time": "2026-01-13 17:06:35",
+            "vod_remarks": "全20集",
+            "vod_play_from": "wjm3u8,1080zyk"
+        },
+        {
+            "vod_id": 29232,
+            "vod_name": "万界奇缘",
+            "type_id": 26,
+            "type_name": "国产动漫",
+            "vod_en": "wanjieqiyuan",
+            "vod_time": "2026-01-13 17:06:35",
+            "vod_remarks": "全40集",
+            "vod_play_from": "wjm3u8,1080zyk"
+        },
+        {
+            "vod_id": 29212,
+            "vod_name": "小姐不熙娣",
+            "type_id": 24,
+            "type_name": "港台综艺",
+            "vod_en": "xiaojiebuxidi",
+            "vod_time": "2026-01-13 17:06:35",
+            "vod_remarks": "更新至20260112期",
+            "vod_play_from": "wjm3u8,sdm3u8,kcm3u8,lzm3u8,ffm3u8,1080zyk,okm3u8"
+        },
+        {
+            "vod_id": 15764,
+            "vod_name": "第三调解室",
+            "type_id": 31,
+            "type_name": "大陆综艺",
+            "vod_en": "disandiaojieshi",
+            "vod_time": "2026-01-13 17:06:35",
+            "vod_remarks": "更新至20260113期",
+            "vod_play_from": "wjm3u8,jinyingm3u8,1080zyk,kcm3u8,sdm3u8,okm3u8,lzm3u8"
+        },
+        {
+            "vod_id": 363,
+            "vod_name": "灵云代码",
+            "type_id": 26,
+            "type_name": "国产动漫",
+            "vod_en": "lingyundaima",
+            "vod_time": "2026-01-13 17:06:35",
+            "vod_remarks": "全20集",
+            "vod_play_from": "wjm3u8,sdm3u8,1080zyk"
+        },
+        {
+            "vod_id": 172689,
+            "vod_name": "许你一个安康",
+            "type_id": 13,
+            "type_name": "国产剧",
+            "vod_en": "xuniyigeankang",
+            "vod_time": "2026-01-13 17:06:34",
+            "vod_remarks": "全12集",
+            "vod_play_from": "1080zyk"
+        },
+        {
+            "vod_id": 172688,
+            "vod_name": "第76届NHK红白歌会",
+            "type_id": 23,
+            "type_name": "日韩综艺",
+            "vod_en": "di76jieNHKhongbaigehui",
+            "vod_time": "2026-01-13 17:06:34",
+            "vod_remarks": "HD中字",
+            "vod_play_from": "1080zyk"
+        },
+        {
+            "vod_id": 172344,
+            "vod_name": "末日狠人：开局囤积万亿物资动态漫",
+            "type_id": 26,
+            "type_name": "国产动漫",
+            "vod_en": "morihenrenkaijudunjiwanyiwuzidongtaiman",
+            "vod_time": "2026-01-13 17:06:34",
+            "vod_remarks": "更新至44集",
+            "vod_play_from": "1080zyk"
+        },
+        {
+            "vod_id": 172339,
+            "vod_name": "师尊：这个冲师逆徒才不是圣子动态漫",
+            "type_id": 26,
+            "type_name": "国产动漫",
+            "vod_en": "shizunzhegechongshinitucaibushishengzidongtaiman",
+            "vod_time": "2026-01-13 17:06:34",
+            "vod_remarks": "更新至111集",
+            "vod_play_from": "1080zyk,lzm3u8"
+        },
+        {
+            "vod_id": 172327,
+            "vod_name": "从哥布林到哥布林神动态漫",
+            "type_id": 26,
+            "type_name": "国产动漫",
+            "vod_en": "conggebulindaogebulinshendongtaiman",
+            "vod_time": "2026-01-13 17:06:34",
+            "vod_remarks": "更新至44集",
+            "vod_play_from": "1080zyk"
+        },
+        {
+            "vod_id": 172242,
+            "vod_name": "江思先生动态漫",
+            "type_id": 26,
+            "type_name": "国产动漫",
+            "vod_en": "jiangsixianshengdongtaiman",
+            "vod_time": "2026-01-13 17:06:34",
+            "vod_remarks": "更新至142集",
+            "vod_play_from": "1080zyk,lzm3u8"
+        },
+        {
+            "vod_id": 170811,
+            "vod_name": "我真没想重生啊 动态漫",
+            "type_id": 26,
+            "type_name": "国产动漫",
+            "vod_en": "wozhenmeixiangzhongshengadongtaiman",
+            "vod_time": "2026-01-13 17:06:34",
+            "vod_remarks": "更新至42集",
+            "vod_play_from": "1080zyk"
+        }
+    ],
+    "class": [
+        {
+            "type_id": 1,
+            "type_name": "电影"
+        },
+        {
+            "type_id": 2,
+            "type_name": "电视剧"
+        },
+        {
+            "type_id": 3,
+            "type_name": "综艺"
+        },
+        {
+            "type_id": 4,
+            "type_name": "动漫"
+        },
+        {
+            "type_id": 5,
+            "type_name": "福利视频"
+        },
+        {
+            "type_id": 6,
+            "type_name": "动作片"
+        },
+        {
+            "type_id": 7,
+            "type_name": "喜剧片"
+        },
+        {
+            "type_id": 8,
+            "type_name": "爱情片"
+        },
+        {
+            "type_id": 9,
+            "type_name": "科幻片"
+        },
+        {
+            "type_id": 10,
+            "type_name": "恐怖片"
+        },
+        {
+            "type_id": 11,
+            "type_name": "犯罪片"
+        },
+        {
+            "type_id": 12,
+            "type_name": "战争片"
+        },
+        {
+            "type_id": 13,
+            "type_name": "国产剧"
+        },
+        {
+            "type_id": 14,
+            "type_name": "港台剧"
+        },
+        {
+            "type_id": 15,
+            "type_name": "日韩剧"
+        },
+        {
+            "type_id": 16,
+            "type_name": "欧美剧"
+        },
+        {
+            "type_id": 17,
+            "type_name": "三级伦理"
+        },
+        {
+            "type_id": 18,
+            "type_name": "网红主播"
+        },
+        {
+            "type_id": 20,
+            "type_name": "动画电影"
+        },
+        {
+            "type_id": 21,
+            "type_name": "剧情片"
+        },
+        {
+            "type_id": 22,
+            "type_name": "纪录片"
+        },
+        {
+            "type_id": 23,
+            "type_name": "日韩综艺"
+        },
+        {
+            "type_id": 24,
+            "type_name": "港台综艺"
+        },
+        {
+            "type_id": 25,
+            "type_name": "欧美综艺"
+        },
+        {
+            "type_id": 26,
+            "type_name": "国产动漫"
+        },
+        {
+            "type_id": 27,
+            "type_name": "日韩动漫"
+        },
+        {
+            "type_id": 28,
+            "type_name": "欧美动漫"
+        },
+        {
+            "type_id": 29,
+            "type_name": "海外动漫"
+        },
+        {
+            "type_id": 30,
+            "type_name": "海外剧"
+        },
+        {
+            "type_id": 31,
+            "type_name": "大陆综艺"
+        },
+        {
+            "type_id": 32,
+            "type_name": "明星"
+        },
+        {
+            "type_id": 33,
+            "type_name": "福利图片"
+        },
+        {
+            "type_id": 34,
+            "type_name": "爱蜜社"
+        },
+        {
+            "type_id": 35,
+            "type_name": "头条女神"
+        },
+        {
+            "type_id": 36,
+            "type_name": "美媛馆"
+        },
+        {
+            "type_id": 37,
+            "type_name": "海外抖音"
+        },
+        {
+            "type_id": 38,
+            "type_name": "嗲囡囡"
+        },
+        {
+            "type_id": 39,
+            "type_name": "波萝社"
+        },
+        {
+            "type_id": 40,
+            "type_name": "魅妍社"
+        },
+        {
+            "type_id": 41,
+            "type_name": "爱尤物"
+        },
+        {
+            "type_id": 42,
+            "type_name": "秀人网"
+        },
+        {
+            "type_id": 43,
+            "type_name": "尤果网"
+        },
+        {
+            "type_id": 44,
+            "type_name": "推女神"
+        },
+        {
+            "type_id": 45,
+            "type_name": "DGC套图"
+        },
+        {
+            "type_id": 46,
+            "type_name": "尤蜜荟"
+        },
+        {
+            "type_id": 47,
+            "type_name": "模范学院"
+        },
+        {
+            "type_id": 48,
+            "type_name": "尤物馆"
+        },
+        {
+            "type_id": 49,
+            "type_name": "优星馆"
+        },
+        {
+            "type_id": 50,
+            "type_name": "蜜桃社"
+        },
+        {
+            "type_id": 51,
+            "type_name": "影私荟"
+        },
+        {
+            "type_id": 52,
+            "type_name": "顽味生活"
+        },
+        {
+            "type_id": 53,
+            "type_name": "星乐园"
+        },
+        {
+            "type_id": 54,
+            "type_name": "花の颜"
+        },
+        {
+            "type_id": 55,
+            "type_name": "御女郎"
+        },
+        {
+            "type_id": 56,
+            "type_name": "糖果画报"
+        },
+        {
+            "type_id": 57,
+            "type_name": "花漾"
+        },
+        {
+            "type_id": 58,
+            "type_name": "星颜社"
+        },
+        {
+            "type_id": 59,
+            "type_name": "画语界"
+        },
+        {
+            "type_id": 60,
+            "type_name": "直播"
+        },
+        {
+            "type_id": 61,
+            "type_name": "央视"
+        },
+        {
+            "type_id": 62,
+            "type_name": "卫视"
+        },
+        {
+            "type_id": 63,
+            "type_name": "短剧"
+        },
+        {
+            "type_id": 64,
+            "type_name": "影视解说"
+        },
+        {
+            "type_id": 65,
+            "type_name": "港台三级"
+        },
+        {
+            "type_id": 66,
+            "type_name": "韩国伦理"
+        },
+        {
+            "type_id": 67,
+            "type_name": "西方伦理"
+        },
+        {
+            "type_id": 68,
+            "type_name": "日本伦理"
+        },
+        {
+            "type_id": 69,
+            "type_name": "预告片"
+        },
+        {
+            "type_id": 70,
+            "type_name": "网络电影"
+        },
+        {
+            "type_id": 71,
+            "type_name": "其他综艺"
+        }
+    ]
+}

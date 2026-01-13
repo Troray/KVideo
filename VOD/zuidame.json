@@ -1,0 +1,448 @@
+{
+    "code": 1,
+    "msg": "数据列表",
+    "page": 1,
+    "pagecount": 5584,
+    "limit": "20",
+    "total": 111667,
+    "list": [
+        {
+            "vod_id": 119054,
+            "vod_name": "1月13日 25-26赛季意甲第20轮 热那亚VS卡利亚里",
+            "type_id": 50,
+            "type_name": "足球",
+            "vod_en": "1yue13ri2526saijiyijiadi20lunrenayaVSkaliyali",
+            "vod_time": "2026-01-13 17:13:56",
+            "vod_remarks": "更新国语",
+            "vod_play_from": "zuidam3u8"
+        },
+        {
+            "vod_id": 119053,
+            "vod_name": "1月13日 25-26赛季西甲第19轮 塞维利亚VS塞尔塔",
+            "type_id": 50,
+            "type_name": "足球",
+            "vod_en": "1yue13ri2526saijixijiadi19lunsaiweiliyaVSsaierta",
+            "vod_time": "2026-01-13 17:11:43",
+            "vod_remarks": "更新国语",
+            "vod_play_from": "zuidam3u8"
+        },
+        {
+            "vod_id": 119052,
+            "vod_name": "1月13日 25-26赛季NBA常规赛 湖人VS国王",
+            "type_id": 49,
+            "type_name": "篮球",
+            "vod_en": "1yue13ri2526saijiNBAchangguisaihurenVSguowang",
+            "vod_time": "2026-01-13 17:09:21",
+            "vod_remarks": "更新国语",
+            "vod_play_from": "zuidam3u8"
+        },
+        {
+            "vod_id": 119051,
+            "vod_name": "1月13日 25-26赛季NBA常规赛 篮网VS独行侠",
+            "type_id": 49,
+            "type_name": "篮球",
+            "vod_en": "1yue13ri2526saijiNBAchangguisailanwangVSduxingxia",
+            "vod_time": "2026-01-13 17:07:22",
+            "vod_remarks": "更新国语",
+            "vod_play_from": "zuidam3u8"
+        },
+        {
+            "vod_id": 119050,
+            "vod_name": "1月13日 25-26赛季NBA常规赛 76人VS猛龙",
+            "type_id": 49,
+            "type_name": "篮球",
+            "vod_en": "1yue13ri2526saijiNBAchangguisai76renVSmenglong",
+            "vod_time": "2026-01-13 17:05:12",
+            "vod_remarks": "更新国语",
+            "vod_play_from": "zuidam3u8"
+        },
+        {
+            "vod_id": 119049,
+            "vod_name": "1月13日 25-26赛季NBA常规赛 凯尔特人VS步行者",
+            "type_id": 49,
+            "type_name": "篮球",
+            "vod_en": "1yue13ri2526saijiNBAchangguisaikaierterenVSbuxingzhe",
+            "vod_time": "2026-01-13 17:02:58",
+            "vod_remarks": "更新国语",
+            "vod_play_from": "zuidam3u8"
+        },
+        {
+            "vod_id": 118747,
+            "vod_name": "秋雪漫过的冬天",
+            "type_id": 13,
+            "type_name": "国产剧",
+            "vod_en": "qiuxuemanguodedongtian",
+            "vod_time": "2026-01-13 15:17:03",
+            "vod_remarks": "更新第08集",
+            "vod_play_from": "zuidam3u8"
+        },
+        {
+            "vod_id": 111609,
+            "vod_name": "怪变",
+            "type_id": 16,
+            "type_name": "日剧",
+            "vod_en": "guaibian",
+            "vod_time": "2026-01-13 15:16:53",
+            "vod_remarks": "更新第72集",
+            "vod_play_from": "zuidam3u8"
+        },
+        {
+            "vod_id": 34432,
+            "vod_name": "万界独尊",
+            "type_id": 29,
+            "type_name": "国产动漫",
+            "vod_en": "wanjieduzun",
+            "vod_time": "2026-01-13 14:40:11",
+            "vod_remarks": "更新第399集",
+            "vod_play_from": "zuidam3u8"
+        },
+        {
+            "vod_id": 34545,
+            "vod_name": "武神主宰",
+            "type_id": 29,
+            "type_name": "国产动漫",
+            "vod_en": "wushenzhuzai",
+            "vod_time": "2026-01-13 14:40:01",
+            "vod_remarks": "更新第616集",
+            "vod_play_from": "zuidam3u8"
+        },
+        {
+            "vod_id": 35384,
+            "vod_name": "炼气十万年",
+            "type_id": 29,
+            "type_name": "国产动漫",
+            "vod_en": "lianqishiwannian",
+            "vod_time": "2026-01-13 14:39:53",
+            "vod_remarks": "更新第311集",
+            "vod_play_from": "zuidam3u8"
+        },
+        {
+            "vod_id": 118320,
+            "vod_name": "势均力敌的我们第二季",
+            "type_id": 25,
+            "type_name": "大陆综艺",
+            "vod_en": "shijunlididewomendierji",
+            "vod_time": "2026-01-13 14:39:45",
+            "vod_remarks": "更新20260112",
+            "vod_play_from": "zuidam3u8"
+        },
+        {
+            "vod_id": 117768,
+            "vod_name": "名侦探学院第九季",
+            "type_id": 25,
+            "type_name": "大陆综艺",
+            "vod_en": "mingzhentanxueyuandijiuji",
+            "vod_time": "2026-01-13 14:39:44",
+            "vod_remarks": "更新20260113",
+            "vod_play_from": "zuidam3u8"
+        },
+        {
+            "vod_id": 115442,
+            "vod_name": "在恋爱开始之前",
+            "type_id": 25,
+            "type_name": "大陆综艺",
+            "vod_en": "zailianaikaishizhiqian",
+            "vod_time": "2026-01-13 14:39:37",
+            "vod_remarks": "更新20260113第15期",
+            "vod_play_from": "zuidam3u8"
+        },
+        {
+            "vod_id": 115441,
+            "vod_name": "奔跑吧·天路篇",
+            "type_id": 25,
+            "type_name": "大陆综艺",
+            "vod_en": "benpaobatianlupian",
+            "vod_time": "2026-01-13 14:39:32",
+            "vod_remarks": "更新20260113",
+            "vod_play_from": "zuidam3u8"
+        },
+        {
+            "vod_id": 116878,
+            "vod_name": "快乐老友·有风季",
+            "type_id": 25,
+            "type_name": "大陆综艺",
+            "vod_en": "kuailelaoyouyoufengji",
+            "vod_time": "2026-01-13 14:39:28",
+            "vod_remarks": "更新20260113上",
+            "vod_play_from": "zuidam3u8"
+        },
+        {
+            "vod_id": 117875,
+            "vod_name": "玉茗茶骨",
+            "type_id": 13,
+            "type_name": "国产剧",
+            "vod_en": "yumingchagu",
+            "vod_time": "2026-01-13 14:39:25",
+            "vod_remarks": "更新第28集",
+            "vod_play_from": "zuidam3u8"
+        },
+        {
+            "vod_id": 113459,
+            "vod_name": "姐姐对我来说是女人",
+            "type_id": 26,
+            "type_name": "日韩综艺",
+            "vod_en": "jiejieduiwolaishuoshinvren",
+            "vod_time": "2026-01-13 14:39:20",
+            "vod_remarks": "更新第12集",
+            "vod_play_from": "zuidam3u8"
+        },
+        {
+            "vod_id": 119048,
+            "vod_name": "失忆医生第二季",
+            "type_id": 14,
+            "type_name": "欧美剧",
+            "vod_en": "shiyiyishengdierji",
+            "vod_time": "2026-01-13 14:37:16",
+            "vod_remarks": "更新第01集",
+            "vod_play_from": "zuidam3u8"
+        },
+        {
+            "vod_id": 119047,
+            "vod_name": "妮基塔·罗伊与暗黑启示录",
+            "type_id": 10,
+            "type_name": "恐怖片",
+            "vod_en": "nijitaluoyiyuanheiqishilu",
+            "vod_time": "2026-01-13 14:35:01",
+            "vod_remarks": "更新HD",
+            "vod_play_from": "zuidam3u8"
+        }
+    ],
+    "class": [
+        {
+            "type_id": 1,
+            "type_name": "电影"
+        },
+        {
+            "type_id": 2,
+            "type_name": "电视剧"
+        },
+        {
+            "type_id": 3,
+            "type_name": "综艺"
+        },
+        {
+            "type_id": 4,
+            "type_name": "动漫"
+        },
+        {
+            "type_id": 6,
+            "type_name": "动作片"
+        },
+        {
+            "type_id": 7,
+            "type_name": "喜剧片"
+        },
+        {
+            "type_id": 8,
+            "type_name": "爱情片"
+        },
+        {
+            "type_id": 9,
+            "type_name": "科幻片"
+        },
+        {
+            "type_id": 10,
+            "type_name": "恐怖片"
+        },
+        {
+            "type_id": 11,
+            "type_name": "剧情片"
+        },
+        {
+            "type_id": 12,
+            "type_name": "战争片"
+        },
+        {
+            "type_id": 13,
+            "type_name": "国产剧"
+        },
+        {
+            "type_id": 14,
+            "type_name": "欧美剧"
+        },
+        {
+            "type_id": 15,
+            "type_name": "韩剧"
+        },
+        {
+            "type_id": 16,
+            "type_name": "日剧"
+        },
+        {
+            "type_id": 17,
+            "type_name": "港剧"
+        },
+        {
+            "type_id": 18,
+            "type_name": "台剧"
+        },
+        {
+            "type_id": 19,
+            "type_name": "泰剧"
+        },
+        {
+            "type_id": 20,
+            "type_name": "纪录片"
+        },
+        {
+            "type_id": 23,
+            "type_name": "海外剧"
+        },
+        {
+            "type_id": 25,
+            "type_name": "大陆综艺"
+        },
+        {
+            "type_id": 26,
+            "type_name": "日韩综艺"
+        },
+        {
+            "type_id": 27,
+            "type_name": "港台综艺"
+        },
+        {
+            "type_id": 28,
+            "type_name": "欧美综艺"
+        },
+        {
+            "type_id": 29,
+            "type_name": "国产动漫"
+        },
+        {
+            "type_id": 30,
+            "type_name": "日韩动漫"
+        },
+        {
+            "type_id": 31,
+            "type_name": "欧美动漫"
+        },
+        {
+            "type_id": 39,
+            "type_name": "动画片"
+        },
+        {
+            "type_id": 44,
+            "type_name": "港台动漫"
+        },
+        {
+            "type_id": 45,
+            "type_name": "海外动漫"
+        },
+        {
+            "type_id": 47,
+            "type_name": "演唱会"
+        },
+        {
+            "type_id": 48,
+            "type_name": "体育赛事"
+        },
+        {
+            "type_id": 49,
+            "type_name": "篮球"
+        },
+        {
+            "type_id": 50,
+            "type_name": "足球"
+        },
+        {
+            "type_id": 51,
+            "type_name": "预告片"
+        },
+        {
+            "type_id": 52,
+            "type_name": "斯诺克"
+        },
+        {
+            "type_id": 53,
+            "type_name": "影视解说"
+        },
+        {
+            "type_id": 54,
+            "type_name": "爽文短剧"
+        },
+        {
+            "type_id": 55,
+            "type_name": "伦理"
+        },
+        {
+            "type_id": 56,
+            "type_name": "港台三级"
+        },
+        {
+            "type_id": 57,
+            "type_name": "韩国伦理"
+        },
+        {
+            "type_id": 58,
+            "type_name": "西方伦理"
+        },
+        {
+            "type_id": 59,
+            "type_name": "日本伦理"
+        },
+        {
+            "type_id": 60,
+            "type_name": "两性课堂"
+        },
+        {
+            "type_id": 61,
+            "type_name": "写真热舞"
+        },
+        {
+            "type_id": 62,
+            "type_name": "4K电影"
+        },
+        {
+            "type_id": 63,
+            "type_name": "有声动漫"
+        },
+        {
+            "type_id": 64,
+            "type_name": "女频恋爱"
+        },
+        {
+            "type_id": 65,
+            "type_name": "反转爽剧"
+        },
+        {
+            "type_id": 66,
+            "type_name": "古装仙侠"
+        },
+        {
+            "type_id": 67,
+            "type_name": "年代穿越"
+        },
+        {
+            "type_id": 68,
+            "type_name": "脑洞悬疑"
+        },
+        {
+            "type_id": 69,
+            "type_name": "现代都市"
+        },
+        {
+            "type_id": 70,
+            "type_name": "邵氏电影"
+        },
+        {
+            "type_id": 71,
+            "type_name": "Netflix电影"
+        },
+        {
+            "type_id": 72,
+            "type_name": "Netflix自制剧"
+        },
+        {
+            "type_id": 73,
+            "type_name": "擦边短剧"
+        },
+        {
+            "type_id": 74,
+            "type_name": "科普学习"
+        },
+        {
+            "type_id": 75,
+            "type_name": "漫剧"
+        }
+    ]
+}

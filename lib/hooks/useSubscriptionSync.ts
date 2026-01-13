@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { settingsStore } from '@/lib/store/settings-store';
 import { fetchSourcesFromUrl, mergeSources } from '@/lib/utils/source-import-utils';
+import type { SourceSubscription } from '@/lib/types';
 
 // Minimum time between syncs for the same subscription (5 minutes)
 const SYNC_COOLDOWN_MS = 5 * 60 * 1000;
@@ -19,14 +20,14 @@ export function useSubscriptionSync() {
         const sync = async () => {
             // Double-check to prevent race conditions
             if (hasSyncedRef.current || isSyncingRef.current) return;
-            
+
             isSyncingRef.current = true;
 
             try {
                 // Read subscriptions directly from store (not via state to avoid re-renders)
                 const settings = settingsStore.getSettings();
-                const activeSubscriptions = settings.subscriptions.filter((s: any) => s.autoRefresh !== false);
-                
+                const activeSubscriptions = settings.subscriptions.filter((s: SourceSubscription) => s.autoRefresh !== false);
+
                 if (activeSubscriptions.length === 0) {
                     hasSyncedRef.current = true;
                     return;
@@ -64,7 +65,7 @@ export function useSubscriptionSync() {
                         if (subIdx !== -1) {
                             updatedSubscriptions[subIdx] = {
                                 ...updatedSubscriptions[subIdx],
-                                lastUpdated: Date.now()
+                                lastUpdated: now
                             };
                             anyChanged = true; // Mark changed to save the updated timestamp
                         }

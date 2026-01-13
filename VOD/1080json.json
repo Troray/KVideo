@@ -1,0 +1,372 @@
+{
+    "code": 1,
+    "msg": "\u6570\u636e\u5217\u8868",
+    "page": 1,
+    "pagecount": 3925,
+    "limit": 20,
+    "total": 78496,
+    "list": [
+        {
+            "vod_id": "79011",
+            "vod_name": "\u5931\u7a83\u7684\u5973\u5b69\u7b2c\u4e00\u5b63",
+            "type_id": "15",
+            "type_name": "\u6b27\u7f8e\u5267",
+            "vod_en": "shiqiedenvhaidiyiji",
+            "vod_time": "2026-01-13 17:16:42",
+            "vod_remarks": "\u66f4\u65b0\u81f302\u96c6",
+            "vod_play_from": "1080zyk"
+        },
+        {
+            "vod_id": "79274",
+            "vod_name": "\u957f\u5251\u98ce\u4e91\u7ca4\u8bed\u7248",
+            "type_id": "66",
+            "type_name": "\u56fd\u4ea7\u52a8\u6f2b",
+            "vod_en": "changjianfengyunyueyuban",
+            "vod_time": "2026-01-13 16:48:10",
+            "vod_remarks": "\u516810\u96c6",
+            "vod_play_from": "1080zyk"
+        },
+        {
+            "vod_id": "79271",
+            "vod_name": "\u957f\u5251\u98ce\u4e91",
+            "type_id": "66",
+            "type_name": "\u56fd\u4ea7\u52a8\u6f2b",
+            "vod_en": "changjianfengyun",
+            "vod_time": "2026-01-13 16:46:06",
+            "vod_remarks": "\u516810\u96c6",
+            "vod_play_from": "1080zyk"
+        },
+        {
+            "vod_id": "79273",
+            "vod_name": "\u6211\u7684\u5496\u5561\u7537\u53cb\u7b2c\u4e8c\u5b63",
+            "type_id": "64",
+            "type_name": "\u65e5\u97e9\u7efc\u827a",
+            "vod_en": "wodekafeinanyoudierji",
+            "vod_time": "2026-01-13 16:38:31",
+            "vod_remarks": "\u66f4\u65b0\u81f306\u671f",
+            "vod_play_from": "1080zyk"
+        },
+        {
+            "vod_id": "79272",
+            "vod_name": "\u5bfb\u6b22\u4f5c\u4e50\u7684\u59d0\u59d0\u7ca4\u8bed",
+            "type_id": "63",
+            "type_name": "\u6e2f\u53f0\u7efc\u827a",
+            "vod_en": "xunhuanzuoledejiejieyueyu",
+            "vod_time": "2026-01-13 16:21:21",
+            "vod_remarks": "\u66f4\u65b0\u81f306\u96c6",
+            "vod_play_from": "1080zyk"
+        },
+        {
+            "vod_id": "77367",
+            "vod_name": "\u9ed1\u767d\u53a8\u5e08\uff1a\u6599\u7406\u9636\u7ea7\u6218\u4e89\u7b2c\u4e8c\u5b63",
+            "type_id": "64",
+            "type_name": "\u65e5\u97e9\u7efc\u827a",
+            "vod_en": "heibaichushiliaolijiejizhanzhengdierji",
+            "vod_time": "2026-01-13 16:12:40",
+            "vod_remarks": "\u516813\u671f",
+            "vod_play_from": "1080zyk"
+        },
+        {
+            "vod_id": "79270",
+            "vod_name": "\u9a7e\u9a762025",
+            "type_id": "10",
+            "type_name": "\u5267\u60c5\u7247",
+            "vod_en": "jiashi2025",
+            "vod_time": "2026-01-13 16:11:05",
+            "vod_remarks": "HD\u4e2d\u5b57",
+            "vod_play_from": "1080zyk"
+        },
+        {
+            "vod_id": "79269",
+            "vod_name": "\u4e07\u754c\u5947\u7f18",
+            "type_id": "66",
+            "type_name": "\u56fd\u4ea7\u52a8\u6f2b",
+            "vod_en": "wanjieqiyuan",
+            "vod_time": "2026-01-13 16:06:31",
+            "vod_remarks": "\u516840\u96c6",
+            "vod_play_from": "1080zyk"
+        },
+        {
+            "vod_id": "79268",
+            "vod_name": "\u98ce\u59ff\u7269\u8bed\u94f6\u6cb3\u7bc7",
+            "type_id": "66",
+            "type_name": "\u56fd\u4ea7\u52a8\u6f2b",
+            "vod_en": "fengziwuyuyinhepian",
+            "vod_time": "2026-01-13 15:22:52",
+            "vod_remarks": "\u516820\u96c6",
+            "vod_play_from": "1080zyk"
+        },
+        {
+            "vod_id": "79267",
+            "vod_name": "\u7075\u4e91\u4ee3\u7801",
+            "type_id": "66",
+            "type_name": "\u56fd\u4ea7\u52a8\u6f2b",
+            "vod_en": "lingyundaima",
+            "vod_time": "2026-01-13 14:45:39",
+            "vod_remarks": "\u516820\u96c6",
+            "vod_play_from": "1080zyk"
+        },
+        {
+            "vod_id": "78491",
+            "vod_name": "\u7537\u751f\u5973\u751f\u5411\u524d\u51b2\u7b2c\u5341\u516b\u5b63",
+            "type_id": "62",
+            "type_name": "\u5927\u9646\u7efc\u827a",
+            "vod_en": "nanshengnvshengxiangqianchongdishibaji",
+            "vod_time": "2026-01-13 14:38:46",
+            "vod_remarks": "\u66f4\u65b0\u81f320260113\u671f",
+            "vod_play_from": "1080zyk"
+        },
+        {
+            "vod_id": "54870",
+            "vod_name": "\u7b2c\u4e09\u8c03\u89e3\u5ba4",
+            "type_id": "62",
+            "type_name": "\u5927\u9646\u7efc\u827a",
+            "vod_en": "disandiaojieshi",
+            "vod_time": "2026-01-13 14:35:42",
+            "vod_remarks": "\u66f4\u65b0\u81f320260113\u671f",
+            "vod_play_from": "1080zyk"
+        },
+        {
+            "vod_id": "79266",
+            "vod_name": "\u7389\u89c1\u6881\u8fb0\u9c7c",
+            "type_id": "12",
+            "type_name": "\u56fd\u4ea7\u5267",
+            "vod_en": "yujianliangchenyu",
+            "vod_time": "2026-01-13 14:35:09",
+            "vod_remarks": "\u66f4\u65b0\u81f305\u96c6",
+            "vod_play_from": "1080zyk"
+        },
+        {
+            "vod_id": "28468",
+            "vod_name": "\u5c0f\u59d0\u4e0d\u7199\u5a23",
+            "type_id": "63",
+            "type_name": "\u6e2f\u53f0\u7efc\u827a",
+            "vod_en": "xiaojiebuxidi",
+            "vod_time": "2026-01-13 14:14:19",
+            "vod_remarks": "\u66f4\u65b0\u81f320260112\u671f",
+            "vod_play_from": "1080zyk"
+        },
+        {
+            "vod_id": "79265",
+            "vod_name": "\u8bb8\u4f60\u4e00\u4e2a\u5b89\u5eb7",
+            "type_id": "12",
+            "type_name": "\u56fd\u4ea7\u5267",
+            "vod_en": "xuniyigeankang",
+            "vod_time": "2026-01-13 13:51:10",
+            "vod_remarks": "\u516812\u96c6",
+            "vod_play_from": "1080zyk"
+        },
+        {
+            "vod_id": "77479",
+            "vod_name": "\u6211\u771f\u6ca1\u60f3\u91cd\u751f\u554a \u52a8\u6001\u6f2b",
+            "type_id": "66",
+            "type_name": "\u56fd\u4ea7\u52a8\u6f2b",
+            "vod_en": "wozhenmeixiangzhongshengadongtaiman",
+            "vod_time": "2026-01-13 13:50:31",
+            "vod_remarks": "\u66f4\u65b0\u81f342\u96c6",
+            "vod_play_from": "1080zyk"
+        },
+        {
+            "vod_id": "78849",
+            "vod_name": "\u6c5f\u601d\u5148\u751f\u52a8\u6001\u6f2b",
+            "type_id": "66",
+            "type_name": "\u56fd\u4ea7\u52a8\u6f2b",
+            "vod_en": "jiangsixianshengdongtaiman",
+            "vod_time": "2026-01-13 13:48:43",
+            "vod_remarks": "\u66f4\u65b0\u81f3142\u96c6",
+            "vod_play_from": "1080zyk"
+        },
+        {
+            "vod_id": "78907",
+            "vod_name": "\u4ece\u54e5\u5e03\u6797\u5230\u54e5\u5e03\u6797\u795e\u52a8\u6001\u6f2b",
+            "type_id": "66",
+            "type_name": "\u56fd\u4ea7\u52a8\u6f2b",
+            "vod_en": "conggebulindaogebulinshendongtaiman",
+            "vod_time": "2026-01-13 13:46:07",
+            "vod_remarks": "\u66f4\u65b0\u81f344\u96c6",
+            "vod_play_from": "1080zyk"
+        },
+        {
+            "vod_id": "78924",
+            "vod_name": "\u672b\u65e5\u72e0\u4eba\uff1a\u5f00\u5c40\u56e4\u79ef\u4e07\u4ebf\u7269\u8d44\u52a8\u6001\u6f2b",
+            "type_id": "66",
+            "type_name": "\u56fd\u4ea7\u52a8\u6f2b",
+            "vod_en": "morihenrenkaijudunjiwanyiwuzidongtaiman",
+            "vod_time": "2026-01-13 13:44:50",
+            "vod_remarks": "\u66f4\u65b0\u81f344\u96c6",
+            "vod_play_from": "1080zyk"
+        },
+        {
+            "vod_id": "79264",
+            "vod_name": "\u7b2c76\u5c4aNHK\u7ea2\u767d\u6b4c\u4f1a",
+            "type_id": "64",
+            "type_name": "\u65e5\u97e9\u7efc\u827a",
+            "vod_en": "di76jieNHKhongbaigehui",
+            "vod_time": "2026-01-13 13:43:18",
+            "vod_remarks": "HD\u4e2d\u5b57",
+            "vod_play_from": "1080zyk"
+        }
+    ],
+    "class": [
+        {
+            "type_id": "1",
+            "type_name": "\u7535\u5f71"
+        },
+        {
+            "type_id": "2",
+            "type_name": "\u8fde\u7eed\u5267"
+        },
+        {
+            "type_id": "3",
+            "type_name": "\u7efc\u827a"
+        },
+        {
+            "type_id": "4",
+            "type_name": "\u52a8\u6f2b"
+        },
+        {
+            "type_id": "5",
+            "type_name": "\u52a8\u4f5c\u7247"
+        },
+        {
+            "type_id": "6",
+            "type_name": "\u559c\u5267\u7247"
+        },
+        {
+            "type_id": "7",
+            "type_name": "\u7231\u60c5\u7247"
+        },
+        {
+            "type_id": "8",
+            "type_name": "\u79d1\u5e7b\u7247"
+        },
+        {
+            "type_id": "9",
+            "type_name": "\u6050\u6016\u7247"
+        },
+        {
+            "type_id": "10",
+            "type_name": "\u5267\u60c5\u7247"
+        },
+        {
+            "type_id": "11",
+            "type_name": "\u6218\u4e89\u7247"
+        },
+        {
+            "type_id": "12",
+            "type_name": "\u56fd\u4ea7\u5267"
+        },
+        {
+            "type_id": "13",
+            "type_name": "\u53f0\u6e7e\u5267"
+        },
+        {
+            "type_id": "14",
+            "type_name": "\u97e9\u56fd\u5267"
+        },
+        {
+            "type_id": "15",
+            "type_name": "\u6b27\u7f8e\u5267"
+        },
+        {
+            "type_id": "16",
+            "type_name": "\u9999\u6e2f\u5267"
+        },
+        {
+            "type_id": "17",
+            "type_name": "\u6cf0\u56fd\u5267"
+        },
+        {
+            "type_id": "18",
+            "type_name": "\u65e5\u672c\u5267"
+        },
+        {
+            "type_id": "19",
+            "type_name": "\u798f\u5229"
+        },
+        {
+            "type_id": "20",
+            "type_name": "\u8bb0\u5f55\u7247"
+        },
+        {
+            "type_id": "41",
+            "type_name": "\u52a8\u753b\u7247"
+        },
+        {
+            "type_id": "54",
+            "type_name": "\u6d77\u5916\u5267"
+        },
+        {
+            "type_id": "61",
+            "type_name": "\u502b\u7406\u7247"
+        },
+        {
+            "type_id": "62",
+            "type_name": "\u5927\u9646\u7efc\u827a"
+        },
+        {
+            "type_id": "63",
+            "type_name": "\u6e2f\u53f0\u7efc\u827a"
+        },
+        {
+            "type_id": "64",
+            "type_name": "\u65e5\u97e9\u7efc\u827a"
+        },
+        {
+            "type_id": "65",
+            "type_name": "\u6b27\u7f8e\u7efc\u827a"
+        },
+        {
+            "type_id": "66",
+            "type_name": "\u56fd\u4ea7\u52a8\u6f2b"
+        },
+        {
+            "type_id": "67",
+            "type_name": "\u65e5\u97e9\u52a8\u6f2b"
+        },
+        {
+            "type_id": "68",
+            "type_name": "\u6b27\u7f8e\u52a8\u6f2b"
+        },
+        {
+            "type_id": "69",
+            "type_name": "\u6e2f\u53f0\u52a8\u6f2b"
+        },
+        {
+            "type_id": "70",
+            "type_name": "\u6d77\u5916\u52a8\u6f2b"
+        },
+        {
+            "type_id": "78",
+            "type_name": "\u641e\u7b11"
+        },
+        {
+            "type_id": "79",
+            "type_name": "\u97f3\u4e50"
+        },
+        {
+            "type_id": "80",
+            "type_name": "\u5f71\u89c6"
+        },
+        {
+            "type_id": "81",
+            "type_name": "\u6c7d\u8f66"
+        },
+        {
+            "type_id": "83",
+            "type_name": "\u77ed\u5267\u5927\u5168"
+        },
+        {
+            "type_id": "92",
+            "type_name": "\u9884\u544a\u7247"
+        },
+        {
+            "type_id": "93",
+            "type_name": "\u9884\u544a\u7247"
+        },
+        {
+            "type_id": "94",
+            "type_name": "\u4f53\u80b2"
+        }
+    ]
+}
