@@ -136,7 +136,7 @@ export function DesktopMoreMenu({
             <div className="px-4 py-2.5 flex items-center justify-between">
                 <div className="flex items-center gap-3 text-sm text-[var(--text-color)]">
                     <Icons.ShieldAlert size={18} />
-                    <span>广告过滤</span>
+                    <span>广告过滤(实验)</span>
                 </div>
                 <button
                     onClick={() => setAdFilter(!adFilter)}
