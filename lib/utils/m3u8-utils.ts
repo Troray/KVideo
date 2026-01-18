@@ -25,22 +25,40 @@ export function filterM3u8Ad(content: string, baseUrl: string): string {
         const line = lines[i];
         const trimmedLine = line.trim();
 
-        // 1. Remove Discontinuity Tags
-        if (trimmedLine === '#EXT-X-DISCONTINUITY') {
+        // 1. Identify Ad Segments
+        // Load keywords from environment variable (support newline or comma separator)
+        // Default fallback if not set
+        const envKeywords = process.env.NEXT_PUBLIC_AD_KEYWORDS || '';
+        const keywords = envKeywords
+            ? envKeywords.split(/[\n,]/).map(k => k.trim()).filter(k => k)
+            : ['/adjump/'];
+
+        // Check if line matches any keyword
+        if (keywords.some(keyword => trimmedLine.includes(keyword))) {
+            // This is an ad segment. We must NOT add it.
+            // AND we must remove the preceding metadata (EXTINF and potentially DISCONTINUITY)
+
+            // Backtrack to remove associated tags
+            while (processedLines.length > 0) {
+                const lastIndex = processedLines.length - 1;
+                const lastLine = processedLines[lastIndex].trim();
+
+                if (lastLine.startsWith('#EXTINF:')) {
+                    processedLines.pop(); // Remove duration
+                } else if (lastLine === '#EXT-X-DISCONTINUITY') {
+                    processedLines.pop(); // Remove discontinuity start
+                } else {
+                    // Stop if we hit something else (like another URL or unrelated tag)
+                    break;
+                }
+            }
             continue;
         }
 
-        // 2. Identify Ad Segments
-        // Key indicator: URL contains '/adjump/' or similar ad patterns
-        if (trimmedLine.includes('/adjump/') || trimmedLine.includes('/video/adjump/')) {
-            // This is an ad segment. We must NOT add it.
-            // AND we must remove the preceding #EXTINF tag if it was already added.
-            if (processedLines.length > 0) {
-                const lastLine = processedLines[processedLines.length - 1];
-                if (lastLine.trim().startsWith('#EXTINF:')) {
-                    processedLines.pop(); // Remove the EXTINF line associated with this ad
-                }
-            }
+        // 2. Discontinuity Tags - Keep them by default
+        // They will be removed via backtracking IF they turn out to be for an ad
+        if (trimmedLine === '#EXT-X-DISCONTINUITY') {
+            processedLines.push(line);
             continue;
         }
 
@@ -53,8 +71,7 @@ export function filterM3u8Ad(content: string, baseUrl: string): string {
         // If it's a tag (starts with #), checks if it's a URI tag (like #EXT-X-KEY:URI="...")
         if (trimmedLine.startsWith('#')) {
             if (trimmedLine.startsWith('#EXTINF:') && lines[i + 1]) {
-                // If this is EXTINF, checking ahead *might* be an optimization but iterating is safer.
-                // We just push it for now; if next line is invalid/ad, we pop it then.
+                // We just push it for now; if next line is ad, we pop it then.
                 processedLines.push(line);
                 continue;
             }
