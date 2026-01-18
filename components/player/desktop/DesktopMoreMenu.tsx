@@ -32,12 +32,14 @@ export function DesktopMoreMenu({
         autoSkipOutro,
         skipOutroSeconds,
         showModeIndicator,
+        adFilter,
         setAutoNextEpisode,
         setAutoSkipIntro,
         setSkipIntroSeconds,
         setAutoSkipOutro,
         setSkipOutroSeconds,
         setShowModeIndicator,
+        setAdFilter,
     } = usePlayerSettings();
 
     const buttonRef = React.useRef<HTMLButtonElement>(null);
@@ -125,6 +127,26 @@ export function DesktopMoreMenu({
                 >
                     <span
                         className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform shadow-sm ${showModeIndicator ? 'translate-x-4' : 'translate-x-0'
+                            }`}
+                    />
+                </button>
+            </div>
+
+            {/* Ad Filter Switch */}
+            <div className="px-4 py-2.5 flex items-center justify-between">
+                <div className="flex items-center gap-3 text-sm text-[var(--text-color)]">
+                    <Icons.ShieldAlert size={18} />
+                    <span>广告过滤</span>
+                </div>
+                <button
+                    onClick={() => setAdFilter(!adFilter)}
+                    className={`relative w-10 h-6 rounded-full transition-colors cursor-pointer ${adFilter ? 'bg-[var(--accent-color)]' : 'bg-[color-mix(in_srgb,var(--text-color)_20%,transparent)]'
+                        }`}
+                    aria-checked={adFilter}
+                    role="switch"
+                >
+                    <span
+                        className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform shadow-sm ${adFilter ? 'translate-x-4' : 'translate-x-0'
                             }`}
                     />
                 </button>
