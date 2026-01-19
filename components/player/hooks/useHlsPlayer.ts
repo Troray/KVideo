@@ -69,7 +69,7 @@ export function useHlsPlayer({
                 // Exceptions might exist for iOS where MSE is strictly not available, check Hls.isSupported() result carefully.
                 // Hls.isSupported() is false on iOS Safari usually, so this block won't run there.
 
-                const config: Partial<import('hls.js').HlsConfig> = {
+                const config: any = {
                     // Worker & Performance
                     enableWorker: true,
                     lowLatencyMode: false,
