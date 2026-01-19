@@ -18,6 +18,7 @@ export type SortOption =
   | 'name-desc';
 
 export type SearchDisplayMode = 'normal' | 'grouped';
+export type AdFilterMode = 'off' | 'keyword' | 'heuristic' | 'aggressive';
 
 export interface AppSettings {
   sources: VideoSource[];
@@ -35,7 +36,8 @@ export interface AppSettings {
   autoSkipOutro: boolean;
   skipOutroSeconds: number;
   showModeIndicator: boolean; // Show '直连模式'/'代理模式' badge on player
-  adFilter: boolean; // Filter ad tags from m3u8
+  adFilter: boolean; // Filter ad tags from m3u8 (legacy, kept for compatibility)
+  adFilterMode: AdFilterMode; // 'off' | 'keyword' | 'heuristic' | 'aggressive'
   // Search & Display settings
   realtimeLatency: boolean; // Enable real-time latency ping updates
   searchDisplayMode: SearchDisplayMode; // 'normal' = individual cards, 'grouped' = group same-name videos
@@ -107,6 +109,7 @@ export const settingsStore = {
         skipOutroSeconds: 0,
         showModeIndicator: false,
         adFilter: false,
+        adFilterMode: 'heuristic',
         realtimeLatency: false,
         searchDisplayMode: 'normal',
         episodeReverseOrder: false,
@@ -131,6 +134,7 @@ export const settingsStore = {
         skipOutroSeconds: 0,
         showModeIndicator: false,
         adFilter: false,
+        adFilterMode: 'heuristic',
         realtimeLatency: false,
         searchDisplayMode: 'normal',
         episodeReverseOrder: false,

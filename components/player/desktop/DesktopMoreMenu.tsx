@@ -40,6 +40,8 @@ export function DesktopMoreMenu({
         setSkipOutroSeconds,
         setShowModeIndicator,
         setAdFilter,
+        adFilterMode,
+        setAdFilterMode,
     } = usePlayerSettings();
 
     const buttonRef = React.useRef<HTMLButtonElement>(null);
@@ -132,24 +134,23 @@ export function DesktopMoreMenu({
                 </button>
             </div>
 
-            {/* Ad Filter Switch */}
+            {/* Ad Filter Mode Selector */}
             <div className="px-4 py-2.5 flex items-center justify-between">
                 <div className="flex items-center gap-3 text-sm text-[var(--text-color)]">
                     <Icons.ShieldAlert size={18} />
-                    <span>广告过滤(实验)</span>
+                    <span>广告过滤</span>
                 </div>
-                <button
-                    onClick={() => setAdFilter(!adFilter)}
-                    className={`relative w-10 h-6 rounded-full transition-colors cursor-pointer ${adFilter ? 'bg-[var(--accent-color)]' : 'bg-[color-mix(in_srgb,var(--text-color)_20%,transparent)]'
-                        }`}
-                    aria-checked={adFilter}
-                    role="switch"
+                <select
+                    value={adFilterMode}
+                    onChange={(e) => setAdFilterMode(e.target.value as any)}
+                    className="bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--text-color)] text-xs rounded-md px-2 py-1 outline-none focus:border-[var(--accent-color)] cursor-pointer"
+                    onClick={(e) => e.stopPropagation()}
                 >
-                    <span
-                        className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform shadow-sm ${adFilter ? 'translate-x-4' : 'translate-x-0'
-                            }`}
-                    />
-                </button>
+                    <option value="off" className="bg-gray-800 text-white">关闭</option>
+                    <option value="keyword" className="bg-gray-800 text-white">关键词</option>
+                    <option value="heuristic" className="bg-gray-800 text-white">智能(Beta)</option>
+                    <option value="aggressive" className="bg-gray-800 text-white">激进</option>
+                </select>
             </div>
 
             {/* Auto Next Episode Switch */}

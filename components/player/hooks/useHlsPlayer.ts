@@ -19,7 +19,8 @@ export function useHlsPlayer({
     onError
 }: UseHlsPlayerProps) {
     const hlsRef = useRef<Hls | null>(null);
-    const { adFilter } = usePlayerSettings();
+    const { adFilterMode } = usePlayerSettings();
+    const isAdFilterEnabled = adFilterMode !== 'off';
 
     useEffect(() => {
         const video = videoRef.current;
@@ -45,13 +46,13 @@ export function useHlsPlayer({
 
             class AdFilterLoader extends DefaultLoader {
                 load(context: any, config: any, callbacks: any) {
-                    if (adFilter && (context.type === 'manifest' || context.type === 'level')) {
+                    if (isAdFilterEnabled && (context.type === 'manifest' || context.type === 'level')) {
                         const originalOnSuccess = callbacks.onSuccess;
                         callbacks.onSuccess = (response: any, stats: any, context: any, networkDetails: any) => {
                             if (typeof response.data === 'string') {
                                 try {
                                     // Filter the content
-                                    response.data = filterM3u8Ad(response.data, context.url);
+                                    response.data = filterM3u8Ad(response.data, context.url, adFilterMode);
                                 } catch (e) {
                                     console.warn('[HLS] Ad filter error:', e);
                                 }
@@ -63,7 +64,7 @@ export function useHlsPlayer({
                 }
             }
 
-            if (!isNativeHlsSupported || adFilter) {
+            if (!isNativeHlsSupported || isAdFilterEnabled) {
                 // If ad filtering is on, we force Hls.js even on native-supported desktop browsers
                 // Exceptions might exist for iOS where MSE is strictly not available, check Hls.isSupported() result carefully.
                 // Hls.isSupported() is false on iOS Safari usually, so this block won't run there.
@@ -254,7 +255,7 @@ export function useHlsPlayer({
                                             const absoluteUrl = isRelative ? new URL(uri, absoluteMasterSrc).toString() : uri;
                                             const subRes = await fetch(absoluteUrl);
                                             const subContent = await subRes.text();
-                                            const filteredSub = filterM3u8Ad(subContent, absoluteUrl);
+                                            const filteredSub = filterM3u8Ad(subContent, absoluteUrl, adFilterMode);
                                             const subBlob = new Blob([filteredSub], { type: 'application/vnd.apple.mpegurl' });
                                             const subBlobUrl = URL.createObjectURL(subBlob);
                                             createdBlobs.push(subBlobUrl);
@@ -279,7 +280,7 @@ export function useHlsPlayer({
                                         const absoluteUrl = isRelative ? new URL(trimmedLine, absoluteMasterSrc).toString() : trimmedLine;
                                         const subRes = await fetch(absoluteUrl);
                                         const subContent = await subRes.text();
-                                        const filteredSub = filterM3u8Ad(subContent, absoluteUrl);
+                                        const filteredSub = filterM3u8Ad(subContent, absoluteUrl, adFilterMode);
                                         const subBlob = new Blob([filteredSub], { type: 'application/vnd.apple.mpegurl' });
                                         const subBlobUrl = URL.createObjectURL(subBlob);
                                         createdBlobs.push(subBlobUrl);
@@ -339,5 +340,5 @@ export function useHlsPlayer({
             }
             extraBlobs.forEach(url => URL.revokeObjectURL(url));
         };
-    }, [src, videoRef, autoPlay, onAutoPlayPrevented, onError, adFilter]);
+    }, [src, videoRef, autoPlay, onAutoPlayPrevented, onError, isAdFilterEnabled, adFilterMode]);
 }

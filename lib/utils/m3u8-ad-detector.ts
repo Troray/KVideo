@@ -256,6 +256,6 @@ export const THRESHOLDS = {
 /**
  * Determine if a block should be filtered based on its score
  */
-export function shouldFilterBlock(score: number): boolean {
-    return score >= THRESHOLDS.HIGH;
+export function shouldFilterBlock(score: number, threshold: number = THRESHOLDS.HIGH): boolean {
+    return score >= threshold;
 }

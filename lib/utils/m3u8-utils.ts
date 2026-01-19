@@ -17,7 +17,9 @@ import { parseBlocks, learnMainPattern, scoreBlock, shouldFilterBlock } from './
  * @param baseUrl The base URL of the M3U8 file (to resolve relative paths)
  * @returns The filtered M3U8 content
  */
-export function filterM3u8Ad(content: string, baseUrl: string): string {
+export type AdFilterMode = 'off' | 'keyword' | 'heuristic' | 'aggressive';
+
+export function filterM3u8Ad(content: string, baseUrl: string, mode: AdFilterMode = 'heuristic'): string {
     if (!content) return '';
 
     // 1. Performance: Parse Keywords & Base URL ONLY ONCE
@@ -33,21 +35,22 @@ export function filterM3u8Ad(content: string, baseUrl: string): string {
     } catch (e) { /* ignore */ }
 
     // 2. Global Scan: Check if any ad keywords exist in the content
-    const hasKeywordMatch = keywords.some(k => content.includes(k));
-    const hasCueTag = content.includes('#EXT-X-CUE-OUT') || content.includes('#EXT-X-CUE-IN');
+    const hasKeywordMatch = mode !== 'off' && keywords.some(k => content.includes(k));
+    const hasCueTag = mode !== 'off' && (content.includes('#EXT-X-CUE-OUT') || content.includes('#EXT-X-CUE-IN'));
 
     // 3. Heuristic Analysis: If no explicit ad signals, use block-based detection
     const lines = content.split(/\r?\n/);
     let adLineIndices = new Set<number>();
 
-    if (!hasCueTag) {
+    if (!hasCueTag && (mode === 'heuristic' || mode === 'aggressive')) {
         // No obvious ad signals - run heuristic analysis
         const blocks = parseBlocks(lines);
         if (blocks.length > 1) {
             const mainPattern = learnMainPattern(blocks);
             for (const block of blocks) {
                 const score = scoreBlock(block, mainPattern);
-                if (shouldFilterBlock(score)) {
+                const threshold = mode === 'aggressive' ? 3.0 : 5.0;
+                if (shouldFilterBlock(score, threshold)) {
                     // Mark all lines in this block for removal
                     for (const segment of block.segments) {
                         adLineIndices.add(segment.lineIndex);
@@ -74,7 +77,7 @@ export function filterM3u8Ad(content: string, baseUrl: string): string {
 
         // 3. CUE Tag Detection (SCTE-35 Standard)
         // EXT-X-CUE-OUT marks start of ad, EXT-X-CUE-IN marks end
-        if (trimmedLine.startsWith('#EXT-X-CUE-OUT')) {
+        if (mode !== 'off' && trimmedLine.startsWith('#EXT-X-CUE-OUT')) {
             insideCueAdBlock = true;
             // Remove preceding DISCONTINUITY if present
             if (processedLines.length > 0 && processedLines[processedLines.length - 1].trim() === '#EXT-X-DISCONTINUITY') {

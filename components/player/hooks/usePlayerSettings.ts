@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { settingsStore } from '@/lib/store/settings-store';
+import { settingsStore, AdFilterMode } from '@/lib/store/settings-store';
 
 /**
  * Hook to access and update player settings from the settings store
@@ -18,6 +18,7 @@ export function usePlayerSettings() {
             skipOutroSeconds: stored.skipOutroSeconds,
             showModeIndicator: stored.showModeIndicator,
             adFilter: stored.adFilter,
+            adFilterMode: stored.adFilterMode,
         };
     });
 
@@ -33,6 +34,7 @@ export function usePlayerSettings() {
                 skipOutroSeconds: stored.skipOutroSeconds,
                 showModeIndicator: stored.showModeIndicator,
                 adFilter: stored.adFilter,
+                adFilterMode: stored.adFilterMode,
             });
         });
         return unsubscribe;
@@ -77,6 +79,10 @@ export function usePlayerSettings() {
         updateSetting('adFilter', value);
     }, [updateSetting]);
 
+    const setAdFilterMode = useCallback((value: AdFilterMode) => {
+        updateSetting('adFilterMode', value);
+    }, [updateSetting]);
+
     return {
         ...settings,
         setAutoNextEpisode,
@@ -86,5 +92,6 @@ export function usePlayerSettings() {
         setSkipOutroSeconds,
         setShowModeIndicator,
         setAdFilter,
+        setAdFilterMode,
     };
 }
