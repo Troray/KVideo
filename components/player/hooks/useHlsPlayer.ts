@@ -199,7 +199,7 @@ export function useHlsPlayer({
             // If the ad discontinuity is in the master playlist (rare for ads, common for periods), it works.
             // If it's in sub-playlists, it might fail unless we parse and blob those too (complex).
 
-            if (adFilter) {
+            if (isAdFilterEnabled) {
                 const processMasterPlaylist = async (masterSrc: string) => {
                     // Move blob tracking outside try to ensure cleanup on error
                     const createdBlobs: string[] = [];
