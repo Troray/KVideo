@@ -86,13 +86,8 @@ export function usePlayerSettings() {
     }, [updateSetting]);
 
     const setAdKeywords = useCallback((value: string[]) => {
-        // Direct store update to avoid type issues with generic updateSetting
-        const currentSettings = settingsStore.getSettings();
-        settingsStore.saveSettings({
-            ...currentSettings,
-            adKeywords: value,
-        });
-    }, []);
+        updateSetting('adKeywords', value);
+    }, [updateSetting]);
 
     return {
         ...settings,

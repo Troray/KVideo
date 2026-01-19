@@ -91,57 +91,43 @@ function getEnvSubscriptions(customValue?: string): SourceSubscription[] {
 // Debugging helper
 // console.log("Environment Subscriptions:", getEnvSubscriptions());
 
+// Shared default settings factory to avoid code duplication
+function getDefaultAppSettings(): AppSettings {
+  return {
+    sources: getDefaultSources(),
+    premiumSources: getDefaultPremiumSources(),
+    subscriptions: getEnvSubscriptions(),
+    sortBy: 'default',
+    searchHistory: true,
+    watchHistory: true,
+    passwordAccess: false,
+    accessPasswords: [],
+    autoNextEpisode: true,
+    autoSkipIntro: false,
+    skipIntroSeconds: 0,
+    autoSkipOutro: false,
+    skipOutroSeconds: 0,
+    showModeIndicator: false,
+    adFilter: false,
+    adFilterMode: 'heuristic',
+    adKeywords: [],
+    realtimeLatency: false,
+    searchDisplayMode: 'normal',
+    episodeReverseOrder: false,
+  };
+}
+
 export const settingsStore = {
   getSettings(): AppSettings {
+    // SSR: Return defaults
     if (typeof window === 'undefined') {
-      return {
-        sources: getDefaultSources(),
-        premiumSources: getDefaultPremiumSources(),
-        subscriptions: getEnvSubscriptions(),
-        sortBy: 'default',
-        searchHistory: true,
-        watchHistory: true,
-        passwordAccess: false,
-        accessPasswords: [],
-        autoNextEpisode: true,
-        autoSkipIntro: false,
-        skipIntroSeconds: 0,
-        autoSkipOutro: false,
-        skipOutroSeconds: 0,
-        showModeIndicator: false,
-        adFilter: false,
-        adFilterMode: 'heuristic',
-        adKeywords: [],
-        realtimeLatency: false,
-        searchDisplayMode: 'normal',
-        episodeReverseOrder: false,
-      };
+      return getDefaultAppSettings();
     }
 
+    // Client: No stored settings, return defaults
     const stored = localStorage.getItem(SETTINGS_KEY);
     if (!stored) {
-      return {
-        sources: getDefaultSources(),
-        premiumSources: getDefaultPremiumSources(),
-        subscriptions: getEnvSubscriptions(),
-        sortBy: 'default',
-        searchHistory: true,
-        watchHistory: true,
-        passwordAccess: false,
-        accessPasswords: [],
-        autoNextEpisode: true,
-        autoSkipIntro: false,
-        skipIntroSeconds: 0,
-        autoSkipOutro: false,
-        skipOutroSeconds: 0,
-        showModeIndicator: false,
-        adFilter: false,
-        adFilterMode: 'heuristic',
-        adKeywords: [],
-        realtimeLatency: false,
-        searchDisplayMode: 'normal',
-        episodeReverseOrder: false,
-      };
+      return getDefaultAppSettings();
     }
 
     try {
@@ -206,30 +192,7 @@ export const settingsStore = {
       };
     } catch {
       // Even if localStorage fails, we should return defaults + ENV subscriptions
-      const envSubscriptions = getEnvSubscriptions();
-
-      return {
-        sources: getDefaultSources(),
-        premiumSources: getDefaultPremiumSources(),
-        subscriptions: envSubscriptions,
-        sortBy: 'default',
-        searchHistory: true,
-        watchHistory: true,
-        passwordAccess: false,
-        accessPasswords: [],
-        autoNextEpisode: true,
-        autoSkipIntro: false,
-        skipIntroSeconds: 0,
-        autoSkipOutro: false,
-        skipOutroSeconds: 0,
-        showModeIndicator: false,
-        adFilter: false,
-        adFilterMode: 'heuristic',
-        adKeywords: [],
-        realtimeLatency: false,
-        searchDisplayMode: 'normal',
-        episodeReverseOrder: false,
-      };
+      return getDefaultAppSettings();
     }
   },
 

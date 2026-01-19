@@ -11,8 +11,8 @@ import { AdKeywordsInjector } from "@/components/AdKeywordsInjector";
 import fs from 'fs';
 import path from 'path';
 
-// Server Component specifically for reading env/file
-function AdKeywordsWrapper() {
+// Server Component specifically for reading env/file (async for best practices)
+async function AdKeywordsWrapper() {
   let keywords: string[] = [];
 
   try {
@@ -24,10 +24,15 @@ function AdKeywordsWrapper() {
         ? keywordsFile
         : path.join(process.cwd(), keywordsFile);
 
-      if (fs.existsSync(filePath)) {
-        const content = fs.readFileSync(filePath, 'utf-8');
-        keywords = content.split(/[\n,]/).map(k => k.trim()).filter(k => k);
+      try {
+        const content = await fs.promises.readFile(filePath, 'utf-8');
+        keywords = content.split(/[\n,]/).map((k: string) => k.trim()).filter((k: string) => k);
         console.log(`[AdFilter] Loaded ${keywords.length} keywords from file: ${filePath}`);
+      } catch (fileError: unknown) {
+        // Handle file not found (ENOENT) gracefully
+        if ((fileError as NodeJS.ErrnoException).code !== 'ENOENT') {
+          console.warn('[AdFilter] Error reading keywords file:', fileError);
+        }
       }
     }
 
@@ -35,7 +40,7 @@ function AdKeywordsWrapper() {
     if (keywords.length === 0) {
       const envKeywords = process.env.AD_KEYWORDS || process.env.NEXT_PUBLIC_AD_KEYWORDS;
       if (envKeywords) {
-        keywords = envKeywords.split(/[\n,]/).map(k => k.trim()).filter(k => k);
+        keywords = envKeywords.split(/[\n,]/).map((k: string) => k.trim()).filter((k: string) => k);
       }
     }
   } catch (error) {
