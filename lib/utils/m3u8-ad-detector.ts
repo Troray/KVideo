@@ -120,8 +120,7 @@ function extractFilename(url: string): string {
  * Find common prefix among an array of strings
  */
 function findCommonPrefix(strings: string[]): string {
-    if (strings.length === 0) return '';
-    if (strings.length === 1) return strings[0];
+    if (!strings || strings.length < 2) return '';
 
     let prefix = '';
     const first = strings[0];
