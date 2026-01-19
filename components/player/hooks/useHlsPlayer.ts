@@ -44,28 +44,22 @@ export function useHlsPlayer({
             const DefaultLoader = (Hls as any).DefaultConfig.loader;
 
             class AdFilterLoader extends DefaultLoader {
-                constructor(config: any) {
-                    super(config);
-                    const load = this.load.bind(this);
-
-                    this.load = function (context: any, config: any, callbacks: any) {
-                        if (adFilter && (context.type === 'manifest' || context.type === 'level')) {
-                            const onSuccess = callbacks.onSuccess;
-                            callbacks.onSuccess = function (response: any, stats: any, context: any, networkDetails: any) {
-                                if (typeof response.data === 'string') {
-                                    try {
-                                        // Filter the content
-                                        // console.log('[HLS] Intercepted playlist:', context.url);
-                                        response.data = filterM3u8Ad(response.data, context.url);
-                                    } catch (e) {
-                                        console.warn('[HLS] Ad filter error:', e);
-                                    }
+                load(context: any, config: any, callbacks: any) {
+                    if (adFilter && (context.type === 'manifest' || context.type === 'level')) {
+                        const originalOnSuccess = callbacks.onSuccess;
+                        callbacks.onSuccess = (response: any, stats: any, context: any, networkDetails: any) => {
+                            if (typeof response.data === 'string') {
+                                try {
+                                    // Filter the content
+                                    response.data = filterM3u8Ad(response.data, context.url);
+                                } catch (e) {
+                                    console.warn('[HLS] Ad filter error:', e);
                                 }
-                                onSuccess(response, stats, context, networkDetails);
-                            };
-                        }
-                        load(context, config, callbacks);
-                    };
+                            }
+                            originalOnSuccess(response, stats, context, networkDetails);
+                        };
+                    }
+                    super.load(context, config, callbacks);
                 }
             }
 
