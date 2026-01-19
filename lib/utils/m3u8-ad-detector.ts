@@ -7,7 +7,7 @@
 
 // Ad-related path keywords for scoring
 export const AD_PATH_KEYWORDS = [
-    'ads', 'ad', 'advert', 'preroll', 'midroll', 'postroll',
+    'advert', 'preroll', 'midroll', 'postroll',
     'dai', 'vast', 'ima', 'adjump', 'commercial', 'sponsor'
 ];
 
