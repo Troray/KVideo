@@ -97,8 +97,8 @@ export function filterM3u8Ad(content: string, baseUrl: string): string {
             continue;
         }
 
-        // 4. Keyword-based Ad Detection & Backtrack
-        if (hasKeywordMatch && keywords.some(keyword => trimmedLine.includes(keyword))) {
+        // 4. Keyword-based Ad Detection & Backtrack (skip if no keywords configured)
+        if (keywords.length > 0 && hasKeywordMatch && keywords.some(keyword => trimmedLine.includes(keyword))) {
             // Found Ad: Remove it and backtrack to remove associated metadata
             while (processedLines.length > 0) {
                 const lastIndex = processedLines.length - 1;

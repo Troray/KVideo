@@ -201,21 +201,41 @@ export function useHlsPlayer({
 
             if (adFilter) {
                 const processMasterPlaylist = async (masterSrc: string) => {
+                    // Move blob tracking outside try to ensure cleanup on error
+                    const createdBlobs: string[] = [];
+
+                    // Safely resolve relative URLs to absolute (handles iOS Safari scenarios)
+                    let absoluteMasterSrc: string;
                     try {
-                        const response = await fetch(masterSrc);
+                        absoluteMasterSrc = new URL(masterSrc, window.location.href).toString();
+                    } catch {
+                        absoluteMasterSrc = masterSrc; // Fallback if URL parsing fails
+                    }
+
+                    try {
+                        const response = await fetch(absoluteMasterSrc);
                         const masterContent = await response.text();
 
                         // If it's a simple playlist (no variants), just filter and play
                         if (!masterContent.includes('#EXT-X-STREAM-INF')) {
-                            const filtered = filterM3u8Ad(masterContent, masterSrc);
+                            const filtered = filterM3u8Ad(masterContent, absoluteMasterSrc);
                             const blob = new Blob([filtered], { type: 'application/vnd.apple.mpegurl' });
                             const blobUrl = URL.createObjectURL(blob);
-                            return blobUrl;
+                            createdBlobs.push(blobUrl);
+                            return { masterBlobUrl: blobUrl, allBlobs: createdBlobs };
                         }
 
                         // It IS a master playlist. Use map + Promise.all for clean concurrent processing.
                         const lines = masterContent.split(/\r?\n/);
-                        const createdBlobs: string[] = [];
+
+                        // Helper to safely compare origins
+                        const isSameOrigin = (url: string): boolean => {
+                            try {
+                                return new URL(url).origin === new URL(absoluteMasterSrc).origin;
+                            } catch {
+                                return false;
+                            }
+                        };
 
                         // Process each line, looking back at previous line to determine context
                         const lineProcessingPromises = lines.map(async (line, index) => {
@@ -228,11 +248,11 @@ export function useHlsPlayer({
                                 if (uri) {
                                     // Process if relative URL or same-origin absolute URL
                                     const isRelative = !uri.startsWith('http');
-                                    const isSameOrigin = uri.startsWith('http') && new URL(uri).origin === new URL(masterSrc).origin;
+                                    const sameOrigin = uri.startsWith('http') && isSameOrigin(uri);
 
-                                    if (isRelative || isSameOrigin) {
+                                    if (isRelative || sameOrigin) {
                                         try {
-                                            const absoluteUrl = isRelative ? new URL(uri, masterSrc).toString() : uri;
+                                            const absoluteUrl = isRelative ? new URL(uri, absoluteMasterSrc).toString() : uri;
                                             const subRes = await fetch(absoluteUrl);
                                             const subContent = await subRes.text();
                                             const filteredSub = filterM3u8Ad(subContent, absoluteUrl);
@@ -253,11 +273,11 @@ export function useHlsPlayer({
                             if (prevLine.startsWith('#EXT-X-STREAM-INF') && trimmedLine && !trimmedLine.startsWith('#')) {
                                 // Process if relative URL or same-origin absolute URL
                                 const isRelative = !trimmedLine.startsWith('http');
-                                const isSameOrigin = trimmedLine.startsWith('http') && new URL(trimmedLine).origin === new URL(masterSrc).origin;
+                                const sameOrigin = trimmedLine.startsWith('http') && isSameOrigin(trimmedLine);
 
-                                if (isRelative || isSameOrigin) {
+                                if (isRelative || sameOrigin) {
                                     try {
-                                        const absoluteUrl = isRelative ? new URL(trimmedLine, masterSrc).toString() : trimmedLine;
+                                        const absoluteUrl = isRelative ? new URL(trimmedLine, absoluteMasterSrc).toString() : trimmedLine;
                                         const subRes = await fetch(absoluteUrl);
                                         const subContent = await subRes.text();
                                         const filteredSub = filterM3u8Ad(subContent, absoluteUrl);
@@ -286,19 +306,20 @@ export function useHlsPlayer({
 
                         return { masterBlobUrl, allBlobs: createdBlobs };
                     } catch (e) {
-                        console.warn('[HLS Native] Recursive fetch failed', e);
+                        // Critical: Clean up any blobs created before the error
+                        for (const blobUrl of createdBlobs) {
+                            try {
+                                URL.revokeObjectURL(blobUrl);
+                            } catch { /* ignore cleanup errors */ }
+                        }
+                        console.error('[HLS Native] Recursive fetch failed', e);
                         throw e;
                     }
                 };
 
                 processMasterPlaylist(src).then((result) => {
-                    if (typeof result === 'string') {
-                        video.src = result;
-                        objectUrl = result;
-                    } else {
-                        video.src = result.masterBlobUrl;
-                        extraBlobs = result.allBlobs;
-                    }
+                    video.src = result.masterBlobUrl;
+                    extraBlobs = result.allBlobs;
                 }).catch(() => {
                     video.src = src;
                 });

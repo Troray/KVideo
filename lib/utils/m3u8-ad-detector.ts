@@ -37,6 +37,7 @@ interface MainPattern {
     filenameRegex: RegExp | null;
     avgDuration: number;
     commonPrefix: string;
+    pathPrefix: string; // Directory path prefix (e.g., "/20230907/73PWifvT/1392kb/hls/")
 }
 
 /**
@@ -138,6 +139,21 @@ function findCommonPrefix(strings: string[]): string {
 }
 
 /**
+ * Extract path prefix (directory) from URL
+ * e.g., "/20230907/73PWifvT/1392kb/hls/" from "/20230907/73PWifvT/1392kb/hls/gFE6lwIk.ts"
+ */
+function extractPathPrefix(url: string): string {
+    try {
+        const path = url.includes('://') ? new URL(url).pathname : url;
+        const lastSlash = path.lastIndexOf('/');
+        return lastSlash >= 0 ? path.substring(0, lastSlash + 1) : '';
+    } catch {
+        const lastSlash = url.lastIndexOf('/');
+        return lastSlash >= 0 ? url.substring(0, lastSlash + 1) : '';
+    }
+}
+
+/**
  * Learn pattern from the largest block (assumed to be main content)
  */
 export function learnMainPattern(blocks: Block[]): MainPattern {
@@ -147,7 +163,7 @@ export function learnMainPattern(blocks: Block[]): MainPattern {
     ) : null;
 
     if (!mainBlock || mainBlock.segments.length === 0) {
-        return { filenameRegex: null, avgDuration: 0, commonPrefix: '' };
+        return { filenameRegex: null, avgDuration: 0, commonPrefix: '', pathPrefix: '' };
     }
 
     // Extract filenames
@@ -169,7 +185,12 @@ export function learnMainPattern(blocks: Block[]): MainPattern {
         filenameRegex = new RegExp(`^${escapedPrefix}`);
     }
 
-    return { filenameRegex, avgDuration, commonPrefix };
+    // Extract path prefix (directory path without filename)
+    // e.g., "/20230907/73PWifvT/1392kb/hls/" from "/20230907/73PWifvT/1392kb/hls/gFE6lwIk.ts"
+    const firstUrl = mainBlock.segments[0].url;
+    const pathPrefix = extractPathPrefix(firstUrl);
+
+    return { filenameRegex, avgDuration, commonPrefix, pathPrefix };
 }
 
 /**
@@ -198,8 +219,9 @@ export function scoreBlock(block: Block, mainPattern: MainPattern): number {
     // Check filename pattern mismatch
     if (mainPattern.filenameRegex) {
         const mismatchCount = block.segments.filter(s => {
+            if (!mainPattern.filenameRegex) return false; // No pattern to compare against
             const filename = extractFilename(s.url);
-            return !mainPattern.filenameRegex!.test(filename);
+            return !mainPattern.filenameRegex.test(filename);
         }).length;
 
         if (mismatchCount === block.segments.length && block.segments.length > 0) {
@@ -207,12 +229,17 @@ export function scoreBlock(block: Block, mainPattern: MainPattern): number {
         }
     }
 
-    // Check if segment URLs are from different path structure
-    if (block.segments.length > 0) {
-        const firstUrl = block.segments[0].url;
-        // If URL contains significantly different path depth, add score
-        if (firstUrl.startsWith('/') && firstUrl.split('/').length > 3) {
-            score += 0.5;
+    // **KEY FEATURE**: Check path prefix mismatch (e.g., different date/folder/bitrate)
+    // This is the most reliable indicator for ads that come from different CDN paths
+    if (mainPattern.pathPrefix && block.segments.length > 0) {
+        const pathMismatchCount = block.segments.filter(s => {
+            const segmentPathPrefix = extractPathPrefix(s.url);
+            return segmentPathPrefix !== mainPattern.pathPrefix;
+        }).length;
+
+        if (pathMismatchCount === block.segments.length) {
+            // ALL segments have different path prefix - strong ad indicator
+            score += 5.0;
         }
     }
 
