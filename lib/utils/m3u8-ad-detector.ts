@@ -196,7 +196,7 @@ export function learnMainPattern(blocks: Block[]): MainPattern {
  * Score a block for ad likelihood based on heuristics
  * Returns a score where higher = more likely to be an ad
  */
-export function scoreBlock(block: Block, mainPattern: MainPattern): number {
+export function scoreBlock(block: Block, mainPattern: MainPattern, extraKeywords: string[] = []): number {
     let score = 0;
 
     // If block has CUE tag, it's definitely an ad
@@ -204,11 +204,15 @@ export function scoreBlock(block: Block, mainPattern: MainPattern): number {
         return 10; // Max score
     }
 
-    // Check path keywords
+    // Check path keywords (Built-in + Custom)
+    // We filter out very short custom keywords to avoid false positives in scoring
+    const safeExtraKeywords = extraKeywords.filter(k => k.length > 2);
+    const allKeywords = [...AD_PATH_KEYWORDS, ...safeExtraKeywords];
+
     for (const segment of block.segments) {
         const urlLower = segment.url.toLowerCase();
-        for (const keyword of AD_PATH_KEYWORDS) {
-            if (urlLower.includes(keyword)) {
+        for (const keyword of allKeywords) {
+            if (urlLower.includes(keyword.toLowerCase())) {
                 score += 2.5;
                 break; // Only count once per segment
             }

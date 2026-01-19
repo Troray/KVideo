@@ -50,7 +50,8 @@ export function filterM3u8Ad(content: string, baseUrl: string, mode: AdFilterMod
         if (blocks.length > 1) {
             const mainPattern = learnMainPattern(blocks);
             for (const block of blocks) {
-                const score = scoreBlock(block, mainPattern);
+                // Pass all keywords (including custom ones) to heuristic scorer
+                const score = scoreBlock(block, mainPattern, keywords);
                 const threshold = mode === 'aggressive' ? 3.0 : 5.0;
                 if (shouldFilterBlock(score, threshold)) {
                     // Mark all lines in this block for removal
