@@ -113,7 +113,7 @@ export function useHlsPlayer({
                 };
 
                 // Use custom loader if ad filtering is enabled
-                if (adFilter) {
+                if (isAdFilterEnabled) {
                     config.loader = AdFilterLoader;
                 }
 
