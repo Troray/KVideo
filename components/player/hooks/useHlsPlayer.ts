@@ -32,7 +32,6 @@ export function useHlsPlayer({
         }
 
         let hls: Hls | null = null;
-        let objectUrl: string | null = null;
         let extraBlobs: string[] = [];
 
         // Check if HLS is supported natively (Safari, Mobile Chrome)
@@ -320,7 +319,9 @@ export function useHlsPlayer({
                 processMasterPlaylist(src).then((result) => {
                     video.src = result.masterBlobUrl;
                     extraBlobs = result.allBlobs;
-                }).catch(() => {
+                }).catch((e) => {
+                    console.warn('[HLS Native] Ad filtering failed, falling back to original source.', e);
+                    onError?.('广告过滤失败，已回退到原始视频流');
                     video.src = src;
                 });
 
@@ -335,9 +336,6 @@ export function useHlsPlayer({
         return () => {
             if (hls) {
                 hls.destroy();
-            }
-            if (objectUrl) {
-                URL.revokeObjectURL(objectUrl);
             }
             extraBlobs.forEach(url => URL.revokeObjectURL(url));
         };
