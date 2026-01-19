@@ -195,6 +195,7 @@ export const settingsStore = {
         skipOutroSeconds: typeof parsed.skipOutroSeconds === 'number' ? parsed.skipOutroSeconds : 0,
         showModeIndicator: parsed.showModeIndicator !== undefined ? parsed.showModeIndicator : false,
         adFilter: parsed.adFilter !== undefined ? parsed.adFilter : false,
+        adFilterMode: parsed.adFilterMode || 'heuristic',
         realtimeLatency: parsed.realtimeLatency !== undefined ? parsed.realtimeLatency : false,
         searchDisplayMode: parsed.searchDisplayMode === 'grouped' ? 'grouped' : 'normal',
         episodeReverseOrder: parsed.episodeReverseOrder !== undefined ? parsed.episodeReverseOrder : false,
@@ -219,6 +220,8 @@ export const settingsStore = {
         skipOutroSeconds: 0,
         showModeIndicator: false,
         adFilter: false,
+        adFilterMode: 'heuristic',
+
         realtimeLatency: false,
         searchDisplayMode: 'normal',
         episodeReverseOrder: false,
