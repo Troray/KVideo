@@ -19,14 +19,16 @@ import { parseBlocks, learnMainPattern, scoreBlock, shouldFilterBlock } from './
  */
 export type AdFilterMode = 'off' | 'keyword' | 'heuristic' | 'aggressive';
 
-export function filterM3u8Ad(content: string, baseUrl: string, mode: AdFilterMode = 'heuristic'): string {
+export function filterM3u8Ad(content: string, baseUrl: string, mode: AdFilterMode = 'heuristic', customKeywords: string[] = []): string {
     if (!content) return '';
 
     // 1. Performance: Parse Keywords & Base URL ONLY ONCE
-    const envKeywords = process.env.NEXT_PUBLIC_AD_KEYWORDS;
-    const keywords = typeof envKeywords === 'string'
-        ? envKeywords.split(/[\n,]/).map(k => k.trim()).filter(k => k)
-        : ['/adjump/'];
+    // Merge env keywords (build time) with custom keywords (runtime injected)
+    const envKeywordsStr = process.env.NEXT_PUBLIC_AD_KEYWORDS || '';
+    const envKeywords = envKeywordsStr.split(/[\n,]/).map(k => k.trim()).filter(k => k);
+
+    // Combine and deduplicate
+    const keywords = Array.from(new Set([...envKeywords, ...customKeywords, '/adjump/']));
 
     const basePath = baseUrl.substring(0, baseUrl.lastIndexOf('/') + 1);
     let origin = '';

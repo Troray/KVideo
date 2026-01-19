@@ -19,6 +19,7 @@ export function usePlayerSettings() {
             showModeIndicator: stored.showModeIndicator,
             adFilter: stored.adFilter,
             adFilterMode: stored.adFilterMode,
+            adKeywords: stored.adKeywords,
         };
     });
 
@@ -35,6 +36,7 @@ export function usePlayerSettings() {
                 showModeIndicator: stored.showModeIndicator,
                 adFilter: stored.adFilter,
                 adFilterMode: stored.adFilterMode,
+                adKeywords: stored.adKeywords,
             });
         });
         return unsubscribe;
@@ -83,6 +85,15 @@ export function usePlayerSettings() {
         updateSetting('adFilterMode', value);
     }, [updateSetting]);
 
+    const setAdKeywords = useCallback((value: string[]) => {
+        // Direct store update to avoid type issues with generic updateSetting
+        const currentSettings = settingsStore.getSettings();
+        settingsStore.saveSettings({
+            ...currentSettings,
+            adKeywords: value,
+        });
+    }, []);
+
     return {
         ...settings,
         setAutoNextEpisode,
@@ -93,5 +104,6 @@ export function usePlayerSettings() {
         setShowModeIndicator,
         setAdFilter,
         setAdFilterMode,
+        setAdKeywords,
     };
 }

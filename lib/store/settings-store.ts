@@ -38,6 +38,7 @@ export interface AppSettings {
   showModeIndicator: boolean; // Show '直连模式'/'代理模式' badge on player
   adFilter: boolean; // Filter ad tags from m3u8 (legacy, kept for compatibility)
   adFilterMode: AdFilterMode; // 'off' | 'keyword' | 'heuristic' | 'aggressive'
+  adKeywords: string[]; // Dynamically loaded ad keywords
   // Search & Display settings
   realtimeLatency: boolean; // Enable real-time latency ping updates
   searchDisplayMode: SearchDisplayMode; // 'normal' = individual cards, 'grouped' = group same-name videos
@@ -110,6 +111,7 @@ export const settingsStore = {
         showModeIndicator: false,
         adFilter: false,
         adFilterMode: 'heuristic',
+        adKeywords: [],
         realtimeLatency: false,
         searchDisplayMode: 'normal',
         episodeReverseOrder: false,
@@ -135,6 +137,7 @@ export const settingsStore = {
         showModeIndicator: false,
         adFilter: false,
         adFilterMode: 'heuristic',
+        adKeywords: [],
         realtimeLatency: false,
         searchDisplayMode: 'normal',
         episodeReverseOrder: false,
@@ -196,6 +199,7 @@ export const settingsStore = {
         showModeIndicator: parsed.showModeIndicator !== undefined ? parsed.showModeIndicator : false,
         adFilter: parsed.adFilter !== undefined ? parsed.adFilter : false,
         adFilterMode: parsed.adFilterMode || 'heuristic',
+        adKeywords: Array.isArray(parsed.adKeywords) ? parsed.adKeywords : [],
         realtimeLatency: parsed.realtimeLatency !== undefined ? parsed.realtimeLatency : false,
         searchDisplayMode: parsed.searchDisplayMode === 'grouped' ? 'grouped' : 'normal',
         episodeReverseOrder: parsed.episodeReverseOrder !== undefined ? parsed.episodeReverseOrder : false,
@@ -221,7 +225,7 @@ export const settingsStore = {
         showModeIndicator: false,
         adFilter: false,
         adFilterMode: 'heuristic',
-
+        adKeywords: [],
         realtimeLatency: false,
         searchDisplayMode: 'normal',
         episodeReverseOrder: false,
