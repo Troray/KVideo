@@ -33,6 +33,7 @@ export function useHlsPlayer({
 
         let hls: Hls | null = null;
         let objectUrl: string | null = null;
+        let extraBlobs: string[] = [];
 
         // Check if HLS is supported natively (Safari, Mobile Chrome)
         const isNativeHlsSupported = video.canPlayType('application/vnd.apple.mpegurl');
@@ -183,7 +184,7 @@ export function useHlsPlayer({
                                 }
                                 break;
                             default:
-                                onError?.(`致命错误：${data.details}`);
+                                onError?.(`致命错误：${data.details || '未知错误'}`);
                                 hls?.destroy();
                                 break;
                         }
@@ -201,27 +202,177 @@ export function useHlsPlayer({
             // If it's in sub-playlists, it might fail unless we parse and blob those too (complex).
 
             if (adFilter) {
-                fetch(src)
-                    .then(res => res.text())
-                    .then(content => {
-                        // Check if it looks like a master playlist
-                        if (content.includes('#EXT-X-STREAM-INF')) {
-                            // Master playlist integration is hard with Blob on native.
-                            // For now, playing original.
-                            // TODO: Implement recursive fetch/blob for native if needed.
-                            console.warn('[HLS Native] Ad filter on Master Playlist not fully supported on native.');
-                            video.src = src;
-                        } else {
-                            const filtered = filterM3u8Ad(content, src);
+                const processMasterPlaylist = async (masterSrc: string) => {
+                    try {
+                        const response = await fetch(masterSrc);
+                        const masterContent = await response.text();
+                        const baseUrl = masterSrc.substring(0, masterSrc.lastIndexOf('/') + 1);
+
+                        // If it's a simple playlist (no variants), just filter and play
+                        if (!masterContent.includes('#EXT-X-STREAM-INF')) {
+                            const filtered = filterM3u8Ad(masterContent, masterSrc);
                             const blob = new Blob([filtered], { type: 'application/vnd.apple.mpegurl' });
-                            objectUrl = URL.createObjectURL(blob);
-                            video.src = objectUrl;
+                            const blobUrl = URL.createObjectURL(blob);
+                            // Track for cleanup (although currently we only track objectUrl variable, 
+                            // for recursive we might need an array if we were strictly managing all, 
+                            // but here strictly speaking only the master blob needs to necessarily be fed to video.src,
+                            // HOWEVER, the sub-blobs are referenced by the master blob. 
+                            // Browsers usually clean up Blob URLs on document unload, but strictly we should track them.
+                            // For this specific hook scope, we'll try to track them if possible, or reliable on React cleanup.)
+                            // limitation: The simple objectUrl variable is single. 
+                            // We will need to extend cleanup to an array of URLs.
+                            return blobUrl;
                         }
-                    })
-                    .catch((e) => {
-                        console.warn('[HLS Native] Fetch failed, fallback to src', e);
-                        video.src = src;
-                    });
+
+                        // It IS a master playlist. Recursive processing needed.
+                        const lines = masterContent.split(/\r?\n/);
+                        const processedLines: string[] = [];
+                        const pendingFetches: Promise<void>[] = [];
+
+                        // We need to keep track of created blobs to revoke them later
+                        const createdBlobs: string[] = [];
+
+                        // 1. Scan for URLs to fetch
+                        for (let i = 0; i < lines.length; i++) {
+                            const line = lines[i];
+                            const trimmedLine = line.trim();
+
+                            if (!trimmedLine) {
+                                processedLines.push(line);
+                                continue;
+                            }
+
+                            // Handle #EXT-X-MEDIA:URI="..."
+                            if (trimmedLine.startsWith('#EXT-X-MEDIA') && trimmedLine.includes('URI="')) {
+                                const uriMatch = trimmedLine.match(/URI="([^"]+)"/);
+                                if (uriMatch) {
+                                    const relativeUri = uriMatch[1];
+                                    if (!relativeUri.startsWith('http')) {
+                                        // Use URL constructor for resolution to handle ../ etc correctly
+                                        const absoluteUrl = new URL(relativeUri, masterSrc).toString();
+
+                                        // Start fetching this sub-playlist
+                                        const p = fetch(absoluteUrl)
+                                            .then(r => r.text())
+                                            .then(subContent => {
+                                                const filteredSub = filterM3u8Ad(subContent, absoluteUrl);
+                                                const subBlob = new Blob([filteredSub], { type: 'application/vnd.apple.mpegurl' });
+                                                const subBlobUrl = URL.createObjectURL(subBlob);
+                                                createdBlobs.push(subBlobUrl); // Add to cleanup list
+
+                                                // Replace in the line
+                                                // Note: This simple replace might be risky if URI appears multiple times, but standard tags usually fine.
+                                                // Safer regex replace
+                                                processedLines[i] = processedLines[i].replace(`URI="${relativeUri}"`, `URI="${subBlobUrl}"`);
+                                            })
+                                            .catch(console.warn);
+                                        pendingFetches.push(p);
+                                    }
+                                }
+                                processedLines.push(line); // Will be updated by reference or index if we iterated differently? 
+                                // Actually strings are immutable. We need to push the *potentially modified* line.
+                                // But we are inside an async logic planning. 
+                                // WAIT. We cannot modify processedLines[i] asynchronously comfortably if we push 'line' now.
+                                // Strategy: We push the line. But we capture the INDEX 'i' for the promise to update `processedLines` array.
+                                continue;
+                            }
+
+                            // Handle Stream Inf URL (the next line)
+                            if (trimmedLine.startsWith('#EXT-X-STREAM-INF')) {
+                                processedLines.push(line);
+                                // The next line is the URL
+                                if (i + 1 < lines.length) {
+                                    const nextLine = lines[i + 1].trim();
+                                    if (nextLine && !nextLine.startsWith('#')) {
+                                        const relativeUri = nextLine;
+                                        if (!relativeUri.startsWith('http')) {
+                                            const absoluteUrl = new URL(relativeUri, masterSrc).toString();
+
+                                            // Fetch sub playlist
+                                            const p = fetch(absoluteUrl)
+                                                .then(r => r.text())
+                                                .then(subContent => {
+                                                    const filteredSub = filterM3u8Ad(subContent, absoluteUrl);
+                                                    const subBlob = new Blob([filteredSub], { type: 'application/vnd.apple.mpegurl' });
+                                                    const subBlobUrl = URL.createObjectURL(subBlob);
+                                                    createdBlobs.push(subBlobUrl);
+
+                                                    // Update the URL line in processedLines
+                                                    // processedLines index for next line is master lines index (i+1)
+                                                    // But processedLines might have different length if we skipped something? No, we filter empty but push empty.
+                                                    // However, to be safe, we should pre-fill processedLines with placeholder or carefully track indices.
+                                                    // Easier: We are iterating master lines. processedLines[i] matches lines[i].
+                                                    processedLines[i + 1] = subBlobUrl;
+                                                })
+                                                .catch(console.warn);
+                                            pendingFetches.push(p);
+                                        }
+                                    }
+                                }
+                                continue;
+                            }
+
+                            // Just a regular line or URL that we noticed?
+                            // For Master Playlist, URLs usually follow Stream Inf. 
+                            // But what if it's just a URL line (simple playlist logic already handled above)?
+
+                            // If we already handled logic in STREAM-INF, we just push the line. 
+                            // But wait, the loop continues to i+1.
+                            // We need to skip the next line if we handled it in STREAM-INF?
+                            // Actually, in the STREAM-INF block above, I accessed i+1 but didn't increment i.
+                            // So the loop will visit i+1 next.
+                            // I should treat the URL line as a "Stream URL" pass if identified.
+
+                            // Let's refine the loop to simple "Process Line"
+                            processedLines.push(line);
+                        }
+
+                        // Wait for all sub-fetches
+                        await Promise.all(pendingFetches);
+
+                        // Join back
+                        const finalMasterContent = processedLines.join('\n');
+                        const masterBlob = new Blob([finalMasterContent], { type: 'application/vnd.apple.mpegurl' });
+                        const masterBlobUrl = URL.createObjectURL(masterBlob);
+                        createdBlobs.push(masterBlobUrl);
+
+                        // Pass allow createdBlobs to be cleaned up outside?
+                        // We need a way to store these extra blobs in the ref.
+                        // Ugly hack: extend the objectUrl mechanism or use a separate ref.
+                        // Since I can't easily add a new Ref hook inside this conditional block without breaking rules of hooks,
+                        // I will assume `objectUrl` local var is not enough.
+                        // BUT `useHlsPlayer` has `objectUrl` as a local let variable in useEffect.
+                        // I should change logic to store array of blobs on the `hlsRef` or similar? No.
+                        // The CleanUp function of useEffect has access to the scope.
+                        // So I can declare `const allCreatedBlobs: string[] = []` at the top of useEffect.
+
+                        // Let's rely on the top scope variable I will add.
+                        return { masterBlobUrl, allBlobs: createdBlobs };
+                    } catch (e) {
+                        console.warn('[HLS Native] Recursive fetch failed', e);
+                        throw e;
+                    }
+                };
+
+                processMasterPlaylist(src).then((result) => {
+                    if (typeof result === 'string') {
+                        video.src = result;
+                        objectUrl = result;
+                    } else {
+                        video.src = result.masterBlobUrl;
+                        // We need to store allBlobs for cleanup. 
+                        // Since `objectUrl` is a single string in the original code, 
+                        // I will modify the cleanup function to handle an array if possible, 
+                        // or just overwrite objectUrl to be one of them and lose track of others? NO. Memory leak.
+
+                        // I will assign the array to a property on the cleaning function? No.
+                        // I will move `allBlobs` to the outer scope of useEffect.
+                        extraBlobs = result.allBlobs;
+                    }
+                }).catch(() => {
+                    video.src = src;
+                });
+
             } else {
                 video.src = src;
             }
@@ -237,6 +388,7 @@ export function useHlsPlayer({
             if (objectUrl) {
                 URL.revokeObjectURL(objectUrl);
             }
+            extraBlobs.forEach(url => URL.revokeObjectURL(url));
         };
     }, [src, videoRef, autoPlay, onAutoPlayPrevented, onError, adFilter]);
 }
