@@ -28,7 +28,7 @@ export function filterM3u8Ad(content: string, baseUrl: string, mode: AdFilterMod
     const envKeywords = envKeywordsStr.split(/[\n,]/).map(k => k.trim()).filter(k => k);
 
     // Combine and deduplicate
-    const keywords = Array.from(new Set([...envKeywords, ...customKeywords, '/adjump/']));
+    const keywords = Array.from(new Set([...envKeywords, ...customKeywords]));
 
     const basePath = baseUrl.substring(0, baseUrl.lastIndexOf('/') + 1);
     let origin = '';

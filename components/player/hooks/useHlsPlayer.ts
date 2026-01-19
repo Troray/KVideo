@@ -182,6 +182,7 @@ export function useHlsPlayer({
                                 }
                                 break;
                             default:
+                                console.error('[HLS] Fatal error, cannot recover:', data);
                                 onError?.(`致命错误：${data.details || '未知错误'}`);
                                 hls?.destroy();
                                 break;
