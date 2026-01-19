@@ -165,7 +165,6 @@ export function useHlsPlayer({
                         switch (data.type) {
                             case Hls.ErrorTypes.NETWORK_ERROR:
                                 networkErrorRetries++;
-                                // console.error(`[HLS] Network error (${networkErrorRetries}/${MAX_RETRIES})`, data);
                                 if (networkErrorRetries <= MAX_RETRIES) {
                                     hls?.startLoad();
                                 } else {
@@ -175,7 +174,6 @@ export function useHlsPlayer({
                                 break;
                             case Hls.ErrorTypes.MEDIA_ERROR:
                                 mediaErrorRetries++;
-                                // console.error(`[HLS] Media error (${mediaErrorRetries}/${MAX_RETRIES})`, data);
                                 if (mediaErrorRetries <= MAX_RETRIES) {
                                     hls?.recoverMediaError();
                                 } else {
