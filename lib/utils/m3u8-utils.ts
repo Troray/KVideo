@@ -21,8 +21,8 @@ export function filterM3u8Ad(content: string, baseUrl: string): string {
     if (!content) return '';
 
     // 1. Performance: Parse Keywords & Base URL ONLY ONCE
-    const envKeywords = process.env.NEXT_PUBLIC_AD_KEYWORDS || '';
-    const keywords = envKeywords
+    const envKeywords = process.env.NEXT_PUBLIC_AD_KEYWORDS;
+    const keywords = typeof envKeywords === 'string'
         ? envKeywords.split(/[\n,]/).map(k => k.trim()).filter(k => k)
         : ['/adjump/'];
 
@@ -40,7 +40,7 @@ export function filterM3u8Ad(content: string, baseUrl: string): string {
     const lines = content.split(/\r?\n/);
     let adLineIndices = new Set<number>();
 
-    if (!hasKeywordMatch && !hasCueTag) {
+    if (!hasCueTag) {
         // No obvious ad signals - run heuristic analysis
         const blocks = parseBlocks(lines);
         if (blocks.length > 1) {

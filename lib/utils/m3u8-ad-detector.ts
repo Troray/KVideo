@@ -142,9 +142,9 @@ function findCommonPrefix(strings: string[]): string {
  */
 export function learnMainPattern(blocks: Block[]): MainPattern {
     // Find the largest block by segment count (likely main content)
-    const mainBlock = blocks.reduce((largest, block) =>
+    const mainBlock = blocks.length > 0 ? blocks.reduce((largest, block) =>
         block.segments.length > largest.segments.length ? block : largest
-        , blocks[0]);
+    ) : null;
 
     if (!mainBlock || mainBlock.segments.length === 0) {
         return { filenameRegex: null, avgDuration: 0, commonPrefix: '' };

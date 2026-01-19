@@ -224,20 +224,26 @@ export function useHlsPlayer({
                             // Handle #EXT-X-MEDIA:URI="..."
                             if (trimmedLine.startsWith('#EXT-X-MEDIA') && trimmedLine.includes('URI="')) {
                                 const uriMatch = trimmedLine.match(/URI="([^"]+)"/);
-                                const relativeUri = uriMatch?.[1];
-                                if (relativeUri && !relativeUri.startsWith('http')) {
-                                    try {
-                                        const absoluteUrl = new URL(relativeUri, masterSrc).toString();
-                                        const subRes = await fetch(absoluteUrl);
-                                        const subContent = await subRes.text();
-                                        const filteredSub = filterM3u8Ad(subContent, absoluteUrl);
-                                        const subBlob = new Blob([filteredSub], { type: 'application/vnd.apple.mpegurl' });
-                                        const subBlobUrl = URL.createObjectURL(subBlob);
-                                        createdBlobs.push(subBlobUrl);
-                                        return line.replace(`URI="${relativeUri}"`, `URI="${subBlobUrl}"`);
-                                    } catch (e) {
-                                        console.warn('[HLS Native] Failed to process EXT-X-MEDIA URI:', e);
-                                        return line;
+                                const uri = uriMatch?.[1];
+                                if (uri) {
+                                    // Process if relative URL or same-origin absolute URL
+                                    const isRelative = !uri.startsWith('http');
+                                    const isSameOrigin = uri.startsWith('http') && new URL(uri).origin === new URL(masterSrc).origin;
+
+                                    if (isRelative || isSameOrigin) {
+                                        try {
+                                            const absoluteUrl = isRelative ? new URL(uri, masterSrc).toString() : uri;
+                                            const subRes = await fetch(absoluteUrl);
+                                            const subContent = await subRes.text();
+                                            const filteredSub = filterM3u8Ad(subContent, absoluteUrl);
+                                            const subBlob = new Blob([filteredSub], { type: 'application/vnd.apple.mpegurl' });
+                                            const subBlobUrl = URL.createObjectURL(subBlob);
+                                            createdBlobs.push(subBlobUrl);
+                                            return line.replace(`URI="${uri}"`, `URI="${subBlobUrl}"`);
+                                        } catch (e) {
+                                            console.warn('[HLS Native] Failed to process EXT-X-MEDIA URI:', e);
+                                            return line;
+                                        }
                                     }
                                 }
                             }
@@ -245,9 +251,13 @@ export function useHlsPlayer({
                             // Handle playlist URL (line after #EXT-X-STREAM-INF)
                             const prevLine = index > 0 ? lines[index - 1].trim() : '';
                             if (prevLine.startsWith('#EXT-X-STREAM-INF') && trimmedLine && !trimmedLine.startsWith('#')) {
-                                if (!trimmedLine.startsWith('http')) {
+                                // Process if relative URL or same-origin absolute URL
+                                const isRelative = !trimmedLine.startsWith('http');
+                                const isSameOrigin = trimmedLine.startsWith('http') && new URL(trimmedLine).origin === new URL(masterSrc).origin;
+
+                                if (isRelative || isSameOrigin) {
                                     try {
-                                        const absoluteUrl = new URL(trimmedLine, masterSrc).toString();
+                                        const absoluteUrl = isRelative ? new URL(trimmedLine, masterSrc).toString() : trimmedLine;
                                         const subRes = await fetch(absoluteUrl);
                                         const subContent = await subRes.text();
                                         const filteredSub = filterM3u8Ad(subContent, absoluteUrl);
