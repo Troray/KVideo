@@ -8,6 +8,8 @@ import { useAutoSkip } from './hooks/useAutoSkip';
 import { useStallDetection } from './hooks/useStallDetection';
 import { DesktopControlsWrapper } from './desktop/DesktopControlsWrapper';
 import { DesktopOverlayWrapper } from './desktop/DesktopOverlayWrapper';
+import { usePlayerSettings } from './hooks/usePlayerSettings';
+import './web-fullscreen.css';
 
 interface DesktopVideoPlayerProps {
   src: string;
@@ -36,6 +38,7 @@ export function DesktopVideoPlayer({
   isReversed = false,
 }: DesktopVideoPlayerProps) {
   const { refs, data, actions } = useDesktopPlayerState();
+  const { fullscreenType } = usePlayerSettings();
 
   // Initialize HLS Player
   useHlsPlayer({
@@ -75,7 +78,8 @@ export function DesktopVideoPlayer({
     onTimeUpdate,
     refs,
     data,
-    actions
+    actions,
+    fullscreenType
   });
 
   // Auto-skip intro/outro and auto-next episode
@@ -113,7 +117,8 @@ export function DesktopVideoPlayer({
   return (
     <div
       ref={containerRef}
-      className="relative aspect-video bg-black rounded-[var(--radius-2xl)] group"
+      className={`relative aspect-video bg-black rounded-[var(--radius-2xl)] group ${data.isFullscreen && fullscreenType === 'window' ? 'is-web-fullscreen' : ''
+        }`}
       onMouseMove={handleMouseMove}
       onMouseLeave={() => isPlaying && setShowControls(false)}
     >

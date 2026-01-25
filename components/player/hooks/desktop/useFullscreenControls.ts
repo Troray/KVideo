@@ -9,6 +9,7 @@ interface UseFullscreenControlsProps {
     isAirPlaySupported: boolean;
     setIsPiPSupported: (supported: boolean) => void;
     setIsAirPlaySupported: (supported: boolean) => void;
+    fullscreenType?: 'native' | 'window';
 }
 
 export function useFullscreenControls({
@@ -19,7 +20,8 @@ export function useFullscreenControls({
     isPiPSupported,
     isAirPlaySupported,
     setIsPiPSupported,
-    setIsAirPlaySupported
+    setIsAirPlaySupported,
+    fullscreenType = 'native'
 }: UseFullscreenControlsProps) {
     useEffect(() => {
         if (typeof document !== 'undefined') {
@@ -34,6 +36,11 @@ export function useFullscreenControls({
         if (!containerRef.current) return;
 
         if (!isFullscreen) {
+            if (fullscreenType === 'window') {
+                setIsFullscreen(true);
+                return;
+            }
+
             try {
                 if (containerRef.current.requestFullscreen) {
                     await containerRef.current.requestFullscreen();
@@ -44,11 +51,9 @@ export function useFullscreenControls({
                 } else if ((containerRef.current as any).msRequestFullscreen) {
                     await (containerRef.current as any).msRequestFullscreen();
                 } else if (videoRef.current && (videoRef.current as any).webkitEnterFullscreen) {
-                    // Fallback for browsers that only support fullscreen on video element (like some car browsers)
                     (videoRef.current as any).webkitEnterFullscreen();
                 }
 
-                // Lock orientation to landscape on mobile devices if supported
                 if (window.screen && (window.screen as any).orientation && (window.screen as any).orientation.lock) {
                     try {
                         await (window.screen as any).orientation.lock('landscape');
@@ -58,7 +63,6 @@ export function useFullscreenControls({
                 }
             } catch (error) {
                 console.warn('Fullscreen request failed, trying fallback:', error);
-                // Last ditch effort: try native video fullscreen if container failed
                 if (videoRef.current && (videoRef.current as any).webkitEnterFullscreen) {
                     try {
                         (videoRef.current as any).webkitEnterFullscreen();
@@ -68,6 +72,11 @@ export function useFullscreenControls({
                 }
             }
         } else {
+            if (fullscreenType === 'window') {
+                setIsFullscreen(false);
+                return;
+            }
+
             try {
                 if (document.exitFullscreen) {
                     await document.exitFullscreen();
@@ -79,7 +88,6 @@ export function useFullscreenControls({
                     await (document as any).msExitFullscreen();
                 }
 
-                // Unlock orientation when exiting fullscreen
                 if (window.screen && (window.screen as any).orientation && (window.screen as any).orientation.unlock) {
                     try {
                         (window.screen as any).orientation.unlock();
@@ -91,7 +99,7 @@ export function useFullscreenControls({
                 console.error('Failed to exit fullscreen:', error);
             }
         }
-    }, [containerRef, videoRef, isFullscreen]);
+    }, [containerRef, videoRef, isFullscreen, fullscreenType, setIsFullscreen]);
 
     useEffect(() => {
         const handleFullscreenChange = () => {
@@ -101,9 +109,12 @@ export function useFullscreenControls({
                 (document as any).mozFullScreenElement ||
                 (document as any).msFullscreenElement
             );
-            setIsFullscreen(isInFullscreen);
 
-            // Double check orientation lock/unlock on change
+            // Only update if not in window mode, or if exiting native mode
+            if (fullscreenType === 'native' || !isInFullscreen) {
+                setIsFullscreen(isInFullscreen);
+            }
+
             if (isInFullscreen) {
                 if (window.screen && (window.screen as any).orientation && (window.screen as any).orientation.lock) {
                     (window.screen as any).orientation.lock('landscape').catch(() => { });
@@ -128,7 +139,19 @@ export function useFullscreenControls({
             document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
             document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
         };
-    }, [setIsFullscreen]);
+    }, [setIsFullscreen, fullscreenType]);
+
+    useEffect(() => {
+        if (isFullscreen && fullscreenType === 'window') {
+            const handleEsc = (e: KeyboardEvent) => {
+                if (e.key === 'Escape') {
+                    setIsFullscreen(false);
+                }
+            };
+            window.addEventListener('keydown', handleEsc);
+            return () => window.removeEventListener('keydown', handleEsc);
+        }
+    }, [isFullscreen, fullscreenType, setIsFullscreen]);
 
     const togglePictureInPicture = useCallback(async () => {
         if (!videoRef.current || !isPiPSupported) return;

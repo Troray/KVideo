@@ -43,6 +43,7 @@ export interface AppSettings {
   realtimeLatency: boolean; // Enable real-time latency ping updates
   searchDisplayMode: SearchDisplayMode; // 'normal' = individual cards, 'grouped' = group same-name videos
   episodeReverseOrder: boolean; // Persist episode list reverse state
+  fullscreenType: 'native' | 'window'; // Fullscreen mode preference
 }
 
 import { exportSettings, importSettings, SEARCH_HISTORY_KEY, WATCH_HISTORY_KEY } from './settings-helpers';
@@ -114,6 +115,7 @@ function getDefaultAppSettings(): AppSettings {
     realtimeLatency: false,
     searchDisplayMode: 'normal',
     episodeReverseOrder: false,
+    fullscreenType: 'native',
   };
 }
 
@@ -189,6 +191,7 @@ export const settingsStore = {
         realtimeLatency: parsed.realtimeLatency !== undefined ? parsed.realtimeLatency : false,
         searchDisplayMode: parsed.searchDisplayMode === 'grouped' ? 'grouped' : 'normal',
         episodeReverseOrder: parsed.episodeReverseOrder !== undefined ? parsed.episodeReverseOrder : false,
+        fullscreenType: parsed.fullscreenType === 'window' ? 'window' : 'native',
       };
     } catch {
       // Even if localStorage fails, we should return defaults + ENV subscriptions

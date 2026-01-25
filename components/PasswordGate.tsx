@@ -34,9 +34,12 @@ export function PasswordGate({ children, hasEnvPassword: initialHasEnvPassword }
             };
 
             // 1. Initial local check (fast)
+            // Determine if the app SHOULD be protected
+            const isProtected = (settings.passwordAccess && settings.accessPasswords.length > 0) || initialHasEnvPassword;
+
             // Default to canPersist = true for first check if not sure
             const isUnlocked = getUnlockedState(true);
-            const localLocked = (settings.passwordAccess || initialHasEnvPassword) && !isUnlocked;
+            const localLocked = isProtected && !isUnlocked;
             if (mounted) setIsLocked(localLocked);
             if (mounted) setIsClient(true);
 
@@ -62,7 +65,8 @@ export function PasswordGate({ children, hasEnvPassword: initialHasEnvPassword }
                     const canPersist = data.hasEnvPassword && data.persistPassword;
                     const finalUnlocked = getUnlockedState(canPersist);
 
-                    const confirmLocked = (settings.passwordAccess || data.hasEnvPassword) && !finalUnlocked;
+                    const isProtectedNow = (settings.passwordAccess && settings.accessPasswords.length > 0) || data.hasEnvPassword;
+                    const confirmLocked = isProtectedNow && !finalUnlocked;
                     setIsLocked(confirmLocked);
                 }
             } catch (e) {
@@ -85,9 +89,11 @@ export function PasswordGate({ children, hasEnvPassword: initialHasEnvPassword }
             const isUnlocked = (sessionStorage.getItem(SESSION_UNLOCKED_KEY) === 'true') ||
                 (canPersist && localStorage.getItem(SESSION_UNLOCKED_KEY) === 'true');
 
-            if (!settings.passwordAccess && !hasEnvPassword) {
+            const isProtected = (settings.passwordAccess && settings.accessPasswords.length > 0) || hasEnvPassword;
+
+            if (!isProtected) {
                 setIsLocked(false);
-            } else if (settings.passwordAccess && !isUnlocked) {
+            } else if (!isUnlocked) {
                 setIsLocked(true);
             }
         };

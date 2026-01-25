@@ -22,6 +22,7 @@ interface UseDesktopPlayerLogicProps {
     refs: DesktopPlayerState['refs'];
     data: DesktopPlayerState['data'];
     actions: DesktopPlayerState['actions'];
+    fullscreenType?: 'native' | 'window';
 }
 
 export function useDesktopPlayerLogic({
@@ -32,7 +33,8 @@ export function useDesktopPlayerLogic({
     onTimeUpdate,
     refs,
     data,
-    actions
+    actions,
+    fullscreenType = 'native'
 }: UseDesktopPlayerLogicProps) {
     const {
         videoRef, containerRef, progressBarRef, volumeBarRef,
@@ -117,7 +119,8 @@ export function useDesktopPlayerLogic({
 
     const fullscreenControls = useFullscreenControls({
         containerRef, videoRef, isFullscreen, setIsFullscreen,
-        isPiPSupported, isAirPlaySupported, setIsPiPSupported, setIsAirPlaySupported
+        isPiPSupported, isAirPlaySupported, setIsPiPSupported, setIsAirPlaySupported,
+        fullscreenType
     });
 
     const controlsVisibility = useControlsVisibility({

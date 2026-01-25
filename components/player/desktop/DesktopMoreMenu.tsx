@@ -43,6 +43,8 @@ export function DesktopMoreMenu({
         setAdFilter,
         adFilterMode,
         setAdFilterMode,
+        fullscreenType,
+        setFullscreenType,
     } = usePlayerSettings();
 
     const buttonRef = React.useRef<HTMLButtonElement>(null);
@@ -267,6 +269,44 @@ export function DesktopMoreMenu({
                         <span className="text-[10px] sm:text-xs text-[var(--text-color-secondary)]">秒</span>
                     </div>
                 )}
+            </div>
+
+            {/* Fullscreen Mode Selector */}
+            <div className="px-3 py-2 sm:px-4 sm:py-2.5 flex items-center justify-between gap-4 sm:gap-6">
+                <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-[var(--text-color)]">
+                    <Icons.Settings size={16} className="sm:w-[18px] sm:h-[18px]" />
+                    <span>全屏方式</span>
+                </div>
+                <div className="relative">
+                    <button
+                        onClick={() => {
+                            setFullscreenType(fullscreenType === 'native' ? 'window' : 'native');
+                        }}
+                        className="flex items-center gap-1 sm:gap-1.5 bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--text-color)] text-[10px] sm:text-xs rounded-[var(--radius-2xl)] px-2 sm:px-2.5 py-1 sm:py-1.5 outline-none hover:border-[var(--accent-color)] hover:bg-[color-mix(in_srgb,var(--accent-color)_5%,transparent)] transition-all cursor-pointer whitespace-nowrap"
+                    >
+                        <span>{fullscreenType === 'native' ? '系统全屏' : '网页全屏'}</span>
+                        <Icons.Maximize size={12} className="text-[var(--text-color-secondary)]" />
+                    </button>
+                </div>
+            </div>
+
+            {/* Fullscreen Mode Selector */}
+            <div className="px-3 py-2 sm:px-4 sm:py-2.5 flex items-center justify-between gap-4 sm:gap-6">
+                <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-[var(--text-color)]">
+                    <Icons.Settings size={16} className="sm:w-[18px] sm:h-[18px]" />
+                    <span>全屏方式</span>
+                </div>
+                <div className="relative">
+                    <button
+                        onClick={() => {
+                            setFullscreenType(fullscreenType === 'native' ? 'window' : 'native');
+                        }}
+                        className="flex items-center gap-1 sm:gap-1.5 bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--text-color)] text-[10px] sm:text-xs rounded-[var(--radius-2xl)] px-2 sm:px-2.5 py-1 sm:py-1.5 outline-none hover:border-[var(--accent-color)] hover:bg-[color-mix(in_srgb,var(--accent-color)_5%,transparent)] transition-all cursor-pointer whitespace-nowrap"
+                    >
+                        <span>{fullscreenType === 'native' ? '系统全屏' : '网页全屏'}</span>
+                        <Icons.Maximize size={12} className="text-[var(--text-color-secondary)]" />
+                    </button>
+                </div>
             </div>
 
             {/* Skip Outro Switch */}

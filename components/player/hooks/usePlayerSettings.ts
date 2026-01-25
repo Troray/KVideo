@@ -20,6 +20,7 @@ export function usePlayerSettings() {
             adFilter: stored.adFilter,
             adFilterMode: stored.adFilterMode,
             adKeywords: stored.adKeywords,
+            fullscreenType: stored.fullscreenType,
         };
     });
 
@@ -37,6 +38,7 @@ export function usePlayerSettings() {
                 adFilter: stored.adFilter,
                 adFilterMode: stored.adFilterMode,
                 adKeywords: stored.adKeywords,
+                fullscreenType: stored.fullscreenType,
             });
         });
         return unsubscribe;
@@ -89,6 +91,10 @@ export function usePlayerSettings() {
         updateSetting('adKeywords', value);
     }, [updateSetting]);
 
+    const setFullscreenType = useCallback((value: 'native' | 'window') => {
+        updateSetting('fullscreenType', value);
+    }, [updateSetting]);
+
     return {
         ...settings,
         setAutoNextEpisode,
@@ -100,5 +106,6 @@ export function usePlayerSettings() {
         setAdFilter,
         setAdFilterMode,
         setAdKeywords,
+        setFullscreenType,
     };
 }
