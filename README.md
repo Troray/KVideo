@@ -112,6 +112,8 @@
 4. **关键步骤**：在 `Settings` -> `Functions` -> `Compatibility flags` 中添加 `nodejs_compat`。
 5. **重试部署**：在 Deployments 页签找到最新部署，点击 `Retry deployment`。
 
+---
+
 ### 选项 2：Vercel 一键部署
 简单快捷。
 
@@ -122,6 +124,7 @@
 3. Vercel 会自动检测 Next.js 项目并部署
 4. 几分钟后即可访问你自己的 KVideo 实例
 
+---
 ### 选项 3：Docker 部署
 
 **方式一：从 Docker Hub 拉取**
@@ -167,8 +170,7 @@ docker build -t kvideo .
 docker run -d -p 3000:3000 --name kvideo kvideo
 ```
 
-
-
+---
 ### 选项 4：Node.js 本地部署
 
 ```bash
@@ -188,6 +190,7 @@ npm start
 
 应用将在 `http://localhost:3000` 启动。
 
+---
 ## ⚙️ 配置与功能手册
 
 ### 🎨 站点名称自定义配置
@@ -234,8 +237,7 @@ KVideo 支持多种密码保护方式：
 
 - **与全局密码兼容**：本地密码与全局密码均可解锁应用
 
-
-
+---
 ### 📦 自动订阅源配置
 
 
@@ -297,6 +299,7 @@ NEXT_PUBLIC_SUBSCRIPTION_SOURCES='[{"name":"每日更新源","url":"https://exam
 ]
 ```
 
+---
 ## 🔄 如何更新
 
 ### Vercel / Cloudflare / EdgeOne
@@ -318,7 +321,11 @@ npm install
 npm run build
 npm start
 ```
+### 🔄 自动化
+本项目使用 GitHub Actions 自动构建和发布 Docker 镜像。每次代码推送到 main 分支时，会自动构建多架构镜像并推送到 Docker Hub。
 
+
+---
 ## 🛠 技术栈
 
 ### 前端核心
@@ -335,12 +342,18 @@ npm start
 - **API Routes**：处理数据代理
 - **Service Worker**：离线缓存
 
-## 🤝 贡献与支持
+## 🤝 贡献代码
 
-欢迎提交 Issue 或 Pull Request！详情请查看 [贡献指南](CONTRIBUTING.md)。
+我们非常欢迎各种形式的贡献！无论是报告 Bug、提出新功能建议、改进文档，还是提交代码，你的每一份贡献都让这个项目变得更好。
 
-- **报告 Bug**: [GitHub Issues](https://github.com/KuekHaoYang/KVideo/issues)
-- **项目作者**: [KuekHaoYang](https://github.com/KuekHaoYang)
+**想要参与开发？请查看 [贡献指南](https://github.com/Troray/KVideo/blob/main/CONTRIBUTING.md) 了解详细的开发规范和流程。**
+
+快速开始：
+
+1. **报告 Bug**：[提交 Issue](https://github.com/KuekHaoYang/KVideo/issues)
+2. **功能建议**：在 Issues 中提出你的想法
+3. **代码贡献**：Fork → Branch → PR
+4. **文档改进**：直接提交 PR
 
 ## 📄 许可证
 
@@ -348,7 +361,18 @@ npm start
 
 ## 🙏 致谢
 
-感谢 [Next.js](https://nextjs.org/), [Tailwind CSS](https://tailwindcss.com/), [Zustand](https://github.com/pmndrs/zustand), [React](https://react.dev/) 等开源项目。
+感谢以下开源项目：
+
+- [Next.js](https://nextjs.org/) - React 框架
+- [Tailwind CSS](https://tailwindcss.com/) - CSS 框架
+- [Zustand](https://github.com/pmndrs/zustand) - 状态管理
+- [React](https://react.dev/) - UI 库
+
+## 📞 联系方式
+
+- **作者**：[KuekHaoYang](https://github.com/KuekHaoYang)
+- **项目主页**：https://github.com/KuekHaoYang/KVideo
+- **问题反馈**：[GitHub Issues](https://github.com/KuekHaoYang/KVideo/issues)
 
 ---
 
