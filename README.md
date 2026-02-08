@@ -14,6 +14,8 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
+---
+
 ## 📖 项目简介
 
 **KVideo** 是一个高性能、现代化的视频聚合与播放应用，专注于提供极致的用户体验和视觉设计。本项目利用 Next.js 16 的最新特性，结合 React 19 和 Tailwind CSS v4，打造了一个既美观又强大的视频浏览平台。
@@ -87,11 +89,131 @@
 
 ### 🛡️ 广告过滤
 - **多模式选择**：支持关闭、关键词过滤、智能启发式过滤(Beta)和激进模式。
+
 - **UI 集成**：在播放器设置菜单中直接切换模式，实时生效。
+
 - **自定义关键词**：支持通过环境变量扩展过滤关键词。
+
 - **高性能**：基于流式处理，对播放加载速度几乎无影响。
 
-## 🔐 隐私保护
+  
+
+## 🚀 部署指南
+
+### 选项 1：Cloudflare Pages (推荐) ✨
+免费、快速、全球CDN加速。
+
+1. **Fork** 本仓库到你的 GitHub。
+2. 访问 [Cloudflare Pages](https://dash.cloudflare.com/?to=/:account/pages/new/provider/github) 并连接 GitHub。
+3. 选择 `KVideo` 项目，配置构建参数：
+   - **Framework Preset**: `Next.js`
+   - **Build command**: `npm run pages:build`
+   - **Build output directory**: `.vercel/output/static`
+4. **关键步骤**：在 `Settings` -> `Functions` -> `Compatibility flags` 中添加 `nodejs_compat`。
+5. **重试部署**：在 Deployments 页签找到最新部署，点击 `Retry deployment`。
+
+### 选项 2：Vercel 一键部署
+简单快捷。
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/KuekHaoYang/KVideo)
+
+1. 点击上方按钮
+2. 连接你的 GitHub 账号
+3. Vercel 会自动检测 Next.js 项目并部署
+4. 几分钟后即可访问你自己的 KVideo 实例
+
+### 选项 3：Docker 部署
+
+**方式一：从 Docker Hub 拉取**
+
+```bash
+#直接运行容器
+docker run -d -p 3000:3000 --name kvideo kuekhaoyang/kvideo:latest
+
+#设置全局访问密码
+docker run -d -p 3000:3000 -e ACCESS_PASSWORD=your_premium_password --name kvideo kuekhaoyang/kvideo:latest
+
+#带环境变量启动
+docker run -d -p 3000:3000 \
+  -e NEXT_PUBLIC_SITE_NAME="我的视频平台" \
+  -e NEXT_PUBLIC_SITE_TITLE="我的视频 - 聚合播放平台" \
+  -e NEXT_PUBLIC_SITE_DESCRIPTION="专属视频聚合播放平台" \
+  --name kvideo kuekhaoyang/kvideo:latest
+  
+#配置订阅源
+docker run -d -p 3000:3000 -e NEXT_PUBLIC_SUBSCRIPTION_SOURCES='[{"name":"MySource","url":"..."}]' --name kvideo kuekhaoyang/kvideo:latest
+```
+
+应用将在 `http://localhost:3000` 启动。
+
+> **✨ 多架构支持**：镜像支持 2 种主流平台架构：
+>
+> - `linux/amd64` - Intel/AMD 64位（大多数服务器、PC、Intel Mac）
+> - `linux/arm64` - ARM 64位（Apple Silicon Mac、AWS Graviton、树莓派 4/5）
+
+**方式二：使用 Docker Compose**
+
+```bash
+# 确保目录中存在 docker-compose.yml
+docker-compose up -d
+```
+
+**方式三：本地构建镜像**
+
+```bash
+git clone https://github.com/KuekHaoYang/KVideo.git
+cd KVideo
+docker build -t kvideo .
+docker run -d -p 3000:3000 --name kvideo kvideo
+```
+
+
+
+### 选项 4：Node.js 本地部署
+
+```bash
+# 1. 克隆仓库
+git clone https://github.com/KuekHaoYang/KVideo.git
+cd KVideo
+
+# 2. 安装依赖
+npm install
+
+# 3. 构建项目
+npm run build
+
+# 4. 启动生产服务器
+npm start
+```
+
+应用将在 `http://localhost:3000` 启动。
+
+## ⚙️ 配置与功能手册
+
+### 🎨 站点名称自定义配置
+
+通过环境变量可以自定义站点名称、标题和描述，无需修改源代码。
+
+**可用环境变量：**
+
+| 变量名 | 说明 | 默认值 |
+|--------|------|--------|
+| `NEXT_PUBLIC_SITE_TITLE` | 浏览器标签页标题 | `视频聚合平台 - KVideo` |
+| `NEXT_PUBLIC_SITE_DESCRIPTION` | 站点描述 | `专属视频聚合播放平台，具备美观的 Liquid Glass UI` |
+| `NEXT_PUBLIC_SITE_NAME` | 站点头部名称 | `视频聚合平台` |
+| `ACCESS_PASSWORD` | 全局访问密码 | `无` `站长自行设置 可选` |
+| `PERSIST_PASSWORD` | 密码持久化 | `true` |
+
+**配置示例（本地开发）：**
+在项目根目录创建 `.env.local` 文件：
+
+```env
+NEXT_PUBLIC_SITE_NAME=我的视频平台
+NEXT_PUBLIC_SITE_TITLE=我的视频 - 聚合播放平台
+NEXT_PUBLIC_SITE_DESCRIPTION=专属视频聚合播放平台
+```
+
+### 🔐 隐私保护
 
 本应用注重用户隐私：
 
@@ -99,128 +221,46 @@
 - **无服务器数据**：不收集或上传任何用户数据
 - **自定义源**：用户可自行配置视频源
 
-## 🔒 密码访问控制
+### 🔒 密码访问控制
 
-KVideo 支持两种密码保护方式：
+KVideo 支持多种密码保护方式：
 
-### 方式一：本地保存密码
+**本地保存密码**
 
-在设置页面中启用密码访问，并添加密码：
-
+在`设置`页面中启用`本地密码`访问，并添加密码：
 - **设备独立**：仅在当前浏览器/设备有效
 - **可管理**：可随时添加或删除
 - **多密码支持**：可设置多个有效密码
 
-### 方式二：环境变量密码（推荐用于部署）
+- **与全局密码兼容**：本地密码与全局密码均可解锁应用
 
-通过 `ACCESS_PASSWORD` 环境变量设置全局密码：
 
-**Docker 部署：**
 
-```bash
-docker run -d -p 3000:3000 -e ACCESS_PASSWORD=your_premium_password --name kvideo kuekhaoyang/kvideo:latest
-```
+### 📦 自动订阅源配置
 
-**Vercel 部署：**
 
-在 Vercel 项目设置中添加环境变量：
-- 变量名：`ACCESS_PASSWORD`
-- 变量值：你的密码
-
-**特点：**
-- **全局生效**：所有用户都需要此密码才能访问
-- **无法在界面删除**：只能通过修改环境变量更改
-- **与本地密码兼容**：两种密码都可以解锁应用
-- **密码持久化**：支持通过 `PERSIST_PASSWORD` 环境变量控制是否在当前设备上记住密码。
-
-### 方式三：密码持久化设置（ENV）
-
-通过 `PERSIST_PASSWORD` 环境变量，你可以控制用户在输入正确密码后，是否需要在下次打开时重新输入。
-
-| 变量名 | 选项 | 说明 | 默认值 |
-|--------|------|------|--------|
-| `PERSIST_PASSWORD` | `true` / `false` | 是否在本地浏览器持久化保存解锁状态。设置为 `true` 时，用户只需输入一次密码，后续访问无需再次输入。 | `true` |
-
-> [!NOTE]
-> 此功能仅在设置了 `ACCESS_PASSWORD` 时才会生效。如果没有设置环境密码，此选项将被忽略。
-
-## 🎨 站点名称自定义配置
-
-通过环境变量可以自定义站点名称、标题和描述，无需修改源代码。
-
-### 可用环境变量：
-
-| 变量名 | 说明 | 默认值 |
-|--------|------|--------|
-| `NEXT_PUBLIC_SITE_TITLE` | 浏览器标签页标题 | `视频聚合平台 - KVideo` |
-| `NEXT_PUBLIC_SITE_DESCRIPTION` | 站点描述 | `专属视频聚合播放平台，具备美观的 Liquid Glass UI` |
-| `NEXT_PUBLIC_SITE_NAME` | 站点头部名称 | `视频聚合平台` |
-| `PERSIST_PASSWORD` | 密码持久化 | `true` |
-
-### 配置示例：
-
-**Vercel 部署：**
-在 Vercel 项目设置中添加环境变量：
-
-- 变量名：`NEXT_PUBLIC_SITE_NAME`
-- 变量值：`我的视频平台`
-
-**Cloudflare Pages 部署：**
-在 Cloudflare Pages 项目设置中添加环境变量：
-- 变量名：`NEXT_PUBLIC_SITE_NAME`
-- 变量值：`我的视频平台`
-
-**Docker 部署：**
-```bash
-docker run -d -p 3000:3000 \
-  -e NEXT_PUBLIC_SITE_NAME="我的视频平台" \
-  -e NEXT_PUBLIC_SITE_TITLE="我的视频 - 聚合播放平台" \
-  -e NEXT_PUBLIC_SITE_DESCRIPTION="专属视频聚合播放平台" \
-  --name kvideo kuekhaoyang/kvideo:latest
-```
-
-**本地开发：**
-在项目根目录创建 `.env.local` 文件：
-```env
-NEXT_PUBLIC_SITE_NAME=我的视频平台
-NEXT_PUBLIC_SITE_TITLE=我的视频 - 聚合播放平台
-NEXT_PUBLIC_SITE_DESCRIPTION=专属视频聚合播放平台
-```
-
-## 📦 自动订阅源配置
-
-可以通过环境变量 `NEXT_PUBLIC_SUBSCRIPTION_SOURCES` 自动配置订阅源，应用启动时会自动加载并设置为自动更新。
+可以通过环境变量 `NEXT_PUBLIC_SUBSCRIPTION_SOURCES` 自动配置订阅源。
 
 **格式：** JSON 数组字符串，包含 `name` 和 `url` 字段。
-
 **示例：**
-
 ```bash
 NEXT_PUBLIC_SUBSCRIPTION_SOURCES='[{"name":"每日更新源","url":"https://example.com/api.json"},{"name":"备用源","url":"https://backup.com/api.json"}]'
 ```
 
-**Docker 部署：**
+## 📦 数据源说明
 
-```bash
-docker run -d -p 3000:3000 -e NEXT_PUBLIC_SUBSCRIPTION_SOURCES='[{"name":"MySource","url":"..."}]' --name kvideo kuekhaoyang/kvideo:latest
-```
+### ⚠️ 重要的区别说明：订阅源 vs 视频源
 
-**Vercel 部署：**
+**这是一个常见的误区，请仔细阅读：**
 
-在 Vercel 项目设置中添加环境变量：
-- 变量名：`NEXT_PUBLIC_SUBSCRIPTION_SOURCES`
-- 变量值：`[{"name":"...","url":"..."}]`
+- **视频源 (Source)**：单个 CMS/App API 接口 (如 `https://api.example.com/vod`)。这种链接**不能**直接作为"订阅"添加。
+- **订阅源 (Subscription)**：包含多个视频源信息的 **JSON 配置文件** URL。只有这种返回 JSON 列表的链接才能在"订阅管理"中添加。
 
-**Cloudflare Pages 部署：**
+> **简单来说**：如果你只有一个 m3u8 或 API 接口地址，请去"自定义源"添加。如果你有一个包含多个源的 JSON 文件链接，请去"订阅管理"添加。
 
-在 Cloudflare Pages 项目设置中添加环境变量：
-- 变量名：`NEXT_PUBLIC_SUBSCRIPTION_SOURCES`
-- 变量值：`[{"name":"...","url":"..."}]`
+### 📝 自定义源 JSON 格式
 
-## 📝 自定义源 JSON 格式
-
-如果你想创建自己的订阅源或批量导入源，可以使用以下 JSON 格式。
-
+如果你想创建自己的订阅源或批量导入源，可以使用以下 JSON 格式：
 **基本结构：**
 
 可以是单个对象数组，也可以是包含 `sources` 或 `list` 字段的对象。
@@ -257,176 +297,20 @@ docker run -d -p 3000:3000 -e NEXT_PUBLIC_SUBSCRIPTION_SOURCES='[{"name":"MySour
 ]
 ```
 
-### ⚠️ 重要的区别说明：订阅源 vs 视频源
-
-**这是一个常见的误区，请仔细阅读：**
-
-- **视频源 (Source)**：
-  - 指向单个 CMS/App API 接口
-  - 例如：`https://api.example.com/vod`
-  - 这种链接**不能**直接作为"订阅"添加
-  - 只能在"自定义源管理"中作为单个源添加
-
-- **订阅源 (Subscription)**：
-  - 指向一个 **JSON 文件**（如上面的示例）的 URL
-  - 这个 JSON 文件里包含了一个或多个视频源的列表
-  - 例如：`https://mysite.com/kvideo-sources.json`
-  - 这是一个**配置文件**的链接，不是视频 API 的链接
-  - 只有这种返回 JSON 列表的链接才能在"订阅管理"中添加
-
-> **简单来说**：如果你只有一个 m3u8 或 API 接口地址，请去"自定义源"添加。如果你有一个包含多个源的 JSON 文件链接，请去"订阅管理"添加。
-
-## 🛠 技术栈
-
-### 前端核心
-
-| 技术 | 版本 | 用途 |
-|------|------|------|
-| **[Next.js](https://nextjs.org/)** | 16.0.3 | React 框架，使用 App Router |
-| **[React](https://react.dev/)** | 19.2.0 | UI 组件库 |
-| **[TypeScript](https://www.typescriptlang.org/)** | 5.x | 类型安全的 JavaScript |
-| **[Tailwind CSS](https://tailwindcss.com/)** | 4.x | 实用优先的 CSS 框架 |
-| **[Zustand](https://github.com/pmndrs/zustand)** | 5.0.2 | 轻量级状态管理 |
-
-### 开发工具
-
-- **ESLint 9**：代码质量检查
-- **PostCSS 8**：CSS 处理器
-- **Vercel Analytics**：性能监控和分析
-
-### 架构特点
-
-- **App Router**：Next.js 13+ 的新路由系统，支持服务端组件和流式渲染
-- **API Routes**：内置 API 端点，处理豆瓣数据和视频源代理
-- **Service Worker**：离线缓存和智能预加载
-- **Server Components**：优化首屏加载性能
-- **Client Components**：复杂交互和状态管理
-
-## 🚀 快速部署
-
-### 在线体验
-
-访问 **[https://kvideo.vercel.app/](https://kvideo.vercel.app/)** 立即体验，无需安装！
-
-### 部署到自己的服务器
-
-
-
-
-
-#### 选项 1：Vercel 一键部署（推荐）
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/KuekHaoYang/KVideo)
-
-1. 点击上方按钮
-2. 连接你的 GitHub 账号
-3. Vercel 会自动检测 Next.js 项目并部署
-4. 几分钟后即可访问你自己的 KVideo 实例
-
-#### 选项 2：Cloudflare Pages 部署 (推荐)
-
-此方法完全免费且速度极快，是部署本项目的最佳选择。
-
-1. **Fork 本仓库**：首先将项目 Fork 到你的 GitHub 账户。
-
-2. **创建项目**：
-   - 点击访问 [**Cloudflare Pages - Connect Git**](https://dash.cloudflare.com/?to=/:account/pages/new/provider/github)。
-   - 如果未连接 GitHub，请点击 **Connect GitHub**；若已连接，直接选择你刚刚 Fork 的 `KVideo` 项目并点击 **Begin setup**。
-
-3. **配置构建参数**：
-   - **Project name**: 默认为 `kvideo` (建议保持不变，后续链接基于此名称)
-   - **Framework Preset**: 选择 `Next.js`
-   - **Build command**: 输入 `npm run pages:build`
-   - **Build output directory**: 输入 `.vercel/output/static`
-   - 点击 **Save and Deploy**。
-
-4. **⚠️ 关键步骤：修复运行时环境**
-   > *注意：此时部署虽然显示"Success"，但你会发现访问网页会报错。这是因为缺少必要的兼容性配置。请按以下步骤修复：*
-
-   - 进入 **[项目设置页面](https://dash.cloudflare.com/?to=/:account/pages/view/kvideo/settings/production)** (如果你的项目名不是 kvideo，请在控制台手动查找 Settings -> Functions)。
-   - 拉到页面底部找到 **Compatibility flags** 部分。
-   - 添加标志：`nodejs_compat`
-
-5. **重试部署 (生效配置)**：
-   - 回到 **[项目概览页面](https://dash.cloudflare.com/?to=/:account/pages/view/kvideo)**。
-   - 在 **Deployments** 列表中，找到最新的那次部署。
-   - 点击右侧的三个点 `...` 菜单，选择 **Retry deployment**。
-   - 等待新的部署完成后，你的 KVideo 就部署成功了！
-
-#### 选项 3：Docker 部署
-
-**从 Docker Hub 拉取（最简单）：**
-
-```bash
-# 拉取最新版本
-docker pull kuekhaoyang/kvideo:latest
-docker run -d -p 3000:3000 --name kvideo kuekhaoyang/kvideo:latest
-```
-
-应用将在 `http://localhost:3000` 启动。
-
-> **✨ 多架构支持**：镜像支持 2 种主流平台架构：
-> - `linux/amd64` - Intel/AMD 64位（大多数服务器、PC、Intel Mac）
-> - `linux/arm64` - ARM 64位（Apple Silicon Mac、AWS Graviton、树莓派 4/5）
-
-**自己构建镜像：**
-
-```bash
-git clone https://github.com/KuekHaoYang/KVideo.git
-cd KVideo
-docker build -t kvideo .
-docker run -d -p 3000:3000 --name kvideo kvideo
-```
-
-**使用 Docker Compose：**
-
-```bash
-docker-compose up -d
-```
-
-#### 选项 4：传统 Node.js 部署
-
-```bash
-# 1. 克隆仓库
-git clone https://github.com/KuekHaoYang/KVideo.git
-cd KVideo
-
-# 2. 安装依赖
-npm install
-
-# 3. 构建项目
-npm run build
-
-# 4. 启动生产服务器
-npm start
-```
-
-应用将在 `http://localhost:3000` 启动。
-
 ## 🔄 如何更新
 
-### Vercel 部署
+### Vercel / Cloudflare / EdgeOne
+推送到 GitHub 仓库的 `main` 分支会自动触发构建和部署。
 
-Vercel 会自动检测 GitHub 仓库的更新并重新部署，无需手动操作。
-
-### Docker 部署
-
-当有新版本发布时：
-
+### Docker 更新
 ```bash
-# 停止并删除旧容器
 docker stop kvideo
 docker rm kvideo
-
-# 拉取最新镜像
 docker pull kuekhaoyang/kvideo:latest
-
-# 运行新容器
 docker run -d -p 3000:3000 --name kvideo kuekhaoyang/kvideo:latest
 ```
 
-### Node.js 部署
-
+### Node.js 更新
 ```bash
 cd KVideo
 git pull origin main
@@ -435,19 +319,28 @@ npm run build
 npm start
 ```
 
-> **🔄 自动化部署**：本项目使用 GitHub Actions 自动构建和发布 Docker 镜像。每次代码推送到 main 分支时，会自动构建多架构镜像并推送到 Docker Hub。
+## 🛠 技术栈
 
-## 🤝 贡献代码
+### 前端核心
+| 技术 | 版本 | 用途 |
+|------|------|------|
+| **[Next.js](https://nextjs.org/)** | 16.0.3 | React 框架 |
+| **[React](https://react.dev/)** | 19.2.0 | UI 组件库 |
+| **[TypeScript](https://www.typescriptlang.org/)** | 5.x | 类型安全 |
+| **[Tailwind CSS](https://tailwindcss.com/)** | 4.x | CSS 框架 |
+| **[Zustand](https://github.com/pmndrs/zustand)** | 5.0.2 | 状态管理 |
 
-我们非常欢迎各种形式的贡献！无论是报告 Bug、提出新功能建议、改进文档，还是提交代码，你的每一份贡献都让这个项目变得更好。
+### 架构特点
+- **App Router**：支持服务端组件 (RSC)
+- **API Routes**：处理数据代理
+- **Service Worker**：离线缓存
 
-**想要参与开发？请查看 [贡献指南](CONTRIBUTING.md) 了解详细的开发规范和流程。**
+## 🤝 贡献与支持
 
-快速开始：
-1. **报告 Bug**：[提交 Issue](https://github.com/KuekHaoYang/KVideo/issues)
-2. **功能建议**：在 Issues 中提出你的想法
-3. **代码贡献**：Fork → Branch → PR
-4. **文档改进**：直接提交 PR
+欢迎提交 Issue 或 Pull Request！详情请查看 [贡献指南](CONTRIBUTING.md)。
+
+- **报告 Bug**: [GitHub Issues](https://github.com/KuekHaoYang/KVideo/issues)
+- **项目作者**: [KuekHaoYang](https://github.com/KuekHaoYang)
 
 ## 📄 许可证
 
@@ -455,22 +348,7 @@ npm start
 
 ## 🙏 致谢
 
-感谢以下开源项目：
-
-- [Next.js](https://nextjs.org/) - React 框架
-- [Tailwind CSS](https://tailwindcss.com/) - CSS 框架
-- [Zustand](https://github.com/pmndrs/zustand) - 状态管理
-- [React](https://react.dev/) - UI 库
-
-## 📞 联系方式
-
-- **作者**：[KuekHaoYang](https://github.com/KuekHaoYang)
-- **项目主页**：[https://github.com/KuekHaoYang/KVideo](https://github.com/KuekHaoYang/KVideo)
-- **问题反馈**：[GitHub Issues](https://github.com/KuekHaoYang/KVideo/issues)
-
-
-
-
+感谢 [Next.js](https://nextjs.org/), [Tailwind CSS](https://tailwindcss.com/), [Zustand](https://github.com/pmndrs/zustand), [React](https://react.dev/) 等开源项目。
 
 ---
 
