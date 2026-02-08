@@ -19,7 +19,7 @@ export function useHomePage() {
     const [currentSortBy, setCurrentSortBy] = useState<SortOption>('default');
 
     const onUrlUpdate = useCallback((q: string) => {
-        router.replace(`/?q=${encodeURIComponent(q)}`, { scroll: false });
+        window.history.replaceState(null, '', `/?q=${encodeURIComponent(q)}`);
     }, [router]);
 
     // Search stream hook
@@ -139,7 +139,7 @@ export function useHomePage() {
         setQuery('');
         hasSearchedWithSourcesRef.current = false;
         resetSearch();
-        router.replace('/', { scroll: false });
+        window.history.replaceState(null, '', '/');
     }, [resetSearch, router]);
 
     return {

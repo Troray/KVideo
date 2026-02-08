@@ -22,7 +22,7 @@ export function usePremiumHomePage() {
     const [enabledPremiumSources, setEnabledPremiumSources] = useState<VideoSource[]>([]);
 
     const onUrlUpdate = useCallback((q: string) => {
-        router.replace(`/premium?q=${encodeURIComponent(q)}`, { scroll: false });
+        window.history.replaceState(null, '', `/premium?q=${encodeURIComponent(q)}`);
     }, [router]);
 
     // Search stream hook
@@ -127,7 +127,7 @@ export function usePremiumHomePage() {
         setQuery('');
         hasSearchedWithSourcesRef.current = false;
         resetSearch();
-        router.replace('/premium', { scroll: false });
+        window.history.replaceState(null, '', '/premium');
     };
 
     return {

@@ -34,6 +34,7 @@ export function Navbar({ onReset, isPremiumMode = false }: NavbarProps) {
                                     width={40}
                                     height={40}
                                     className="object-contain"
+                                    unoptimized
                                 />
                             </div>
                             <div className="flex flex-col min-w-0">

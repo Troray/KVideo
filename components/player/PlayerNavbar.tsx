@@ -25,6 +25,7 @@ export function PlayerNavbar({ isPremium }: { isPremium?: boolean }) {
                                 width={40}
                                 height={40}
                                 className="object-contain"
+                                unoptimized
                             />
                         </button>
                         <Button

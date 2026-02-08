@@ -118,7 +118,7 @@ function PlayerContent() {
     // Update URL to reflect current episode
     const params = new URLSearchParams(searchParams.toString());
     params.set('episode', index.toString());
-    router.replace(`/player?${params.toString()}`, { scroll: false });
+    window.history.replaceState(null, '', `/player?${params.toString()}`);
   }, [searchParams, router, setCurrentEpisode, setPlayUrl, setVideoError]);
 
   const handleToggleReverse = (reversed: boolean) => {
@@ -262,7 +262,7 @@ function PlayerContent() {
                           params.set('groupedSources', groupedSourcesParam);
                         }
                         setCurrentSourceId(newSource.source);
-                        router.replace(`/player?${params.toString()}`, { scroll: false });
+                        window.history.replaceState(null, '', `/player?${params.toString()}`);
                       }}
                     />
                   </div>
