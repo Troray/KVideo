@@ -3,8 +3,8 @@ import { settingsStore } from '@/lib/store/settings-store';
 import { fetchSourcesFromUrl, mergeSources } from '@/lib/utils/source-import-utils';
 import type { SourceSubscription } from '@/lib/types';
 
-// Minimum time between syncs for the same subscription (5 minutes)
-const SYNC_COOLDOWN_MS = 5 * 60 * 1000;
+// Minimum time between syncs for the same subscription (24 hours)
+const SYNC_COOLDOWN_MS = 24 * 60 * 60 * 1000;
 // Delay before initial sync to ensure settings are fully loaded
 const INITIAL_SYNC_DELAY_MS = 1000;
 
