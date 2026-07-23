@@ -9,8 +9,6 @@ import { searchVideos } from '@/lib/api/client';
 import { getSourceById } from '@/lib/api/video-sources';
 import { getSourceName } from '@/lib/utils/source-names';
 
-export const runtime = 'edge';
-
 export async function POST(request: NextRequest) {
   const encoder = new TextEncoder();
 

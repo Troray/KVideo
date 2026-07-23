@@ -1,6 +1,4 @@
 import { NextResponse } from 'next/server';
-
-export const runtime = 'edge';
 // We still import this type but won't rely on the empty array
 import { PREMIUM_SOURCES } from '@/lib/api/premium-sources';
 

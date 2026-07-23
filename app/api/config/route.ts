@@ -5,8 +5,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'edge';
-
 export async function GET() {
     const accessPassword = (process.env.ACCESS_PASSWORD || process.env.NEXT_PUBLIC_ACCESS_PASSWORD || '').trim();
     const persistPassword = process.env.PERSIST_PASSWORD !== 'false';
