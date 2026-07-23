@@ -19,7 +19,14 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
     try {
-        const { password } = await request.json();
+        let password = '';
+        try {
+            const body = await request.json();
+            password = body?.password || '';
+        } catch {
+            password = '';
+        }
+
         const accessPassword = (process.env.ACCESS_PASSWORD || process.env.NEXT_PUBLIC_ACCESS_PASSWORD || '').trim();
 
         if (!accessPassword) {
