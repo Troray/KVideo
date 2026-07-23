@@ -46,7 +46,8 @@ export function PasswordGate({ children, hasEnvPassword: initialHasEnvPassword }
             // 2. Fetch remote config & sync
             try {
                 const res = await fetch('/api/config');
-                if (!res.ok) throw new Error('Failed to fetch config');
+                const contentType = res.headers.get('content-type') || '';
+                if (!res.ok || contentType.includes('text/html')) throw new Error('Failed to fetch config (returned HTML)');
 
                 const data = await res.json();
 

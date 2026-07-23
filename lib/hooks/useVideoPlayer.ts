@@ -87,6 +87,13 @@ export function useVideoPlayer(
         response = await fetch(`/api/detail?id=${videoId}&source=${source}`);
       }
 
+      const contentType = response.headers.get('content-type') || '';
+      if (contentType.includes('text/html')) {
+        setVideoError('API 接口响应异常：当前部署环境未触发后端 API 路由（返回了 HTML 页面），请检查 EdgeOne 部署配置。');
+        setLoading(false);
+        return;
+      }
+
       const data = await response.json();
 
       if (!response.ok) {
