@@ -35,6 +35,30 @@ interface EpisodeListProps {
   onSourceChange?: (source: GroupedSource) => void;
 }
 
+function formatEpisodeDisplay(name: string | undefined, originalIndex: number, totalCount: number) {
+  const padLength = totalCount >= 100 ? 3 : 2;
+  const defaultNum = String(originalIndex + 1).padStart(padLength, '0');
+
+  if (!name) return defaultNum;
+
+  const trimmed = name.trim();
+  // Match "第 1 集", "第1集", "第01集", "第 001 集"
+  const epMatch = trimmed.match(/^第\s*(\d+)\s*集$/);
+  if (epMatch) {
+    const num = parseInt(epMatch[1], 10);
+    return String(num).padStart(padLength, '0');
+  }
+
+  // If pure digits like "1", "01"
+  if (/^\d+$/.test(trimmed)) {
+    const num = parseInt(trimmed, 10);
+    return String(num).padStart(padLength, '0');
+  }
+
+  // Non-standard episode title (e.g. "预告", "特别篇", "OVA"), keep custom title
+  return trimmed;
+}
+
 function SourceThumbnail({ pic, alt }: { pic?: string; alt?: string }) {
   const [hasError, setHasError] = useState(false);
 
@@ -77,12 +101,52 @@ export function EpisodeList({
   const listRef = useRef<HTMLDivElement>(null);
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
+  // Range bar scroll & drag refs
+  const rangeBarRef = useRef<HTMLDivElement>(null);
+  const [isDraggingRange, setIsDraggingRange] = useState(false);
+  const dragStartXRef = useRef(0);
+  const dragScrollLeftRef = useRef(0);
+  const hasDraggedRef = useRef(false);
+
   // Tab switcher state: 'episodes' (选集) vs 'sources' (播放源)
   const [activeTab, setActiveTab] = useState<'episodes' | 'sources'>('episodes');
 
   // Latency state for sources
   const [latencies, setLatencies] = useState<Record<string, number>>({});
   const [isPingLoading, setIsPingLoading] = useState(false);
+
+  // Wheel scroll handler for page range bar
+  const handleRangeWheel = useCallback((e: React.WheelEvent<HTMLDivElement>) => {
+    if (!rangeBarRef.current) return;
+    if (e.deltaY !== 0) {
+      e.preventDefault();
+      rangeBarRef.current.scrollLeft += e.deltaY;
+    }
+  }, []);
+
+  // Mouse drag scroll handlers for page range bar
+  const handleRangeMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!rangeBarRef.current) return;
+    setIsDraggingRange(true);
+    hasDraggedRef.current = false;
+    dragStartXRef.current = e.pageX - rangeBarRef.current.offsetLeft;
+    dragScrollLeftRef.current = rangeBarRef.current.scrollLeft;
+  }, []);
+
+  const handleRangeMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isDraggingRange || !rangeBarRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - rangeBarRef.current.offsetLeft;
+    const walk = (x - dragStartXRef.current) * 1.5;
+    if (Math.abs(walk) > 3) {
+      hasDraggedRef.current = true;
+    }
+    rangeBarRef.current.scrollLeft = dragScrollLeftRef.current - walk;
+  }, [isDraggingRange]);
+
+  const handleRangeMouseUpOrLeave = useCallback(() => {
+    setIsDraggingRange(false);
+  }, []);
 
   // Initialize latencies from sources
   useEffect(() => {
@@ -316,17 +380,34 @@ export function EpisodeList({
       {/* Tab Body 1: Episodes Content */}
       {activeTab === 'episodes' && (
         <>
-          {/* Episode Group Pagination Range Tabs */}
+          {/* Episode Group Pagination Range Tabs with wheel & drag scroll */}
           {isPaginated && pageRanges.length > 0 && (
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-2 mb-3 scrollbar-none border-b border-[var(--glass-border)]/50">
+            <div
+              ref={rangeBarRef}
+              onWheel={handleRangeWheel}
+              onMouseDown={handleRangeMouseDown}
+              onMouseMove={handleRangeMouseMove}
+              onMouseUp={handleRangeMouseUpOrLeave}
+              onMouseLeave={handleRangeMouseUpOrLeave}
+              className={`flex items-center gap-1.5 overflow-x-auto py-1.5 px-0.5 mb-3 scrollbar-none border-b border-[var(--glass-border)]/50 select-none ${
+                isDraggingRange ? 'cursor-grabbing' : 'cursor-grab'
+              }`}
+            >
               {pageRanges.map((range) => {
                 const isActiveRange = activePage === range.pageIndex;
                 return (
                   <button
                     key={range.pageIndex}
-                    onClick={() => setActivePage(range.pageIndex)}
+                    onClick={(e) => {
+                      if (hasDraggedRef.current) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        return;
+                      }
+                      setActivePage(range.pageIndex);
+                    }}
                     className={`
-                      px-2.5 py-1 text-xs font-medium rounded-[var(--radius-xl)] transition-all cursor-pointer whitespace-nowrap
+                      px-2.5 py-1.5 text-xs font-medium rounded-[var(--radius-xl)] transition-all cursor-pointer whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-color)]
                       ${isActiveRange
                         ? 'bg-[var(--accent-color)] text-white shadow-sm font-bold'
                         : 'bg-[var(--glass-bg)] text-[var(--text-color-secondary)] hover:bg-[var(--glass-hover)] border border-[var(--glass-border)]'
@@ -340,7 +421,7 @@ export function EpisodeList({
             </div>
           )}
 
-          {/* Episode Grid Container */}
+          {/* Episode Grid Container (5-Column Grid with Pure Padded Numbers) */}
           <div
             ref={listRef}
             className="max-h-[420px] sm:max-h-[550px] overflow-y-auto pr-1"
@@ -348,12 +429,13 @@ export function EpisodeList({
             aria-label="剧集选择"
           >
             {pageEpisodes && pageEpisodes.length > 0 ? (
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 gap-2">
+              <div className="grid grid-cols-5 gap-2">
                 {pageEpisodes.map((episode, pageIdx) => {
                   const displayIndex = isPaginated ? activePage * PAGE_SIZE + pageIdx : pageIdx;
                   const originalIndex = getOriginalIndex(displayIndex);
                   const isCurrentEpisode = currentEpisode === originalIndex;
-                  const epName = episode.name || `第 ${originalIndex + 1} 集`;
+                  const epName = formatEpisodeDisplay(episode.name, originalIndex, episodes?.length || 0);
+                  const fullTitle = episode.name || `第 ${originalIndex + 1} 集`;
 
                   return (
                     <button
@@ -370,10 +452,10 @@ export function EpisodeList({
                       role="radio"
                       aria-checked={isCurrentEpisode}
                       aria-current={isCurrentEpisode ? 'true' : undefined}
-                      aria-label={`${epName}${isCurrentEpisode ? '，当前播放' : ''}`}
-                      title={epName}
+                      aria-label={`${fullTitle}${isCurrentEpisode ? '，当前播放' : ''}`}
+                      title={fullTitle}
                       className={`
-                        px-1 sm:px-1.5 py-2 rounded-[var(--radius-xl)] text-center transition-all duration-200 cursor-pointer flex items-center justify-center overflow-hidden
+                        px-1 py-2 rounded-[var(--radius-xl)] text-center transition-all duration-200 cursor-pointer flex items-center justify-center overflow-hidden
                         ${isCurrentEpisode
                           ? 'bg-[var(--accent-color)] text-white shadow-[0_4px_12px_color-mix(in_srgb,var(--accent-color)_45%,transparent)] font-bold scale-[1.02]'
                           : 'bg-[var(--glass-bg)] hover:bg-[var(--glass-hover)] text-[var(--text-color)] border border-[var(--glass-border)] hover:border-[var(--accent-color)]/40'
@@ -381,7 +463,7 @@ export function EpisodeList({
                         focus-visible:ring-2 focus-visible:ring-[var(--accent-color)]
                       `}
                     >
-                      <span className="truncate text-xs sm:text-sm font-medium w-full text-center tracking-tight">
+                      <span className="truncate text-xs font-medium w-full text-center tracking-tight">
                         {epName}
                       </span>
                     </button>
