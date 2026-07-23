@@ -72,6 +72,13 @@ export function PasswordGate({ children, hasEnvPassword: initialHasEnvPassword }
                 }
             } catch (e) {
                 console.error("PasswordGate init failed:", e);
+                if (mounted) {
+                    const envSubs = process.env.NEXT_PUBLIC_SUBSCRIPTION_SOURCES;
+                    if (envSubs) {
+                        console.log('Syncing client env subscriptions (fallback):', envSubs);
+                        settingsStore.syncEnvSubscriptions(envSubs);
+                    }
+                }
             }
         };
 

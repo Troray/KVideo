@@ -8,9 +8,9 @@ import { NextRequest, NextResponse } from 'next/server';
 export const runtime = 'edge';
 
 export async function GET() {
-    const accessPassword = process.env.ACCESS_PASSWORD || '';
+    const accessPassword = (process.env.ACCESS_PASSWORD || process.env.NEXT_PUBLIC_ACCESS_PASSWORD || '').trim();
     const persistPassword = process.env.PERSIST_PASSWORD !== 'false';
-    const subscriptionSources = process.env.SUBSCRIPTION_SOURCES || process.env.NEXT_PUBLIC_SUBSCRIPTION_SOURCES || '';
+    const subscriptionSources = (process.env.SUBSCRIPTION_SOURCES || process.env.NEXT_PUBLIC_SUBSCRIPTION_SOURCES || '').trim();
 
     return NextResponse.json({
         hasEnvPassword: accessPassword.length > 0,
@@ -22,13 +22,13 @@ export async function GET() {
 export async function POST(request: NextRequest) {
     try {
         const { password } = await request.json();
-        const accessPassword = process.env.ACCESS_PASSWORD || '';
+        const accessPassword = (process.env.ACCESS_PASSWORD || process.env.NEXT_PUBLIC_ACCESS_PASSWORD || '').trim();
 
         if (!accessPassword) {
             return NextResponse.json({ valid: false, message: 'No env password set' });
         }
 
-        const valid = password === accessPassword;
+        const valid = (password || '').trim() === accessPassword;
         return NextResponse.json({ valid });
     } catch {
         return NextResponse.json({ valid: false, message: 'Invalid request' }, { status: 400 });
