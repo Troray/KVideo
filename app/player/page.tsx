@@ -243,6 +243,19 @@ function PlayerContent() {
                     isReversed={isReversed}
                     onEpisodeClick={handleEpisodeClick}
                     onToggleReverse={handleToggleReverse}
+                    sources={groupedSources.length > 0 ? groupedSources : undefined}
+                    currentSourceId={currentSourceId || source || ''}
+                    onSourceChange={(newSource) => {
+                      const params = new URLSearchParams();
+                      params.set('id', String(newSource.id));
+                      params.set('source', newSource.source);
+                      params.set('title', title || '');
+                      if (groupedSourcesParam) {
+                        params.set('groupedSources', groupedSourcesParam);
+                      }
+                      setCurrentSourceId(newSource.source);
+                      window.history.replaceState(null, '', `/player?${params.toString()}`);
+                    }}
                   />
                 </div>
 
