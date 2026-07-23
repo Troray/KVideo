@@ -23,7 +23,6 @@ export default function SettingsPage() {
     envPasswordSet,
     realtimeLatency,
     searchDisplayMode,
-    fullscreenType,
     isAddModalOpen,
     isExportModalOpen,
     isImportModalOpen,
@@ -54,7 +53,6 @@ export default function SettingsPage() {
     setEditingSource,
     handleRealtimeLatencyChange,
     handleSearchDisplayModeChange,
-    handleFullscreenTypeChange,
     proxyMode,
     handleProxyModeChange,
     rememberScrollPosition,
@@ -69,8 +67,6 @@ export default function SettingsPage() {
 
         {/* Player Settings */}
         <PlayerSettings
-          fullscreenType={fullscreenType}
-          onFullscreenTypeChange={handleFullscreenTypeChange}
           proxyMode={proxyMode}
           onProxyModeChange={handleProxyModeChange}
         />

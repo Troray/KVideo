@@ -24,7 +24,9 @@ export function useDesktopPlayerState() {
     const [duration, setDuration] = useState(0);
     const [volume, setVolume] = useState(1);
     const [isMuted, setIsMuted] = useState(false);
-    const [isFullscreen, setIsFullscreen] = useState(false);
+    const [isWebFullscreen, setIsWebFullscreen] = useState(false);
+    const [isNativeFullscreen, setIsNativeFullscreen] = useState(false);
+    const isFullscreen = isWebFullscreen || isNativeFullscreen;
     const [showControls, setShowControls] = useState(true);
     const [isLoading, setIsLoading] = useState(true);
     const [playbackRate, setPlaybackRate] = useState(() => {
@@ -74,6 +76,8 @@ export function useDesktopPlayerState() {
         volume,
         isMuted,
         isFullscreen,
+        isWebFullscreen,
+        isNativeFullscreen,
         showControls,
         isLoading,
         playbackRate,
@@ -94,6 +98,7 @@ export function useDesktopPlayerState() {
         showMoreMenu
     }), [
         isPlaying, currentTime, duration, volume, isMuted, isFullscreen,
+        isWebFullscreen, isNativeFullscreen,
         showControls, isLoading, playbackRate, showSpeedMenu, isPiPSupported,
         isAirPlaySupported, isCastAvailable, isCasting, skipForwardAmount,
         skipBackwardAmount, showSkipForwardIndicator, showSkipBackwardIndicator,
@@ -107,7 +112,12 @@ export function useDesktopPlayerState() {
         setDuration,
         setVolume,
         setIsMuted,
-        setIsFullscreen,
+        setIsFullscreen: (val: boolean) => {
+            setIsWebFullscreen(val);
+            setIsNativeFullscreen(val);
+        },
+        setIsWebFullscreen,
+        setIsNativeFullscreen,
         setShowControls,
         setIsLoading,
         setPlaybackRate,

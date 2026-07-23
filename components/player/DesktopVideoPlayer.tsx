@@ -39,7 +39,6 @@ export function DesktopVideoPlayer({
   isReversed = false,
 }: DesktopVideoPlayerProps) {
   const { refs, data, actions } = useDesktopPlayerState();
-  const { fullscreenType: settingsFullscreenType } = usePlayerSettings();
   const isIOS = useIsIOS();
 
   // State to track if device is in landscape mode
@@ -62,11 +61,8 @@ export function DesktopVideoPlayer({
     };
   }, []);
 
-  // Force windowed fullscreen on iOS to avoid native player hijacking
-  const fullscreenType = isIOS ? 'window' : settingsFullscreenType;
-
-  // Check if we need to force landscape (iOS + Fullscreen + Portrait)
-  const shouldForceLandscape = data.isFullscreen && fullscreenType === 'window' && isIOS && !isLandscape;
+  // Check if we need to force landscape (iOS + Web Fullscreen + Portrait)
+  const shouldForceLandscape = data.isWebFullscreen && isIOS && !isLandscape;
 
   // Initialize HLS Player
   useHlsPlayer({
@@ -107,7 +103,6 @@ export function DesktopVideoPlayer({
     refs,
     data,
     actions,
-    fullscreenType,
     isForceLandscape: shouldForceLandscape
   });
 
@@ -146,13 +141,13 @@ export function DesktopVideoPlayer({
   return (
     <div
       ref={containerRef}
-      className={`kvideo-container relative aspect-video bg-black rounded-[var(--radius-2xl)] group ${data.isFullscreen && fullscreenType === 'window' ? 'is-web-fullscreen' : ''
+      className={`kvideo-container relative aspect-video bg-black rounded-[var(--radius-2xl)] group ${data.isWebFullscreen ? 'is-web-fullscreen' : ''
         } ${shouldForceLandscape ? 'force-landscape' : ''}`}
       onMouseMove={handleMouseMove}
       onMouseLeave={() => isPlaying && setShowControls(false)}
     >
       {/* Clipping Wrapper for video and overlays - Restores the 'Liquid Glass' rounded look */}
-      <div className={`absolute inset-0 overflow-hidden pointer-events-none ${data.isFullscreen && fullscreenType === 'window' ? 'rounded-0' : 'rounded-[var(--radius-2xl)]'
+      <div className={`absolute inset-0 overflow-hidden pointer-events-none ${data.isWebFullscreen ? 'rounded-0' : 'rounded-[var(--radius-2xl)]'
         }`}>
         <div className="absolute inset-0 pointer-events-auto">
           {/* Video Element */}

@@ -270,28 +270,6 @@ export function DesktopMoreMenu({
                 </button>
             )}
 
-            {/* Divider */}
-            <div className="h-px bg-[var(--glass-border)] my-1.5 sm:my-2" />
-
-            {/* Fullscreen Mode Selector */}
-            <div className={`${isRotated ? 'px-2 py-1.5' : 'px-3 py-2 sm:px-4 sm:py-2.5'} flex items-center justify-between gap-4`}>
-                <div className={`flex items-center gap-2 text-[var(--text-color)] ${isRotated ? 'text-[11px]' : 'text-xs sm:text-sm'}`}>
-                    <Icons.Settings size={isRotated ? 14 : 16} className="sm:w-[18px] sm:h-[18px]" />
-                    <span>全屏方式</span>
-                </div>
-                <div className="relative">
-                    <button
-                        onClick={() => {
-                            setFullscreenType(fullscreenType === 'native' ? 'window' : 'native');
-                        }}
-                        className={`flex items-center gap-1 bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--text-color)] rounded-[var(--radius-2xl)] outline-none hover:border-[var(--accent-color)] hover:bg-[color-mix(in_srgb,var(--accent-color)_5%,transparent)] transition-all cursor-pointer whitespace-nowrap ${isRotated ? 'px-1.5 py-0.5 text-[9px]' : 'px-2 sm:px-2.5 py-1 sm:py-1.5 text-[10px] sm:text-xs'}`}
-                    >
-                        <span>{fullscreenType === 'native' ? '系统全屏' : '网页全屏'}</span>
-                        <Icons.Maximize size={isRotated ? 10 : 12} className="text-[var(--text-color-secondary)]" />
-                    </button>
-                </div>
-            </div>
-
             {/* Show Mode Indicator Switch */}
             <div className={`${isRotated ? 'px-2 py-1.5' : 'px-3 py-2 sm:px-4 sm:py-2.5'} flex items-center justify-between gap-4`}>
                 <div className={`flex items-center gap-2 text-[var(--text-color)] ${isRotated ? 'text-[11px]' : 'text-xs sm:text-sm'}`}>

@@ -3,25 +3,27 @@ import { useCallback, useEffect, useMemo } from 'react';
 interface UseFullscreenControlsProps {
     containerRef: React.RefObject<HTMLDivElement | null>;
     videoRef: React.RefObject<HTMLVideoElement | null>;
-    isFullscreen: boolean;
-    setIsFullscreen: (fullscreen: boolean) => void;
+    isWebFullscreen: boolean;
+    isNativeFullscreen: boolean;
+    setIsWebFullscreen: (web: boolean) => void;
+    setIsNativeFullscreen: (native: boolean) => void;
     isPiPSupported: boolean;
     isAirPlaySupported: boolean;
     setIsPiPSupported: (supported: boolean) => void;
     setIsAirPlaySupported: (supported: boolean) => void;
-    fullscreenType?: 'native' | 'window';
 }
 
 export function useFullscreenControls({
     containerRef,
     videoRef,
-    isFullscreen,
-    setIsFullscreen,
+    isWebFullscreen,
+    isNativeFullscreen,
+    setIsWebFullscreen,
+    setIsNativeFullscreen,
     isPiPSupported,
     isAirPlaySupported,
     setIsPiPSupported,
-    setIsAirPlaySupported,
-    fullscreenType = 'native'
+    setIsAirPlaySupported
 }: UseFullscreenControlsProps) {
     useEffect(() => {
         if (typeof document !== 'undefined') {
@@ -37,15 +39,25 @@ export function useFullscreenControls({
         }
     }, [setIsPiPSupported, setIsAirPlaySupported, videoRef]);
 
-    const toggleFullscreen = useCallback(async () => {
+    const toggleWebFullscreen = useCallback(async () => {
+        if (isNativeFullscreen) {
+            try {
+                if (document.exitFullscreen) await document.exitFullscreen();
+                else if ((document as any).webkitExitFullscreen) await (document as any).webkitExitFullscreen();
+            } catch (e) { /* ignore */ }
+            setIsNativeFullscreen(false);
+        }
+        setIsWebFullscreen(!isWebFullscreen);
+    }, [isNativeFullscreen, isWebFullscreen, setIsNativeFullscreen, setIsWebFullscreen]);
+
+    const toggleNativeFullscreen = useCallback(async () => {
         if (!containerRef.current) return;
 
-        if (!isFullscreen) {
-            if (fullscreenType === 'window') {
-                setIsFullscreen(true);
-                return;
-            }
+        if (isWebFullscreen) {
+            setIsWebFullscreen(false);
+        }
 
+        if (!isNativeFullscreen) {
             try {
                 if (containerRef.current.requestFullscreen) {
                     await containerRef.current.requestFullscreen();
@@ -77,11 +89,6 @@ export function useFullscreenControls({
                 }
             }
         } else {
-            if (fullscreenType === 'window') {
-                setIsFullscreen(false);
-                return;
-            }
-
             try {
                 if (document.exitFullscreen) {
                     await document.exitFullscreen();
@@ -104,23 +111,20 @@ export function useFullscreenControls({
                 console.error('Failed to exit fullscreen:', error);
             }
         }
-    }, [containerRef, videoRef, isFullscreen, fullscreenType, setIsFullscreen]);
+    }, [containerRef, videoRef, isWebFullscreen, isNativeFullscreen, setIsWebFullscreen]);
 
     useEffect(() => {
         const handleFullscreenChange = () => {
-            const isInFullscreen = !!(
+            const isInNativeFullscreen = !!(
                 document.fullscreenElement ||
                 (document as any).webkitFullscreenElement ||
                 (document as any).mozFullScreenElement ||
                 (document as any).msFullscreenElement
             );
 
-            // Only update if not in window mode, or if exiting native mode
-            if (fullscreenType === 'native' || !isInFullscreen) {
-                setIsFullscreen(isInFullscreen);
-            }
+            setIsNativeFullscreen(isInNativeFullscreen);
 
-            if (isInFullscreen) {
+            if (isInNativeFullscreen) {
                 if (window.screen && (window.screen as any).orientation && (window.screen as any).orientation.lock) {
                     (window.screen as any).orientation.lock('landscape').catch(() => { });
                 }
@@ -144,19 +148,19 @@ export function useFullscreenControls({
             document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
             document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
         };
-    }, [setIsFullscreen, fullscreenType]);
+    }, [setIsNativeFullscreen]);
 
     useEffect(() => {
-        if (isFullscreen && fullscreenType === 'window') {
+        if (isWebFullscreen) {
             const handleEsc = (e: KeyboardEvent) => {
                 if (e.key === 'Escape') {
-                    setIsFullscreen(false);
+                    setIsWebFullscreen(false);
                 }
             };
             window.addEventListener('keydown', handleEsc);
             return () => window.removeEventListener('keydown', handleEsc);
         }
-    }, [isFullscreen, fullscreenType, setIsFullscreen]);
+    }, [isWebFullscreen, setIsWebFullscreen]);
 
     const togglePictureInPicture = useCallback(async () => {
         if (!videoRef.current || !isPiPSupported) return;
@@ -185,10 +189,12 @@ export function useFullscreenControls({
     }, [videoRef, isAirPlaySupported]);
 
     const fullscreenActions = useMemo(() => ({
-        toggleFullscreen,
+        toggleWebFullscreen,
+        toggleNativeFullscreen,
+        toggleFullscreen: toggleNativeFullscreen,
         togglePictureInPicture,
         showAirPlayMenu
-    }), [toggleFullscreen, togglePictureInPicture, showAirPlayMenu]);
+    }), [toggleWebFullscreen, toggleNativeFullscreen, togglePictureInPicture, showAirPlayMenu]);
 
     return fullscreenActions;
 }

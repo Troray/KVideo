@@ -11,8 +11,8 @@ interface DesktopControlsProps {
     volume: number;
     isMuted: boolean;
     isFullscreen: boolean;
-
-
+    isWebFullscreen: boolean;
+    isNativeFullscreen: boolean;
     showVolumeBar: boolean;
     isPiPSupported: boolean;
     isAirPlaySupported: boolean;
@@ -24,7 +24,9 @@ interface DesktopControlsProps {
     onToggleMute: () => void;
     onVolumeChange: (e: React.MouseEvent<HTMLDivElement>) => void;
     onVolumeMouseDown: (e: React.MouseEvent<HTMLDivElement>) => void;
-    onToggleFullscreen: () => void;
+    onToggleFullscreen?: () => void;
+    onToggleWebFullscreen: () => void;
+    onToggleNativeFullscreen: () => void;
     onTogglePictureInPicture: () => void;
     onShowAirPlayMenu: () => void;
     onShowCastMenu: () => void;

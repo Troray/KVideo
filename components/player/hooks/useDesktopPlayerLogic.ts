@@ -22,7 +22,6 @@ interface UseDesktopPlayerLogicProps {
     refs: DesktopPlayerState['refs'];
     data: DesktopPlayerState['data'];
     actions: DesktopPlayerState['actions'];
-    fullscreenType?: 'native' | 'window';
     isForceLandscape?: boolean;
 }
 
@@ -35,7 +34,6 @@ export function useDesktopPlayerLogic({
     refs,
     data,
     actions,
-    fullscreenType = 'native',
     isForceLandscape = false
 }: UseDesktopPlayerLogicProps) {
     const {
@@ -52,6 +50,8 @@ export function useDesktopPlayerLogic({
         volume,
         isMuted,
         isFullscreen,
+        isWebFullscreen,
+        isNativeFullscreen,
         showControls,
         isLoading,
         playbackRate,
@@ -72,6 +72,8 @@ export function useDesktopPlayerLogic({
         setVolume,
         setIsMuted,
         setIsFullscreen,
+        setIsWebFullscreen,
+        setIsNativeFullscreen,
         setShowControls,
         setIsLoading,
         setPlaybackRate,
@@ -121,9 +123,9 @@ export function useDesktopPlayerLogic({
     });
 
     const fullscreenControls = useFullscreenControls({
-        containerRef, videoRef, isFullscreen, setIsFullscreen,
-        isPiPSupported, isAirPlaySupported, setIsPiPSupported, setIsAirPlaySupported,
-        fullscreenType
+        containerRef, videoRef, isWebFullscreen, isNativeFullscreen,
+        setIsWebFullscreen, setIsNativeFullscreen,
+        isPiPSupported, isAirPlaySupported, setIsPiPSupported, setIsAirPlaySupported
     });
 
     const controlsVisibility = useControlsVisibility({
@@ -144,7 +146,7 @@ export function useDesktopPlayerLogic({
         videoRef, isPlaying, volume, isPiPSupported,
         togglePlay: playbackControls.togglePlay,
         toggleMute: volumeControls.toggleMute,
-        toggleFullscreen: fullscreenControls.toggleFullscreen,
+        toggleFullscreen: fullscreenControls.toggleNativeFullscreen,
         togglePictureInPicture: fullscreenControls.togglePictureInPicture,
         skipForward: skipControls.skipForward,
         skipBackward: skipControls.skipBackward,
@@ -167,7 +169,9 @@ export function useDesktopPlayerLogic({
         showVolumeBarTemporarily: volumeControls.showVolumeBarTemporarily,
         handleVolumeChange: volumeControls.handleVolumeChange,
         handleVolumeMouseDown: volumeControls.handleVolumeMouseDown,
-        toggleFullscreen: fullscreenControls.toggleFullscreen,
+        toggleFullscreen: fullscreenControls.toggleNativeFullscreen,
+        toggleWebFullscreen: fullscreenControls.toggleWebFullscreen,
+        toggleNativeFullscreen: fullscreenControls.toggleNativeFullscreen,
         togglePictureInPicture: fullscreenControls.togglePictureInPicture,
         showAirPlayMenu: fullscreenControls.showAirPlayMenu,
         showCastMenu: castControls.showCastMenu,

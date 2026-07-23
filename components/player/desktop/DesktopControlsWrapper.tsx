@@ -19,6 +19,8 @@ export function DesktopControlsWrapper({ src, data, actions, logic, refs }: Desk
         volume,
         isMuted,
         isFullscreen,
+        isWebFullscreen,
+        isNativeFullscreen,
         showControls,
         showVolumeBar,
         isPiPSupported,
@@ -32,6 +34,8 @@ export function DesktopControlsWrapper({ src, data, actions, logic, refs }: Desk
         handleVolumeChange,
         handleVolumeMouseDown,
         toggleFullscreen,
+        toggleWebFullscreen,
+        toggleNativeFullscreen,
         togglePictureInPicture,
         showAirPlayMenu,
         showCastMenu,
@@ -57,6 +61,8 @@ export function DesktopControlsWrapper({ src, data, actions, logic, refs }: Desk
             volume={volume}
             isMuted={isMuted}
             isFullscreen={isFullscreen}
+            isWebFullscreen={isWebFullscreen}
+            isNativeFullscreen={isNativeFullscreen}
             showVolumeBar={showVolumeBar}
             isPiPSupported={isPiPSupported}
             isAirPlaySupported={isAirPlaySupported}
@@ -69,6 +75,8 @@ export function DesktopControlsWrapper({ src, data, actions, logic, refs }: Desk
             onVolumeChange={handleVolumeChange}
             onVolumeMouseDown={handleVolumeMouseDown}
             onToggleFullscreen={toggleFullscreen}
+            onToggleWebFullscreen={toggleWebFullscreen}
+            onToggleNativeFullscreen={toggleNativeFullscreen}
             onTogglePictureInPicture={togglePictureInPicture}
             onShowAirPlayMenu={showAirPlayMenu}
             onShowCastMenu={showCastMenu}

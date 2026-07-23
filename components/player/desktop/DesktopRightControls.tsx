@@ -4,24 +4,28 @@ import { Icons } from '@/components/ui/Icon';
 
 
 interface DesktopRightControlsProps {
-    isFullscreen: boolean;
+    isWebFullscreen: boolean;
+    isNativeFullscreen: boolean;
     isPiPSupported: boolean;
     isAirPlaySupported: boolean;
     isCastAvailable: boolean;
     isProxied?: boolean;
-    onToggleFullscreen: () => void;
+    onToggleWebFullscreen: () => void;
+    onToggleNativeFullscreen: () => void;
     onTogglePictureInPicture: () => void;
     onShowAirPlayMenu: () => void;
     onShowCastMenu: () => void;
 }
 
 export function DesktopRightControls({
-    isFullscreen,
+    isWebFullscreen,
+    isNativeFullscreen,
     isPiPSupported,
     isAirPlaySupported,
     isCastAvailable,
     isProxied,
-    onToggleFullscreen,
+    onToggleWebFullscreen,
+    onToggleNativeFullscreen,
     onTogglePictureInPicture,
     onShowAirPlayMenu,
     onShowCastMenu
@@ -70,13 +74,24 @@ export function DesktopRightControls({
                 )
             }
 
-            {/* Fullscreen */}
+            {/* Web Fullscreen */}
             <button
-                onClick={onToggleFullscreen}
-                className="btn-icon"
-                aria-label={isFullscreen ? '退出全屏' : '全屏'}
+                onClick={onToggleWebFullscreen}
+                className={`btn-icon transition-all duration-200 ${isWebFullscreen ? 'text-[var(--accent-color)] bg-[var(--accent-color)]/20 border border-[var(--accent-color)]/50 rounded-lg' : 'hover:bg-white/10'}`}
+                aria-label={isWebFullscreen ? '退出网页全屏' : '网页全屏'}
+                title={isWebFullscreen ? '退出网页全屏' : '网页全屏'}
             >
-                {isFullscreen ? <Icons.Minimize size={20} /> : <Icons.Maximize size={20} />}
+                {isWebFullscreen ? <Icons.Minimize2 size={20} /> : <Icons.Maximize2 size={20} />}
+            </button>
+
+            {/* System/Native Fullscreen */}
+            <button
+                onClick={onToggleNativeFullscreen}
+                className={`btn-icon transition-all duration-200 ${isNativeFullscreen ? 'text-[var(--accent-color)] bg-[var(--accent-color)]/20 border border-[var(--accent-color)]/50 rounded-lg' : 'hover:bg-white/10'}`}
+                aria-label={isNativeFullscreen ? '退出系统全屏' : '系统全屏'}
+                title={isNativeFullscreen ? '退出系统全屏' : '系统全屏'}
+            >
+                {isNativeFullscreen ? <Icons.Minimize size={20} /> : <Icons.Maximize size={20} />}
             </button>
         </div >
     );

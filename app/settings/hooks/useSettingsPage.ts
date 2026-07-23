@@ -26,7 +26,6 @@ export function useSettingsPage() {
     // Display settings
     const [realtimeLatency, setRealtimeLatency] = useState(false);
     const [searchDisplayMode, setSearchDisplayMode] = useState<SearchDisplayMode>('normal');
-    const [fullscreenType, setFullscreenType] = useState<'native' | 'window'>('native');
     const [proxyMode, setProxyMode] = useState<ProxyMode>('retry');
     const [rememberScrollPosition, setRememberScrollPosition] = useState(true);
 
@@ -39,7 +38,6 @@ export function useSettingsPage() {
         setAccessPasswords(settings.accessPasswords);
         setRealtimeLatency(settings.realtimeLatency);
         setSearchDisplayMode(settings.searchDisplayMode);
-        setFullscreenType(settings.fullscreenType);
         setProxyMode(settings.proxyMode);
         setRememberScrollPosition(settings.rememberScrollPosition);
 
@@ -285,15 +283,6 @@ export function useSettingsPage() {
         });
     };
 
-    const handleFullscreenTypeChange = (type: 'native' | 'window') => {
-        setFullscreenType(type);
-        const currentSettings = settingsStore.getSettings();
-        settingsStore.saveSettings({
-            ...currentSettings,
-            fullscreenType: type,
-        });
-    };
-
     const handleProxyModeChange = (mode: ProxyMode) => {
         setProxyMode(mode);
         const currentSettings = settingsStore.getSettings();
@@ -351,19 +340,17 @@ export function useSettingsPage() {
         handleAddPassword,
         handleRemovePassword,
         handleExport,
-        handleImportFile, // Renamed from handleImport
-        handleImportLink, // New
-        handleAddSubscription, // New
-        handleRemoveSubscription, // New
-        handleRefreshSubscription, // New
+        handleImportFile,
+        handleImportLink,
+        handleAddSubscription,
+        handleRemoveSubscription,
+        handleRefreshSubscription,
         handleRestoreDefaults,
         handleResetAll,
         editingSource,
         handleEditSource,
         handleRealtimeLatencyChange,
         handleSearchDisplayModeChange,
-        fullscreenType,
-        handleFullscreenTypeChange,
         proxyMode,
         handleProxyModeChange,
         rememberScrollPosition,
