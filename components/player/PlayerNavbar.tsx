@@ -10,9 +10,9 @@ export function PlayerNavbar({ isPremium }: { isPremium?: boolean }) {
     const router = useRouter();
 
     return (
-        <nav className="sticky top-0 z-50 pt-4 pb-2 px-4" style={{ transform: 'translateZ(0)' }}>
-            <div className="max-w-7xl mx-auto bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-[var(--radius-2xl)] shadow-[var(--shadow-sm)] px-4 sm:px-6 py-4">
-                <div className="flex items-center justify-between gap-2">
+        <nav className="sticky top-0 z-50 pt-4 pb-2" style={{ transform: 'translateZ(0)' }}>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="bg-[var(--glass-bg)] border border-[var(--glass-border)] rounded-[var(--radius-2xl)] shadow-[var(--shadow-sm)] px-4 sm:px-6 py-4 flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2 sm:gap-4 min-w-0">
                         <button
                             onClick={() => router.push(isPremium ? '/premium' : '/')}
