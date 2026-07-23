@@ -10,8 +10,6 @@ import { siteConfig } from "@/lib/config/site-config";
 import { AdKeywordsInjector } from "@/components/AdKeywordsInjector";
 import { BackToTop } from "@/components/ui/BackToTop";
 import { ScrollPositionManager } from "@/components/ScrollPositionManager";
-import fs from 'fs';
-import path from 'path';
 
 // Server Component specifically for reading env/file (async for best practices)
 async function AdKeywordsWrapper() {
@@ -21,18 +19,20 @@ async function AdKeywordsWrapper() {
     // 1. Try reading from file (Docker runtime support)
     const keywordsFile = process.env.AD_KEYWORDS_FILE;
     if (keywordsFile) {
-      // Resolve absolute path or relative to CWD
-      const filePath = path.isAbsolute(keywordsFile)
-        ? keywordsFile
-        : path.join(process.cwd(), keywordsFile);
-
       try {
+        const fs = await import('fs');
+        const path = await import('path');
+        // Resolve absolute path or relative to CWD
+        const filePath = path.isAbsolute(keywordsFile)
+          ? keywordsFile
+          : path.join(process.cwd(), keywordsFile);
+
         const content = await fs.promises.readFile(filePath, 'utf-8');
         keywords = content.split(/[\n,]/).map((k: string) => k.trim()).filter((k: string) => k);
         console.log(`[AdFilter] Loaded ${keywords.length} keywords from file: ${filePath}`);
       } catch (fileError: unknown) {
         // Handle file not found (ENOENT) gracefully
-        if ((fileError as NodeJS.ErrnoException).code !== 'ENOENT') {
+        if ((fileError as { code?: string })?.code !== 'ENOENT') {
           console.warn('[AdFilter] Error reading keywords file:', fileError);
         }
       }

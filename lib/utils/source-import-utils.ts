@@ -62,7 +62,20 @@ export function isValidSourceFormat(obj: unknown): obj is ImportSourceFormat {
  * Supports both array format and wrapped object format
  */
 export function parseSourcesFromJson(jsonString: string): ImportResult {
-    const data = JSON.parse(jsonString);
+    const trimmed = (jsonString || '').trim();
+    if (!trimmed) {
+        throw new Error('响应内容为空');
+    }
+    if (trimmed.startsWith('<')) {
+        throw new Error('无法解析数据：服务器返回了 HTML 页面（可能为 404 或 500 错误页面）');
+    }
+
+    let data: any;
+    try {
+        data = JSON.parse(trimmed);
+    } catch {
+        throw new Error('无法解析数据：无效的 JSON 格式');
+    }
 
     let sourcesArray: unknown[];
 
