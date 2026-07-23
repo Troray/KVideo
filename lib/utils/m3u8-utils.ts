@@ -3,13 +3,13 @@
  * Utility functions for M3U8 playlist manipulation
  */
 
-import { parseBlocks, learnMainPattern, scoreBlock, shouldFilterBlock } from './m3u8-ad-detector';
+import { parseBlocks, learnMainPattern, scoreBlock, shouldFilterBlock, findDuplicateSignatureBlockIndices } from './m3u8-ad-detector';
 
 /**
  * Filters ads from specific M3U8 content using multiple detection strategies:
  * 1. Keyword matching (configurable via env)
  * 2. CUE-OUT/CUE-IN standard tags
- * 3. Heuristic block analysis (filename patterns, ad path keywords)
+ * 3. Heuristic block analysis (filename patterns, ad path keywords, duration signature fingerprints)
  * 
  * Also converts relative URLs to absolute URLs for Blob playback.
  * 
@@ -44,9 +44,11 @@ export function filterM3u8Ad(content: string, baseUrl: string, mode: AdFilterMod
         const blocks = parseBlocks(lines);
         if (blocks.length > 1) {
             const mainPattern = learnMainPattern(blocks);
-            for (const block of blocks) {
-                // Pass all keywords (including custom ones) to heuristic scorer
-                const score = scoreBlock(block, mainPattern, keywords);
+            const duplicateIndices = findDuplicateSignatureBlockIndices(blocks);
+
+            blocks.forEach((block, blockIdx) => {
+                const isDuplicate = duplicateIndices.has(blockIdx);
+                const score = scoreBlock(block, mainPattern, keywords, isDuplicate);
                 const threshold = mode === 'aggressive' ? 3.0 : 5.0;
                 if (shouldFilterBlock(score, threshold)) {
                     // Mark all lines in this block for removal
@@ -55,7 +57,7 @@ export function filterM3u8Ad(content: string, baseUrl: string, mode: AdFilterMod
                         adLineIndices.add(segment.lineIndex - 1); // EXTINF line
                     }
                 }
-            }
+            });
         }
     }
 
@@ -70,6 +72,10 @@ export function filterM3u8Ad(content: string, baseUrl: string, mode: AdFilterMod
 
         // Skip lines marked by heuristic analysis
         if (adLineIndices.has(i)) {
+            // Remove preceding DISCONTINUITY if we just entered an ad block
+            if (processedLines.length > 0 && processedLines[processedLines.length - 1].trim() === '#EXT-X-DISCONTINUITY') {
+                processedLines.pop();
+            }
             continue;
         }
 
@@ -115,10 +121,11 @@ export function filterM3u8Ad(content: string, baseUrl: string, mode: AdFilterMod
         }
 
         // 5. Discontinuity Handling (Conservative Mode)
-        // Keep all Discontinuity tags by default.
-        // They will ONLY be removed via backtracking when a confirmed ad segment is found.
-        // This prevents false positives on legitimate concatenated streams.
+        // Keep Discontinuity tags by default, but avoid consecutive duplicates.
         if (trimmedLine === '#EXT-X-DISCONTINUITY') {
+            if (processedLines.length > 0 && processedLines[processedLines.length - 1].trim() === '#EXT-X-DISCONTINUITY') {
+                continue;
+            }
             processedLines.push(line);
             continue;
         }
