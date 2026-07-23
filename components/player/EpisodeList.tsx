@@ -1,9 +1,12 @@
 'use client';
 
 import { useRef, useCallback, useState, useMemo, useEffect } from 'react';
+import Image from 'next/image';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Icons } from '@/components/ui/Icon';
+import { Button } from '@/components/ui/Button';
+import { LatencyBadge } from '@/components/ui/LatencyBadge';
 import { useKeyboardNavigation } from '@/lib/hooks/useKeyboardNavigation';
 
 interface Episode {
@@ -16,6 +19,8 @@ export interface GroupedSource {
   source: string;
   sourceName?: string;
   name?: string;
+  latency?: number;
+  pic?: string;
 }
 
 interface EpisodeListProps {
@@ -30,7 +35,7 @@ interface EpisodeListProps {
   onSourceChange?: (source: GroupedSource) => void;
 }
 
-const PAGE_SIZE = 30;
+const PAGE_SIZE = 50;
 
 export function EpisodeList({
   episodes,
@@ -44,6 +49,73 @@ export function EpisodeList({
 }: EpisodeListProps) {
   const listRef = useRef<HTMLDivElement>(null);
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  // Tab switcher state: 'episodes' (选集) vs 'sources' (播放源)
+  const [activeTab, setActiveTab] = useState<'episodes' | 'sources'>('episodes');
+
+  // Latency state for sources
+  const [latencies, setLatencies] = useState<Record<string, number>>({});
+  const [isPingLoading, setIsPingLoading] = useState(false);
+
+  // Initialize latencies from sources
+  useEffect(() => {
+    if (!sources) return;
+    const initial: Record<string, number> = {};
+    sources.forEach((s) => {
+      if (s.latency !== undefined) {
+        initial[s.source] = s.latency;
+      }
+    });
+    setLatencies(initial);
+  }, [sources]);
+
+  // Ping latencies for sources
+  const refreshLatencies = useCallback(async () => {
+    if (!sources || sources.length === 0) return;
+    setIsPingLoading(true);
+
+    const results = await Promise.all(
+      sources.map(async (source) => {
+        try {
+          const response = await fetch('/api/ping', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              url: source.source,
+            }),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            return { source: source.source, latency: data.latency };
+          }
+        } catch {
+          // Ignore ping error
+        }
+        return { source: source.source, latency: undefined };
+      })
+    );
+
+    const newLatencies: Record<string, number> = {};
+    results.forEach(({ source, latency }) => {
+      if (latency !== undefined) {
+        newLatencies[source] = latency;
+      }
+    });
+
+    setLatencies(newLatencies);
+    setIsPingLoading(false);
+  }, [sources]);
+
+  // Sort sources by latency
+  const sortedSources = useMemo(() => {
+    if (!sources) return [];
+    return [...sources].sort((a, b) => {
+      const latA = latencies[a.source] ?? a.latency ?? Infinity;
+      const latB = latencies[b.source] ?? b.latency ?? Infinity;
+      return latA - latB;
+    });
+  }, [sources, latencies]);
 
   // Memoized display episodes - reversed if toggle is on
   const displayEpisodes = useMemo(() => {
@@ -104,9 +176,9 @@ export function EpisodeList({
     return displayEpisodes.slice(start, start + PAGE_SIZE);
   }, [displayEpisodes, isPaginated, activePage]);
 
-  // Keyboard navigation
+  // Keyboard navigation for episodes
   useKeyboardNavigation({
-    enabled: true,
+    enabled: activeTab === 'episodes',
     containerRef: listRef,
     currentIndex: getDisplayIndex(currentEpisode),
     itemCount: episodes?.length || 0,
@@ -129,22 +201,66 @@ export function EpisodeList({
   });
 
   const showReverseToggle = episodes && episodes.length > 1;
+  const hasMultipleSources = sources && sources.length > 1;
 
   return (
     <Card hover={false}>
-      {/* Header with Title and Reverse Toggle */}
-      <h3 className="text-lg sm:text-xl font-bold text-[var(--text-color)] mb-3 flex items-center gap-2">
-        <Icons.List size={20} className="sm:w-6 sm:h-6" />
-        <span>选集</span>
-        {episodes && (
-          <Badge variant="primary">{episodes.length}</Badge>
-        )}
-        {/* Reverse order toggle button - only show when more than 1 episode */}
-        {showReverseToggle && (
+      {/* Header: Tab Switcher ("选集" vs "播放源") and Actions */}
+      <div className="flex items-center justify-between mb-4 border-b border-[var(--glass-border)] pb-3">
+        <div className="flex items-center gap-1 sm:gap-2">
+          {/* Tab 1: 选集 */}
+          <button
+            onClick={() => setActiveTab('episodes')}
+            className={`
+              flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-xl)] text-sm sm:text-base font-bold transition-all cursor-pointer
+              ${activeTab === 'episodes'
+                ? 'bg-[var(--accent-color)] text-white shadow-sm'
+                : 'text-[var(--text-color-secondary)] hover:text-[var(--text-color)] hover:bg-[var(--glass-hover)]'
+              }
+            `}
+          >
+            <Icons.List size={18} />
+            <span>选集</span>
+            {episodes && (
+              <Badge
+                variant={activeTab === 'episodes' ? 'secondary' : 'primary'}
+                className={`text-xs px-1.5 py-0 ${activeTab === 'episodes' ? 'bg-white/20 text-white border-none' : ''}`}
+              >
+                {episodes.length}
+              </Badge>
+            )}
+          </button>
+
+          {/* Tab 2: 播放源 */}
+          {hasMultipleSources && (
+            <button
+              onClick={() => setActiveTab('sources')}
+              className={`
+                flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-xl)] text-sm sm:text-base font-bold transition-all cursor-pointer
+                ${activeTab === 'sources'
+                  ? 'bg-[var(--accent-color)] text-white shadow-sm'
+                  : 'text-[var(--text-color-secondary)] hover:text-[var(--text-color)] hover:bg-[var(--glass-hover)]'
+                }
+              `}
+            >
+              <Icons.Layers size={18} />
+              <span>播放源</span>
+              <Badge
+                variant={activeTab === 'sources' ? 'secondary' : 'primary'}
+                className={`text-xs px-1.5 py-0 ${activeTab === 'sources' ? 'bg-white/20 text-white border-none' : ''}`}
+              >
+                {sources.length}
+              </Badge>
+            </button>
+          )}
+        </div>
+
+        {/* Header Right Action Button */}
+        {activeTab === 'episodes' && showReverseToggle && (
           <button
             onClick={() => onToggleReverse?.(!isReversed)}
             className={`
-              ml-auto p-1.5 rounded-[var(--radius-2xl)] transition-all duration-200 cursor-pointer
+              p-1.5 rounded-[var(--radius-xl)] transition-all duration-200 cursor-pointer
               ${isReversed
                 ? 'bg-[var(--accent-color)] text-white'
                 : 'bg-[var(--glass-bg)] text-[var(--text-color-secondary)] hover:bg-[var(--glass-hover)] border border-[var(--glass-border)]'
@@ -156,123 +272,184 @@ export function EpisodeList({
             <Icons.ArrowUpDown size={16} />
           </button>
         )}
-      </h3>
 
-      {/* Integrated Merged Source Tabs */}
-      {sources && sources.length > 1 && (
-        <div className="mb-4">
-          <div className="text-xs text-[var(--text-color-secondary)] mb-1.5 font-medium flex items-center gap-1">
-            <Icons.Globe size={13} />
-            <span>切换播放源：</span>
+        {activeTab === 'sources' && (
+          <Button
+            variant="secondary"
+            onClick={refreshLatencies}
+            disabled={isPingLoading}
+            className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-[var(--radius-xl)]"
+          >
+            <Icons.RefreshCw size={13} className={isPingLoading ? 'animate-spin' : ''} />
+            刷新延迟
+          </Button>
+        )}
+      </div>
+
+      {/* Tab Body 1: Episodes Content */}
+      {activeTab === 'episodes' && (
+        <>
+          {/* Episode Group Pagination Range Tabs */}
+          {isPaginated && pageRanges.length > 0 && (
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-2 mb-3 scrollbar-none border-b border-[var(--glass-border)]/50">
+              {pageRanges.map((range) => {
+                const isActiveRange = activePage === range.pageIndex;
+                return (
+                  <button
+                    key={range.pageIndex}
+                    onClick={() => setActivePage(range.pageIndex)}
+                    className={`
+                      px-2.5 py-1 text-xs font-medium rounded-[var(--radius-xl)] transition-all cursor-pointer whitespace-nowrap
+                      ${isActiveRange
+                        ? 'bg-[var(--accent-color)] text-white shadow-sm font-bold'
+                        : 'bg-[var(--glass-bg)] text-[var(--text-color-secondary)] hover:bg-[var(--glass-hover)] border border-[var(--glass-border)]'
+                      }
+                    `}
+                  >
+                    {range.label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Episode Grid Container */}
+          <div
+            ref={listRef}
+            className="max-h-[420px] sm:max-h-[550px] overflow-y-auto pr-1"
+            role="radiogroup"
+            aria-label="剧集选择"
+          >
+            {pageEpisodes && pageEpisodes.length > 0 ? (
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+                {pageEpisodes.map((episode, pageIdx) => {
+                  const displayIndex = isPaginated ? activePage * PAGE_SIZE + pageIdx : pageIdx;
+                  const originalIndex = getOriginalIndex(displayIndex);
+                  const isCurrentEpisode = currentEpisode === originalIndex;
+                  const epName = episode.name || `第 ${originalIndex + 1} 集`;
+
+                  return (
+                    <button
+                      key={originalIndex}
+                      ref={(el) => { buttonRefs.current[displayIndex] = el; }}
+                      onClick={() => onEpisodeClick(episode, originalIndex)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          onEpisodeClick(episode, originalIndex);
+                        }
+                      }}
+                      tabIndex={0}
+                      role="radio"
+                      aria-checked={isCurrentEpisode}
+                      aria-current={isCurrentEpisode ? 'true' : undefined}
+                      aria-label={`${epName}${isCurrentEpisode ? '，当前播放' : ''}`}
+                      title={epName}
+                      className={`
+                        px-2 py-2 rounded-[var(--radius-xl)] text-center transition-all duration-200 cursor-pointer flex items-center justify-center overflow-hidden
+                        ${isCurrentEpisode
+                          ? 'bg-[var(--accent-color)] text-white shadow-[0_4px_12px_color-mix(in_srgb,var(--accent-color)_45%,transparent)] font-bold scale-[1.02]'
+                          : 'bg-[var(--glass-bg)] hover:bg-[var(--glass-hover)] text-[var(--text-color)] border border-[var(--glass-border)] hover:border-[var(--accent-color)]/40'
+                        }
+                        focus-visible:ring-2 focus-visible:ring-[var(--accent-color)]
+                      `}
+                    >
+                      <span className="truncate text-xs sm:text-sm font-medium w-full text-center">
+                        {epName}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-[var(--text-secondary)]">
+                <Icons.Inbox size={48} className="text-[var(--text-color-secondary)] mx-auto mb-2" />
+                <p>暂无剧集信息</p>
+              </div>
+            )}
           </div>
-          <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-            {sources.map((s) => {
-              const isSelected = String(s.id) === String(currentSourceId) || s.source === String(currentSourceId);
-              return (
-                <button
-                  key={`${s.source}-${s.id}`}
-                  onClick={() => onSourceChange?.(s)}
-                  className={`
-                    px-2.5 py-1.5 text-xs font-semibold rounded-[var(--radius-xl)] transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5
-                    ${isSelected
-                      ? 'bg-[var(--accent-color)] text-white shadow-[0_2px_8px_rgba(var(--accent-color-rgb),0.3)] font-bold'
-                      : 'bg-[var(--glass-bg)] hover:bg-[var(--glass-hover)] text-[var(--text-color-secondary)] hover:text-[var(--text-color)] border border-[var(--glass-border)]'
-                    }
-                  `}
-                >
-                  <span>{s.sourceName || s.name || s.source}</span>
-                  {isSelected && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
+        </>
       )}
 
-      {/* Episode Group Pagination Tabs (Range Selector for 30+ episodes) */}
-      {isPaginated && pageRanges.length > 0 && (
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-2 mb-3 scrollbar-none border-b border-[var(--glass-border)]/50">
-          {pageRanges.map((range) => {
-            const isActiveRange = activePage === range.pageIndex;
+      {/* Tab Body 2: Merged Sources List */}
+      {activeTab === 'sources' && sources && (
+        <div className="space-y-2 max-h-[420px] sm:max-h-[550px] overflow-y-auto pr-1">
+          {sortedSources.map((s, index) => {
+            const isCurrent = String(s.id) === String(currentSourceId) || s.source === String(currentSourceId);
+            const latency = latencies[s.source] ?? s.latency;
+            const srcName = s.sourceName || s.name || s.source;
+
             return (
               <button
-                key={range.pageIndex}
-                onClick={() => setActivePage(range.pageIndex)}
+                key={`${s.source}-${index}`}
+                onClick={() => !isCurrent && onSourceChange?.(s)}
                 className={`
-                  px-2.5 py-1 text-xs font-medium rounded-[var(--radius-xl)] transition-all cursor-pointer whitespace-nowrap
-                  ${isActiveRange
-                    ? 'bg-[var(--accent-color)] text-white shadow-sm font-bold'
-                    : 'bg-[var(--glass-bg)] text-[var(--text-color-secondary)] hover:bg-[var(--glass-hover)] border border-[var(--glass-border)]'
+                  w-full p-3 rounded-[var(--radius-xl)] text-left transition-all duration-200
+                  flex items-center gap-3
+                  ${isCurrent
+                    ? 'bg-[var(--accent-color)] text-white shadow-[0_4px_12px_color-mix(in_srgb,var(--accent-color)_50%,transparent)] font-bold'
+                    : 'bg-[var(--glass-bg)] hover:bg-[var(--glass-hover)] text-[var(--text-color)] border border-[var(--glass-border)] cursor-pointer'
                   }
                 `}
+                aria-current={isCurrent ? 'true' : undefined}
               >
-                {range.label}
+                {/* Thumbnail */}
+                {s.pic && (
+                  <div className="w-12 h-16 rounded-[var(--radius-xl)] overflow-hidden flex-shrink-0 bg-[color-mix(in_srgb,var(--glass-bg)_50%,transparent)]">
+                    <Image
+                      src={s.pic}
+                      alt=""
+                      width={48}
+                      height={64}
+                      className="w-full h-full object-cover"
+                      unoptimized
+                      referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                  </div>
+                )}
+
+                {/* Source Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-sm sm:text-base truncate">
+                    {srcName}
+                  </div>
+                  {latency !== undefined && (
+                    <div className="mt-1">
+                      <LatencyBadge latency={latency} />
+                    </div>
+                  )}
+                </div>
+
+                {/* Current playing indicator */}
+                {isCurrent && (
+                  <Badge variant="secondary" className="px-2 py-0.5 text-xs bg-white/20 text-white border-none">
+                    当前播放
+                  </Badge>
+                )}
+
+                {/* Rank badge for top 3 */}
+                {!isCurrent && index < 3 && (
+                  <Badge
+                    variant="secondary"
+                    className={`flex-shrink-0 ${
+                      index === 0
+                        ? 'bg-yellow-500/20 text-yellow-600 border-yellow-500'
+                        : index === 1
+                        ? 'bg-gray-400/20 text-gray-600 border-gray-400'
+                        : 'bg-orange-400/20 text-orange-600 border-orange-400'
+                    }`}
+                  >
+                    #{index + 1}
+                  </Badge>
+                )}
               </button>
             );
           })}
         </div>
       )}
-
-      {/* Episode Grid Container */}
-      <div
-        ref={listRef}
-        className="max-h-[420px] sm:max-h-[550px] overflow-y-auto pr-1"
-        role="radiogroup"
-        aria-label="剧集选择"
-      >
-        {pageEpisodes && pageEpisodes.length > 0 ? (
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
-            {pageEpisodes.map((episode, pageIdx) => {
-              const displayIndex = isPaginated ? activePage * PAGE_SIZE + pageIdx : pageIdx;
-              const originalIndex = getOriginalIndex(displayIndex);
-              const isCurrentEpisode = currentEpisode === originalIndex;
-              const epName = episode.name || `第 ${originalIndex + 1} 集`;
-
-              return (
-                <button
-                  key={originalIndex}
-                  ref={(el) => { buttonRefs.current[displayIndex] = el; }}
-                  onClick={() => onEpisodeClick(episode, originalIndex)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      onEpisodeClick(episode, originalIndex);
-                    }
-                  }}
-                  tabIndex={0}
-                  role="radio"
-                  aria-checked={isCurrentEpisode}
-                  aria-current={isCurrentEpisode ? 'true' : undefined}
-                  aria-label={`${epName}${isCurrentEpisode ? '，当前播放' : ''}`}
-                  title={epName}
-                  className={`
-                    px-2 py-2 rounded-[var(--radius-2xl)] text-center transition-all duration-200 cursor-pointer flex items-center justify-center gap-1 overflow-hidden
-                    ${isCurrentEpisode
-                      ? 'bg-[var(--accent-color)] text-white shadow-[0_4px_12px_color-mix(in_srgb,var(--accent-color)_45%,transparent)] font-bold scale-[1.02]'
-                      : 'bg-[var(--glass-bg)] hover:bg-[var(--glass-hover)] text-[var(--text-color)] border border-[var(--glass-border)] hover:border-[var(--accent-color)]/40'
-                    }
-                    focus-visible:ring-2 focus-visible:ring-[var(--accent-color)]
-                  `}
-                >
-                  <span className="truncate text-xs sm:text-sm font-medium">
-                    {epName}
-                  </span>
-                  {isCurrentEpisode && (
-                    <Icons.Play size={12} className="shrink-0 fill-current" />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="text-center py-8 text-[var(--text-secondary)]">
-            <Icons.Inbox size={48} className="text-[var(--text-color-secondary)] mx-auto mb-2" />
-            <p>暂无剧集信息</p>
-          </div>
-        )}
-      </div>
     </Card>
   );
 }

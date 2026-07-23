@@ -218,7 +218,6 @@ function PlayerContent() {
                     options={[
                       { label: '选集', value: 'episodes' },
                       { label: '简介', value: 'info' },
-                      ...(groupedSources.length > 1 ? [{ label: '来源', value: 'sources' as const }] : []),
                     ]}
                     value={activeTab}
                     onChange={setActiveTab}
@@ -235,7 +234,7 @@ function PlayerContent() {
                   />
                 </div>
 
-                {/* Episode List - Visible if desktop OR active mobile tab */}
+                {/* Episode & Source Tabbed Card - Visible if desktop OR active mobile tab */}
                 <div className={activeTab !== 'episodes' ? 'hidden lg:block' : 'block'}>
                   <EpisodeList
                     episodes={videoData?.episodes || null}
@@ -258,28 +257,6 @@ function PlayerContent() {
                     }}
                   />
                 </div>
-
-                {/* Source Selector - Visible if (desktop AND grouped sources) OR (active mobile tab AND grouped sources) */}
-                {groupedSources.length > 0 && (
-                  <div className={activeTab !== 'sources' ? 'hidden lg:block' : 'block'}>
-                    <SourceSelector
-                      sources={groupedSources}
-                      currentSource={currentSourceId || source || ''}
-                      onSourceChange={(newSource) => {
-                        // Navigate to same video with different source
-                        const params = new URLSearchParams();
-                        params.set('id', String(newSource.id));
-                        params.set('source', newSource.source);
-                        params.set('title', title || '');
-                        if (groupedSourcesParam) {
-                          params.set('groupedSources', groupedSourcesParam);
-                        }
-                        setCurrentSourceId(newSource.source);
-                        window.history.replaceState(null, '', `/player?${params.toString()}`);
-                      }}
-                    />
-                  </div>
-                )}
               </div>
             </div>
           </div>
