@@ -274,15 +274,15 @@ export function EpisodeList({
         )}
 
         {activeTab === 'sources' && (
-          <Button
-            variant="secondary"
+          <button
             onClick={refreshLatencies}
             disabled={isPingLoading}
-            className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-[var(--radius-xl)]"
+            className="p-1.5 rounded-[var(--radius-xl)] transition-all duration-200 cursor-pointer bg-[var(--glass-bg)] text-[var(--text-color-secondary)] hover:bg-[var(--glass-hover)] border border-[var(--glass-border)] disabled:opacity-50"
+            aria-label="刷新延迟"
+            title="刷新延迟"
           >
-            <Icons.RefreshCw size={13} className={isPingLoading ? 'animate-spin' : ''} />
-            刷新延迟
-          </Button>
+            <Icons.RefreshCw size={16} className={isPingLoading ? 'animate-spin' : ''} />
+          </button>
         )}
       </div>
 

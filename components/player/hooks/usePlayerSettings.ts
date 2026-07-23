@@ -29,18 +29,39 @@ export function usePlayerSettings() {
     useEffect(() => {
         const unsubscribe = settingsStore.subscribe(() => {
             const stored = settingsStore.getSettings();
-            setSettings({
-                autoNextEpisode: stored.autoNextEpisode,
-                autoSkipIntro: stored.autoSkipIntro,
-                skipIntroSeconds: stored.skipIntroSeconds,
-                autoSkipOutro: stored.autoSkipOutro,
-                skipOutroSeconds: stored.skipOutroSeconds,
-                showModeIndicator: stored.showModeIndicator,
-                adFilter: stored.adFilter,
-                adFilterMode: stored.adFilterMode,
-                adKeywords: stored.adKeywords,
-                fullscreenType: stored.fullscreenType,
-                proxyMode: stored.proxyMode,
+            setSettings(prev => {
+                const sameKeywords = prev.adKeywords.length === stored.adKeywords.length &&
+                    prev.adKeywords.every((kw, idx) => kw === stored.adKeywords[idx]);
+                
+                if (
+                    prev.autoNextEpisode === stored.autoNextEpisode &&
+                    prev.autoSkipIntro === stored.autoSkipIntro &&
+                    prev.skipIntroSeconds === stored.skipIntroSeconds &&
+                    prev.autoSkipOutro === stored.autoSkipOutro &&
+                    prev.skipOutroSeconds === stored.skipOutroSeconds &&
+                    prev.showModeIndicator === stored.showModeIndicator &&
+                    prev.adFilter === stored.adFilter &&
+                    prev.adFilterMode === stored.adFilterMode &&
+                    sameKeywords &&
+                    prev.fullscreenType === stored.fullscreenType &&
+                    prev.proxyMode === stored.proxyMode
+                ) {
+                    return prev;
+                }
+
+                return {
+                    autoNextEpisode: stored.autoNextEpisode,
+                    autoSkipIntro: stored.autoSkipIntro,
+                    skipIntroSeconds: stored.skipIntroSeconds,
+                    autoSkipOutro: stored.autoSkipOutro,
+                    skipOutroSeconds: stored.skipOutroSeconds,
+                    showModeIndicator: stored.showModeIndicator,
+                    adFilter: stored.adFilter,
+                    adFilterMode: stored.adFilterMode,
+                    adKeywords: stored.adKeywords,
+                    fullscreenType: stored.fullscreenType,
+                    proxyMode: stored.proxyMode,
+                };
             });
         });
         return unsubscribe;
