@@ -35,6 +35,33 @@ interface EpisodeListProps {
   onSourceChange?: (source: GroupedSource) => void;
 }
 
+function SourceThumbnail({ pic, alt }: { pic?: string; alt?: string }) {
+  const [hasError, setHasError] = useState(false);
+
+  if (!pic || hasError) {
+    return (
+      <div className="w-12 h-16 rounded-[var(--radius-xl)] overflow-hidden flex-shrink-0 bg-[color-mix(in_srgb,var(--glass-bg)_80%,transparent)] border border-[var(--glass-border)] flex items-center justify-center">
+        <Icons.Film size={20} className="text-[var(--text-color-secondary)] opacity-40" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-12 h-16 rounded-[var(--radius-xl)] overflow-hidden flex-shrink-0 bg-[color-mix(in_srgb,var(--glass-bg)_50%,transparent)] border border-[var(--glass-border)]">
+      <Image
+        src={pic}
+        alt={alt || ''}
+        width={48}
+        height={64}
+        className="w-full h-full object-cover"
+        unoptimized
+        referrerPolicy="no-referrer"
+        onError={() => setHasError(true)}
+      />
+    </div>
+  );
+}
+
 const PAGE_SIZE = 50;
 
 export function EpisodeList({
@@ -321,7 +348,7 @@ export function EpisodeList({
             aria-label="剧集选择"
           >
             {pageEpisodes && pageEpisodes.length > 0 ? (
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 gap-2">
                 {pageEpisodes.map((episode, pageIdx) => {
                   const displayIndex = isPaginated ? activePage * PAGE_SIZE + pageIdx : pageIdx;
                   const originalIndex = getOriginalIndex(displayIndex);
@@ -346,7 +373,7 @@ export function EpisodeList({
                       aria-label={`${epName}${isCurrentEpisode ? '，当前播放' : ''}`}
                       title={epName}
                       className={`
-                        px-2 py-2 rounded-[var(--radius-xl)] text-center transition-all duration-200 cursor-pointer flex items-center justify-center overflow-hidden
+                        px-1 sm:px-1.5 py-2 rounded-[var(--radius-xl)] text-center transition-all duration-200 cursor-pointer flex items-center justify-center overflow-hidden
                         ${isCurrentEpisode
                           ? 'bg-[var(--accent-color)] text-white shadow-[0_4px_12px_color-mix(in_srgb,var(--accent-color)_45%,transparent)] font-bold scale-[1.02]'
                           : 'bg-[var(--glass-bg)] hover:bg-[var(--glass-hover)] text-[var(--text-color)] border border-[var(--glass-border)] hover:border-[var(--accent-color)]/40'
@@ -354,7 +381,7 @@ export function EpisodeList({
                         focus-visible:ring-2 focus-visible:ring-[var(--accent-color)]
                       `}
                     >
-                      <span className="truncate text-xs sm:text-sm font-medium w-full text-center">
+                      <span className="truncate text-xs sm:text-sm font-medium w-full text-center tracking-tight">
                         {epName}
                       </span>
                     </button>
@@ -393,23 +420,8 @@ export function EpisodeList({
                 `}
                 aria-current={isCurrent ? 'true' : undefined}
               >
-                {/* Thumbnail */}
-                {s.pic && (
-                  <div className="w-12 h-16 rounded-[var(--radius-xl)] overflow-hidden flex-shrink-0 bg-[color-mix(in_srgb,var(--glass-bg)_50%,transparent)]">
-                    <Image
-                      src={s.pic}
-                      alt=""
-                      width={48}
-                      height={64}
-                      className="w-full h-full object-cover"
-                      unoptimized
-                      referrerPolicy="no-referrer"
-                      onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).style.display = 'none';
-                      }}
-                    />
-                  </div>
-                )}
+                {/* Thumbnail with fallback placeholder */}
+                <SourceThumbnail pic={s.pic} alt={srcName} />
 
                 {/* Source Info */}
                 <div className="flex-1 min-w-0">

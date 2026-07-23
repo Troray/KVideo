@@ -28,6 +28,33 @@ interface SourceSelectorProps {
     className?: string;
 }
 
+function SourceThumbnail({ pic, alt }: { pic?: string; alt?: string }) {
+    const [hasError, setHasError] = useState(false);
+
+    if (!pic || hasError) {
+        return (
+            <div className="w-12 h-16 rounded-[var(--radius-xl)] overflow-hidden flex-shrink-0 bg-[color-mix(in_srgb,var(--glass-bg)_80%,transparent)] border border-[var(--glass-border)] flex items-center justify-center">
+                <Icons.Film size={20} className="text-[var(--text-color-secondary)] opacity-40" />
+            </div>
+        );
+    }
+
+    return (
+        <div className="w-12 h-16 rounded-[var(--radius-xl)] overflow-hidden flex-shrink-0 bg-[color-mix(in_srgb,var(--glass-bg)_50%,transparent)] border border-[var(--glass-border)]">
+            <Image
+                src={pic}
+                alt={alt || ''}
+                width={48}
+                height={64}
+                className="w-full h-full object-cover"
+                unoptimized
+                referrerPolicy="no-referrer"
+                onError={() => setHasError(true)}
+            />
+        </div>
+    );
+}
+
 export function SourceSelector({
     sources,
     currentSource,
@@ -104,7 +131,7 @@ export function SourceSelector({
             <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg sm:text-xl font-bold text-[var(--text-color)] flex items-center gap-2">
                     <Icons.Layers size={20} className="sm:w-6 sm:h-6" />
-                    <span></span>
+                    <span>来源列表</span>
                     <Badge variant="primary">{sources.length}</Badge>
                 </h3>
                 <Button
@@ -122,13 +149,14 @@ export function SourceSelector({
                 {sortedSources.map((source, index) => {
                     const isCurrent = source.source === currentSource;
                     const latency = latencies[source.source] ?? source.latency;
+                    const srcName = source.sourceName || source.source;
 
                     return (
                         <button
                             key={`${source.source}-${index}`}
                             onClick={() => !isCurrent && onSourceChange(source)}
                             className={`
-                w-full p-3 rounded-[var(--radius-2xl)] text-left transition-all duration-200
+                w-full p-3 rounded-[var(--radius-xl)] text-left transition-all duration-200
                 flex items-center gap-3
                 ${isCurrent
                                     ? 'bg-[var(--accent-color)] text-white shadow-[0_4px_12px_color-mix(in_srgb,var(--accent-color)_50%,transparent)]'
@@ -137,23 +165,8 @@ export function SourceSelector({
               `}
                             aria-current={isCurrent ? 'true' : undefined}
                         >
-                            {/* Thumbnail */}
-                            {source.pic && (
-                                <div className="w-12 h-16 rounded-[var(--radius-2xl)] overflow-hidden flex-shrink-0 bg-[color-mix(in_srgb,var(--glass-bg)_50%,transparent)]">
-                                    <Image
-                                        src={source.pic}
-                                        alt=""
-                                        width={48}
-                                        height={64}
-                                        className="w-full h-full object-cover"
-                                        unoptimized
-                                        referrerPolicy="no-referrer"
-                                        onError={(e) => {
-                                            (e.currentTarget as HTMLImageElement).style.display = 'none';
-                                        }}
-                                    />
-                                </div>
-                            )}
+                            {/* Thumbnail with fallback placeholder */}
+                            <SourceThumbnail pic={source.pic} alt={srcName} />
 
                             {/* Source Info */}
                             <div className="flex-1 min-w-0">
