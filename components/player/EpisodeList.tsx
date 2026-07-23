@@ -64,14 +64,14 @@ function SourceThumbnail({ pic, alt }: { pic?: string; alt?: string }) {
 
   if (!pic || hasError) {
     return (
-      <div className="w-12 h-16 rounded-[var(--radius-xl)] overflow-hidden flex-shrink-0 bg-[color-mix(in_srgb,var(--glass-bg)_80%,transparent)] border border-[var(--glass-border)] flex items-center justify-center">
+      <div className="w-12 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-[color-mix(in_srgb,var(--glass-bg)_80%,transparent)] border border-[var(--glass-border)] flex items-center justify-center">
         <Icons.Film size={20} className="text-[var(--text-color-secondary)] opacity-40" />
       </div>
     );
   }
 
   return (
-    <div className="w-12 h-16 rounded-[var(--radius-xl)] overflow-hidden flex-shrink-0 bg-[color-mix(in_srgb,var(--glass-bg)_50%,transparent)] border border-[var(--glass-border)]">
+    <div className="w-12 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-[color-mix(in_srgb,var(--glass-bg)_50%,transparent)] border border-[var(--glass-border)]">
       <Image
         src={pic}
         alt={alt || ''}
@@ -303,7 +303,7 @@ export function EpisodeList({
           <button
             onClick={() => setActiveTab('episodes')}
             className={`
-              flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-xl)] text-sm sm:text-base font-bold transition-all cursor-pointer
+              flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm sm:text-base font-bold transition-all cursor-pointer
               ${activeTab === 'episodes'
                 ? 'bg-[var(--accent-color)] text-white shadow-sm'
                 : 'text-[var(--text-color-secondary)] hover:text-[var(--text-color)] hover:bg-[var(--glass-hover)]'
@@ -327,7 +327,7 @@ export function EpisodeList({
             <button
               onClick={() => setActiveTab('sources')}
               className={`
-                flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-xl)] text-sm sm:text-base font-bold transition-all cursor-pointer
+                flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm sm:text-base font-bold transition-all cursor-pointer
                 ${activeTab === 'sources'
                   ? 'bg-[var(--accent-color)] text-white shadow-sm'
                   : 'text-[var(--text-color-secondary)] hover:text-[var(--text-color)] hover:bg-[var(--glass-hover)]'
@@ -351,7 +351,7 @@ export function EpisodeList({
           <button
             onClick={() => onToggleReverse?.(!isReversed)}
             className={`
-              p-1.5 rounded-[var(--radius-xl)] transition-all duration-200 cursor-pointer
+              p-1.5 rounded-lg transition-all duration-200 cursor-pointer
               ${isReversed
                 ? 'bg-[var(--accent-color)] text-white'
                 : 'bg-[var(--glass-bg)] text-[var(--text-color-secondary)] hover:bg-[var(--glass-hover)] border border-[var(--glass-border)]'
@@ -368,7 +368,7 @@ export function EpisodeList({
           <button
             onClick={refreshLatencies}
             disabled={isPingLoading}
-            className="p-1.5 rounded-[var(--radius-xl)] transition-all duration-200 cursor-pointer bg-[var(--glass-bg)] text-[var(--text-color-secondary)] hover:bg-[var(--glass-hover)] border border-[var(--glass-border)] disabled:opacity-50"
+            className="p-1.5 rounded-lg transition-all duration-200 cursor-pointer bg-[var(--glass-bg)] text-[var(--text-color-secondary)] hover:bg-[var(--glass-hover)] border border-[var(--glass-border)] disabled:opacity-50"
             aria-label="刷新延迟"
             title="刷新延迟"
           >
@@ -389,7 +389,7 @@ export function EpisodeList({
               onMouseMove={handleRangeMouseMove}
               onMouseUp={handleRangeMouseUpOrLeave}
               onMouseLeave={handleRangeMouseUpOrLeave}
-              className={`flex items-center gap-1.5 overflow-x-auto py-1.5 px-0.5 mb-3 scrollbar-none border-b border-[var(--glass-border)]/50 select-none ${
+              className={`flex items-center gap-1.5 overflow-x-auto py-2.5 px-1 mb-3 scrollbar-none border-b border-[var(--glass-border)]/50 select-none ${
                 isDraggingRange ? 'cursor-grabbing' : 'cursor-grab'
               }`}
             >
@@ -407,7 +407,7 @@ export function EpisodeList({
                       setActivePage(range.pageIndex);
                     }}
                     className={`
-                      px-2.5 py-1.5 text-xs font-medium rounded-[var(--radius-xl)] transition-all cursor-pointer whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-color)]
+                      px-2.5 py-1 text-xs font-medium rounded-lg transition-all cursor-pointer whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-color)]
                       ${isActiveRange
                         ? 'bg-[var(--accent-color)] text-white shadow-sm font-bold'
                         : 'bg-[var(--glass-bg)] text-[var(--text-color-secondary)] hover:bg-[var(--glass-hover)] border border-[var(--glass-border)]'
@@ -455,7 +455,7 @@ export function EpisodeList({
                       aria-label={`${fullTitle}${isCurrentEpisode ? '，当前播放' : ''}`}
                       title={fullTitle}
                       className={`
-                        px-1 py-2 rounded-[var(--radius-xl)] text-center transition-all duration-200 cursor-pointer flex items-center justify-center overflow-hidden
+                        px-1 py-1.5 rounded-lg text-center transition-all duration-200 cursor-pointer flex items-center justify-center overflow-hidden
                         ${isCurrentEpisode
                           ? 'bg-[var(--accent-color)] text-white shadow-[0_4px_12px_color-mix(in_srgb,var(--accent-color)_45%,transparent)] font-bold scale-[1.02]'
                           : 'bg-[var(--glass-bg)] hover:bg-[var(--glass-hover)] text-[var(--text-color)] border border-[var(--glass-border)] hover:border-[var(--accent-color)]/40'
@@ -493,7 +493,7 @@ export function EpisodeList({
                 key={`${s.source}-${index}`}
                 onClick={() => !isCurrent && onSourceChange?.(s)}
                 className={`
-                  w-full p-3 rounded-[var(--radius-xl)] text-left transition-all duration-200
+                  w-full p-3 rounded-lg text-left transition-all duration-200
                   flex items-center gap-3
                   ${isCurrent
                     ? 'bg-[var(--accent-color)] text-white shadow-[0_4px_12px_color-mix(in_srgb,var(--accent-color)_50%,transparent)] font-bold'
