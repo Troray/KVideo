@@ -39,6 +39,7 @@ interface MainPattern {
     commonPrefix: string;
     pathPrefix: string; // Directory path prefix (e.g., "/20230907/73PWifvT/1392kb/hls/")
     isGlobalNTSC: boolean; // Whether >30% of total playlist segments use 30fps NTSC frame fractions
+    isGlobal24fps: boolean; // Whether >35% of total playlist segments use 24fps/23.976fps frame fractions (.004, .002, .008)
 }
 
 /**
@@ -163,7 +164,7 @@ export function learnMainPattern(blocks: Block[]): MainPattern {
     ) : null;
 
     if (!mainBlock || mainBlock.segments.length === 0) {
-        return { filenameRegex: null, avgDuration: 0, commonPrefix: '', pathPrefix: '', isGlobalNTSC: false };
+        return { filenameRegex: null, avgDuration: 0, commonPrefix: '', pathPrefix: '', isGlobalNTSC: false, isGlobal24fps: false };
     }
 
     // Extract filenames
@@ -190,22 +191,26 @@ export function learnMainPattern(blocks: Block[]): MainPattern {
     const firstUrl = mainBlock.segments[0].url;
     const pathPrefix = extractPathPrefix(firstUrl);
 
-    // Calculate global NTSC 30fps fraction ratio across all blocks in the playlist
+    // Calculate global NTSC 30fps and 24fps/23.976fps fraction ratios across all blocks in the playlist
     const ntscFractions = new Set([33, 67, 133, 167, 233, 267, 333, 367, 433, 467, 533, 567, 633, 667, 733, 767, 833, 867, 933, 967]);
+    const fps24Fractions = new Set([2, 4, 6, 8, 12, 16, 20, 24]);
     let totalSegCount = 0;
     let ntscSegCount = 0;
+    let fps24SegCount = 0;
 
     blocks.forEach(b => {
         b.segments.forEach(s => {
             totalSegCount++;
             const msFraction = Math.round((s.duration % 1) * 1000);
             if (ntscFractions.has(msFraction)) ntscSegCount++;
+            if (fps24Fractions.has(msFraction)) fps24SegCount++;
         });
     });
 
     const isGlobalNTSC = totalSegCount > 0 && (ntscSegCount / totalSegCount) > 0.3;
+    const isGlobal24fps = totalSegCount > 0 && (fps24SegCount / totalSegCount) > 0.35;
 
-    return { filenameRegex, avgDuration, commonPrefix, pathPrefix, isGlobalNTSC };
+    return { filenameRegex, avgDuration, commonPrefix, pathPrefix, isGlobalNTSC, isGlobal24fps };
 }
 
 /**
@@ -359,6 +364,19 @@ export function scoreBlock(
         });
         if (ntscMatches === block.segments.length) {
             score += 5.0; // Definite framerate anomaly for inserted ad block
+        }
+    }
+
+    // **KEY FEATURE**: Framerate fraction grid anomaly detection (25fps/integer ads inserted into 24fps/23.976fps streams)
+    // 24fps movie streams have fractional ms (.004, .002, .008). 25fps/PAL inserted ads use exact integer milliseconds (.000).
+    if (mainPattern.isGlobal24fps && block.segments.length > 0 && block.segments.length <= 10) {
+        let int0Count = 0;
+        block.segments.forEach(s => {
+            const msFraction = Math.round((s.duration % 1) * 1000);
+            if (msFraction === 0) int0Count++;
+        });
+        if (int0Count >= block.segments.length - 1 && int0Count >= 2) {
+            score += 5.0; // Definite 25fps integer ad inserted into 24fps movie stream
         }
     }
 

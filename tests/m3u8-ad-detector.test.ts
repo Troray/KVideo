@@ -207,3 +207,37 @@ test('filterM3u8Ad protects global 30fps/NTSC feature film streams with 0 false 
   assert.equal(filtered.includes('seg-3.ts'), true);
   assert.equal(filtered.includes('seg-6.ts'), true);
 });
+
+test('filterM3u8Ad detects and strips 25fps integer duration inserted ad blocks in 24fps movie streams', () => {
+  const playlist = [
+    '#EXTM3U',
+    '#EXTINF:4.004,',
+    'https://cdn.example.com/movie/seg-0.ts',
+    '#EXTINF:4.004,',
+    'https://cdn.example.com/movie/seg-1.ts',
+    '#EXTINF:4.004,',
+    'https://cdn.example.com/movie/seg-2.ts',
+    '#EXTINF:4.004,',
+    'https://cdn.example.com/movie/seg-3.ts',
+    '#EXT-X-DISCONTINUITY',
+    '#EXTINF:4.000,',
+    'https://cdn.example.com/movie/ad-0.ts',
+    '#EXTINF:4.000,',
+    'https://cdn.example.com/movie/ad-1.ts',
+    '#EXTINF:4.000,',
+    'https://cdn.example.com/movie/ad-2.ts',
+    '#EXTINF:0.560,',
+    'https://cdn.example.com/movie/ad-3.ts',
+    '#EXT-X-DISCONTINUITY',
+    '#EXTINF:4.004,',
+    'https://cdn.example.com/movie/seg-4.ts',
+    '#EXTINF:4.004,',
+    'https://cdn.example.com/movie/seg-5.ts',
+  ].join('\n');
+
+  const filtered = filterM3u8Ad(playlist, 'https://cdn.example.com/movie/index.m3u8', 'heuristic');
+  assert.equal(filtered.includes('ad-0.ts'), false);
+  assert.equal(filtered.includes('ad-3.ts'), false);
+  assert.equal(filtered.includes('seg-0.ts'), true);
+  assert.equal(filtered.includes('seg-5.ts'), true);
+});
