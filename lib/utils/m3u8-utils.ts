@@ -1,28 +1,66 @@
 
-/**
- * Utility functions for M3U8 playlist manipulation
- */
-
 import { parseBlocks, learnMainPattern, scoreBlock, shouldFilterBlock, findDuplicateSignatureBlockIndices } from './m3u8-ad-detector';
 
 /**
- * Filters ads from specific M3U8 content using multiple detection strategies:
- * 1. Keyword matching (configurable via env)
- * 2. CUE-OUT/CUE-IN standard tags
- * 3. Heuristic block analysis (filename patterns, ad path keywords, duration signature fingerprints)
- * 
- * Also converts relative URLs to absolute URLs for Blob playback.
- * 
- * @param content The raw M3U8 content string
- * @param baseUrl The base URL of the M3U8 file (to resolve relative paths)
- * @returns The filtered M3U8 content
+ * Eraser for TypeScript type annotations in custom filter scripts.
+ * Enables users to write clean TypeScript filter scripts directly in the app.
  */
+export function removeTypeAnnotations(code: string): string {
+    if (!code) return '';
+
+    return code
+        .replace(/:\s*(?:string|number|boolean|any|void|unknown|never|object|string\[\]|number\[\]|Record<[^>]+>)\b/g, '')
+        .replace(/interface\s+\w+\s*\{[^}]*\}/g, '')
+        .replace(/type\s+\w+\s*=\s*[^;]+;/g, '');
+}
+
+/**
+ * Executes custom JS/TS user script in a safe evaluation context
+ */
+export function executeCustomAdFilter(content: string, baseUrl: string, customScript: string): string {
+    if (!customScript || !customScript.trim()) {
+        return content;
+    }
+
+    try {
+        const cleanScript = removeTypeAnnotations(customScript);
+        const evaluator = new Function(
+            'm3u8Content',
+            'playlistUrl',
+            `
+            ${cleanScript}
+            if (typeof filterAdsFromM3U8 === 'function') {
+                return filterAdsFromM3U8(m3u8Content, playlistUrl);
+            }
+            return m3u8Content;
+            `
+        );
+
+        const result = evaluator(content, baseUrl);
+        return typeof result === 'string' ? result : content;
+    } catch (e) {
+        console.warn('[AdFilter] Custom script execution failed, falling back to built-in rules:', e);
+        return content;
+    }
+}
+
 export type AdFilterMode = 'off' | 'keyword' | 'heuristic' | 'aggressive';
 
-export function filterM3u8Ad(content: string, baseUrl: string, mode: AdFilterMode = 'heuristic', customKeywords: string[] = []): string {
+export function filterM3u8Ad(
+    content: string,
+    baseUrl: string,
+    mode: AdFilterMode = 'heuristic',
+    customKeywords: string[] = [],
+    customAdFilterCode: string = ''
+): string {
     if (!content) return '';
 
-    // Use keywords passed from AdKeywordsWrapper (already loaded from env/file)
+    // 1. Optional Sandbox Layer: If custom filter script is configured, execute sandbox filter first
+    let processedContent = content;
+    if (mode !== 'off' && customAdFilterCode && customAdFilterCode.trim()) {
+        processedContent = executeCustomAdFilter(content, baseUrl, customAdFilterCode);
+    }
+
     const keywords = customKeywords;
 
     const basePath = baseUrl.substring(0, baseUrl.lastIndexOf('/') + 1);
@@ -32,11 +70,11 @@ export function filterM3u8Ad(content: string, baseUrl: string, mode: AdFilterMod
     } catch (e) { /* ignore */ }
 
     // 2. Global Scan: Check if any ad keywords exist in the content
-    const hasKeywordMatch = mode !== 'off' && keywords.some(k => content.includes(k));
-    const hasCueTag = mode !== 'off' && (content.includes('#EXT-X-CUE-OUT') || content.includes('#EXT-X-CUE-IN'));
+    const hasKeywordMatch = mode !== 'off' && keywords.some(k => processedContent.includes(k));
+    const hasCueTag = mode !== 'off' && (processedContent.includes('#EXT-X-CUE-OUT') || processedContent.includes('#EXT-X-CUE-IN'));
 
     // 3. Heuristic Analysis: If no explicit ad signals, use block-based detection
-    const lines = content.split(/\r?\n/);
+    const lines = processedContent.split(/\r?\n/);
     let adLineIndices = new Set<number>();
 
     if (!hasCueTag && (mode === 'heuristic' || mode === 'aggressive')) {
@@ -69,6 +107,11 @@ export function filterM3u8Ad(content: string, baseUrl: string, mode: AdFilterMod
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
         const trimmedLine = line.trim();
+
+        // Strip Apple Interstitial Metadata tags
+        if (mode !== 'off' && trimmedLine.startsWith('#EXT-X-DATERANGE:') && trimmedLine.includes('CLASS="com.apple.hls.interstitial"')) {
+            continue;
+        }
 
         // Skip lines marked by heuristic analysis
         if (adLineIndices.has(i)) {

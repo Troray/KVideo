@@ -40,6 +40,8 @@ export interface AppSettings {
   adFilter: boolean; // Filter ad tags from m3u8 (legacy, kept for compatibility)
   adFilterMode: AdFilterMode; // 'off' | 'keyword' | 'heuristic' | 'aggressive'
   adKeywords: string[]; // Dynamically loaded ad keywords
+  customAdFilterCode?: string; // Custom TS/JS script for ad filtering sandbox
+  customAdFilterVersion?: number; // Version of loaded custom ad filter script
   // Search & Display settings
   realtimeLatency: boolean; // Enable real-time latency ping updates
   searchDisplayMode: SearchDisplayMode; // 'normal' = individual cards, 'grouped' = group same-name videos
@@ -193,6 +195,8 @@ export const settingsStore = {
         adFilter: parsed.adFilter !== undefined ? parsed.adFilter : false,
         adFilterMode: parsed.adFilterMode || 'heuristic',
         adKeywords: Array.isArray(parsed.adKeywords) ? parsed.adKeywords : [],
+        customAdFilterCode: typeof parsed.customAdFilterCode === 'string' ? parsed.customAdFilterCode : '',
+        customAdFilterVersion: typeof parsed.customAdFilterVersion === 'number' ? parsed.customAdFilterVersion : 0,
         realtimeLatency: parsed.realtimeLatency !== undefined ? parsed.realtimeLatency : false,
         searchDisplayMode: parsed.searchDisplayMode === 'grouped' ? 'grouped' : 'normal',
         episodeReverseOrder: parsed.episodeReverseOrder !== undefined ? parsed.episodeReverseOrder : false,

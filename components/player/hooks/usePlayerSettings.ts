@@ -20,6 +20,8 @@ export function usePlayerSettings() {
             adFilter: stored.adFilter,
             adFilterMode: stored.adFilterMode,
             adKeywords: stored.adKeywords,
+            customAdFilterCode: stored.customAdFilterCode || '',
+            customAdFilterVersion: stored.customAdFilterVersion || 0,
             fullscreenType: stored.fullscreenType,
             proxyMode: stored.proxyMode,
         };
@@ -43,6 +45,8 @@ export function usePlayerSettings() {
                     prev.adFilter === stored.adFilter &&
                     prev.adFilterMode === stored.adFilterMode &&
                     sameKeywords &&
+                    prev.customAdFilterCode === (stored.customAdFilterCode || '') &&
+                    prev.customAdFilterVersion === (stored.customAdFilterVersion || 0) &&
                     prev.fullscreenType === stored.fullscreenType &&
                     prev.proxyMode === stored.proxyMode
                 ) {
@@ -59,6 +63,8 @@ export function usePlayerSettings() {
                     adFilter: stored.adFilter,
                     adFilterMode: stored.adFilterMode,
                     adKeywords: stored.adKeywords,
+                    customAdFilterCode: stored.customAdFilterCode || '',
+                    customAdFilterVersion: stored.customAdFilterVersion || 0,
                     fullscreenType: stored.fullscreenType,
                     proxyMode: stored.proxyMode,
                 };
@@ -114,6 +120,15 @@ export function usePlayerSettings() {
         updateSetting('adKeywords', value);
     }, [updateSetting]);
 
+    const setCustomAdFilterCode = useCallback((code: string, version?: number) => {
+        const currentSettings = settingsStore.getSettings();
+        settingsStore.saveSettings({
+            ...currentSettings,
+            customAdFilterCode: code,
+            customAdFilterVersion: version !== undefined ? version : (currentSettings.customAdFilterVersion || 0) + 1,
+        });
+    }, []);
+
     const setFullscreenType = useCallback((value: 'native' | 'window') => {
         updateSetting('fullscreenType', value);
     }, [updateSetting]);
@@ -133,6 +148,7 @@ export function usePlayerSettings() {
         setAdFilter,
         setAdFilterMode,
         setAdKeywords,
+        setCustomAdFilterCode,
         setFullscreenType,
         setProxyMode,
     };

@@ -19,7 +19,7 @@ export function useHlsPlayer({
     onError
 }: UseHlsPlayerProps) {
     const hlsRef = useRef<Hls | null>(null);
-    const { adFilterMode, adKeywords } = usePlayerSettings();
+    const { adFilterMode, adKeywords, customAdFilterCode } = usePlayerSettings();
     const isAdFilterEnabled = adFilterMode !== 'off';
 
     useEffect(() => {
@@ -52,7 +52,7 @@ export function useHlsPlayer({
                             if (typeof response.data === 'string') {
                                 try {
                                     // Filter the content
-                                    response.data = filterM3u8Ad(response.data, context.url, adFilterMode, adKeywords);
+                                    response.data = filterM3u8Ad(response.data, context.url, adFilterMode, adKeywords, customAdFilterCode);
                                 } catch (e) {
                                     console.warn('[HLS] Ad filter error:', e);
                                 }
@@ -219,7 +219,7 @@ export function useHlsPlayer({
 
                         // If it's a simple playlist (no variants), just filter and play
                         if (!masterContent.includes('#EXT-X-STREAM-INF')) {
-                            const filtered = filterM3u8Ad(masterContent, absoluteMasterSrc, adFilterMode, adKeywords);
+                            const filtered = filterM3u8Ad(masterContent, absoluteMasterSrc, adFilterMode, adKeywords, customAdFilterCode);
                             const blob = new Blob([filtered], { type: 'application/vnd.apple.mpegurl' });
                             const blobUrl = URL.createObjectURL(blob);
                             createdBlobs.push(blobUrl);
