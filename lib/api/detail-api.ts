@@ -5,6 +5,7 @@ import type {
 } from '@/lib/types';
 import { fetchWithTimeout, withRetry } from './http-utils';
 import { parseEpisodes } from './parsers';
+import { cleanHtmlText } from '@/lib/utils/format-utils';
 
 /**
  * Get video detail from a single source
@@ -64,14 +65,14 @@ export async function getVideoDetail(
 
         return {
             vod_id: videoData.vod_id,
-            vod_name: videoData.vod_name,
+            vod_name: cleanHtmlText(videoData.vod_name),
             vod_pic: videoData.vod_pic,
-            vod_remarks: videoData.vod_remarks,
+            vod_remarks: cleanHtmlText(videoData.vod_remarks),
             vod_year: videoData.vod_year,
             vod_area: videoData.vod_area,
-            vod_actor: videoData.vod_actor,
-            vod_director: videoData.vod_director,
-            vod_content: videoData.vod_content,
+            vod_actor: cleanHtmlText(videoData.vod_actor),
+            vod_director: cleanHtmlText(videoData.vod_director),
+            vod_content: cleanHtmlText(videoData.vod_content),
             type_name: videoData.type_name,
             episodes,
             source: source.id,

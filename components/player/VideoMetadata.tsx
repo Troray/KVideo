@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Icons } from '@/components/ui/Icon';
 import { getSourceName } from '@/lib/utils/source-names';
+import { cleanHtmlText } from '@/lib/utils/format-utils';
 
 interface VideoMetadataProps {
   videoData: any;
@@ -68,20 +69,20 @@ export function VideoMetadata({ videoData, source, title }: VideoMetadataProps) 
             )}
           </div>
           {videoData?.vod_content && (
-            <p className="text-sm sm:text-base text-[var(--text-secondary)]">
-              {videoData.vod_content.replace(/<[^>]*>/g, '')}
+            <p className="text-sm sm:text-base text-[var(--text-secondary)] whitespace-pre-line">
+              {cleanHtmlText(videoData.vod_content)}
             </p>
           )}
           {videoData?.vod_actor && (
             <p className="text-xs sm:text-sm text-[var(--text-tertiary)] mt-2">
               <span className="font-semibold">主演：</span>
-              {videoData.vod_actor}
+              {cleanHtmlText(videoData.vod_actor)}
             </p>
           )}
           {videoData?.vod_director && (
             <p className="text-xs sm:text-sm text-[var(--text-tertiary)] mt-1">
               <span className="font-semibold">导演：</span>
-              {videoData.vod_director}
+              {cleanHtmlText(videoData.vod_director)}
             </p>
           )}
         </div>
