@@ -1,6 +1,5 @@
 import { useState, FormEvent, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/Input';
-import { Button } from '@/components/ui/Button';
 import { Icons } from '@/components/ui/Icon';
 import { SearchHistoryDropdown } from '@/components/search/SearchHistoryDropdown';
 import { useSearchHistory } from '@/lib/hooks/useSearchHistory';
@@ -76,33 +75,32 @@ export function SearchBox({ onSearch, onClear, initialQuery = '', placeholder = 
                 onBlur={handleInputBlur}
                 onKeyDown={handleKeyDown}
                 placeholder={placeholder}
-                className="py-1.5 sm:py-2 px-3.5 sm:px-4 text-xs sm:text-sm md:text-base pr-16 sm:pr-20 truncate rounded-full bg-[color-mix(in_srgb,var(--glass-bg)_70%,transparent)]"
+                className="h-8 sm:h-9 !py-0 px-3.5 sm:px-4 text-xs sm:text-sm pr-14 sm:pr-16 truncate rounded-full bg-[color-mix(in_srgb,var(--glass-bg)_70%,transparent)]"
                 aria-label="搜索视频内容"
                 aria-expanded={isDropdownOpen}
                 aria-controls="search-history-dropdown"
                 aria-autocomplete="list"
             />
 
-            <div className="absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center gap-1 z-10">
+            <div className="absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center gap-0.5 z-10">
                 {query && (
                     <button
                         type="button"
                         onClick={handleClear}
-                        className="p-1 sm:p-1.5 text-[var(--text-color)] opacity-70 hover:opacity-100 transition-opacity touch-manipulation cursor-pointer"
+                        className="p-1 sm:p-1.5 text-[var(--text-color-secondary)] hover:text-[var(--text-color)] transition-colors touch-manipulation cursor-pointer"
                         aria-label="清除搜索"
                     >
                         <Icons.X size={16} className="sm:w-[18px] sm:h-[18px]" />
                     </button>
                 )}
-                <Button
+                <button
                     type="submit"
                     disabled={!query.trim()}
-                    variant="primary"
-                    className="w-7 h-7 sm:w-8 sm:h-8 !p-0 rounded-full flex items-center justify-center flex-shrink-0"
+                    className="p-1 sm:p-1.5 text-[var(--text-color-secondary)] hover:text-[var(--accent-color)] disabled:opacity-30 disabled:hover:text-[var(--text-color-secondary)] transition-colors touch-manipulation cursor-pointer flex items-center justify-center"
                     aria-label="搜索"
                 >
                     <Icons.Search size={16} className="sm:w-[18px] sm:h-[18px]" />
-                </Button>
+                </button>
             </div>
 
             {/* Search History Dropdown */}
