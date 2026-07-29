@@ -80,8 +80,9 @@ export function cleanHtmlText(text?: string | null): string {
             }
         });
 
-    // 5. Replace multiple consecutive non-newline whitespace characters (spaces, tabs, non-breaking space \u00a0, full-width space \u3000) with a single space
-    cleaned = cleaned.replace(/[ \t\u00a0\u3000]+/g, ' ');
+    // 5. Treat 2 or more consecutive spaces/nbsp/full-width spaces as paragraph breaks (\n\n)
+    // (CMS sources often use consecutive &nbsp; or space padding instead of <br>/<p> for paragraph breaks)
+    cleaned = cleaned.replace(/[ \t\u00a0\u3000]{2,}/g, '\n\n');
 
     // 6. Clean leading and trailing spaces for each line
     cleaned = cleaned
