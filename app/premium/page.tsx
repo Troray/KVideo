@@ -24,28 +24,20 @@ function PremiumHomePage() {
 
     return (
         <div className="min-h-screen bg-black">
-            {/* Glass Navbar */}
-            <Navbar onReset={handleReset} isPremiumMode={true} />
-
-            {/* Search Form - Separate from navbar */}
-            <div className="max-w-7xl mx-auto px-4 mt-6 mb-8 relative" style={{
-                transform: 'translate3d(0, 0, 0)',
-                zIndex: 1000
-            }}>
-                <SearchForm
-                    onSearch={handleSearch}
-                    onClear={handleReset}
-                    isLoading={loading}
-                    initialQuery={query}
-                    currentSource=""
-                    checkedSources={completedSources}
-                    totalSources={totalSources}
-                    placeholder="输入关键词开始搜索..."
-                />
-            </div>
+            {/* Glass Navbar with integrated search */}
+            <Navbar
+                onReset={handleReset}
+                isPremiumMode={true}
+                onSearch={handleSearch}
+                isLoading={loading}
+                query={query}
+                checkedSources={completedSources}
+                totalSources={totalSources}
+                placeholder="输入关键词开始搜索..."
+            />
 
             {/* Main Content */}
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-20">
                 {/* Results Section */}
                 {(results.length >= 1 || (!loading && results.length > 0)) && (
                     <SearchResults

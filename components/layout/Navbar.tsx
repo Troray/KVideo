@@ -3,28 +3,47 @@ import Image from 'next/image';
 import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 import { Icons } from '@/components/ui/Icon';
 import { siteConfig } from '@/lib/config/site-config';
+import { SearchBox } from '@/components/search/SearchBox';
+import { SearchLoadingAnimation } from '@/components/SearchLoadingAnimation';
 
 interface NavbarProps {
     onReset: () => void;
     isPremiumMode?: boolean;
+    onSearch?: (query: string) => void;
+    isLoading?: boolean;
+    query?: string;
+    currentSource?: string;
+    checkedSources?: number;
+    totalSources?: number;
+    placeholder?: string;
 }
 
-export function Navbar({ onReset, isPremiumMode = false }: NavbarProps) {
+export function Navbar({
+    onReset,
+    isPremiumMode = false,
+    onSearch,
+    isLoading = false,
+    query = '',
+    currentSource = '',
+    checkedSources = 0,
+    totalSources = 16,
+    placeholder,
+}: NavbarProps) {
     const settingsHref = isPremiumMode ? '/premium/settings' : '/settings';
 
     return (
-        <nav className="sticky top-0 z-[2000] pt-4 pb-2" style={{
+        <nav className="sticky top-0 z-[2000] pt-3 pb-2" style={{
             transform: 'translate3d(0, 0, 0)',
             willChange: 'transform'
         }}>
             <div className="max-w-7xl mx-auto px-4">
-                <div className="bg-[var(--glass-bg)] border border-[var(--glass-border)] shadow-[var(--shadow-sm)] px-3 sm:px-6 py-2 sm:py-4 rounded-[var(--radius-2xl)]" style={{
+                <div className="bg-[var(--glass-bg)] border border-[var(--glass-border)] shadow-[var(--shadow-sm)] px-3 sm:px-5 py-2.5 sm:py-3 rounded-[var(--radius-2xl)] backdrop-blur-xl" style={{
                     transform: 'translate3d(0, 0, 0)'
                 }}>
                     <div className="flex items-center justify-between gap-2 sm:gap-4">
                         <Link
                             href={isPremiumMode ? '/premium' : '/'}
-                            className="flex items-center gap-2 sm:gap-3 hover:opacity-80 transition-opacity cursor-pointer min-w-0"
+                            className="flex items-center gap-2 sm:gap-3 hover:opacity-80 transition-opacity cursor-pointer flex-shrink-0 min-w-0"
                             onClick={onReset}
                         >
                             <div className="w-8 h-8 sm:w-10 sm:h-10 relative flex items-center justify-center flex-shrink-0">
@@ -37,11 +56,23 @@ export function Navbar({ onReset, isPremiumMode = false }: NavbarProps) {
                                     unoptimized
                                 />
                             </div>
-                            <div className="flex flex-col min-w-0">
-                                <h1 className="text-lg sm:text-2xl font-bold text-[var(--text-color)] truncate">{siteConfig.name}</h1>
-                                <p className="text-xs text-[var(--text-color-secondary)] hidden sm:block truncate">{siteConfig.description}</p>
+                            <div className="flex flex-col min-w-0 hidden md:flex">
+                                <h1 className="text-lg sm:text-xl font-bold text-[var(--text-color)] truncate">{siteConfig.name}</h1>
+                                <p className="text-xs text-[var(--text-color-secondary)] hidden lg:block truncate">{siteConfig.description}</p>
                             </div>
                         </Link>
+
+                        {/* Search Box integrated in Navbar */}
+                        {onSearch && (
+                            <div className="flex-1 max-w-xl mx-1 sm:mx-4 min-w-0">
+                                <SearchBox
+                                    onSearch={onSearch}
+                                    onClear={onReset}
+                                    initialQuery={query}
+                                    placeholder={placeholder || '搜索电影、电视剧、综艺...'}
+                                />
+                            </div>
+                        )}
 
                         <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                             <a
@@ -66,6 +97,17 @@ export function Navbar({ onReset, isPremiumMode = false }: NavbarProps) {
                         </div>
                     </div>
                 </div>
+
+                {/* Loading Animation directly below navbar */}
+                {isLoading && (
+                    <div className="mt-3">
+                        <SearchLoadingAnimation
+                            currentSource={currentSource}
+                            checkedSources={checkedSources}
+                            totalSources={totalSources}
+                        />
+                    </div>
+                )}
             </div>
         </nav>
     );
